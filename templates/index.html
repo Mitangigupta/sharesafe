@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}ShareSafe | Before You Share, Know What You Reveal{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-box">
+        <div class="hero-tag">
+            <i class="fa-solid fa-shield-halved"></i> Defensive Privacy Checker
+        </div>
+
+        <!-- Bold Requested Hero Statement -->
+        <h1 class="hero-title">
+            Before You Share,<br/>
+            <span class="highlight-cherry">Know What You Reveal.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            Scan your screenshots, identity cards, invoices, and documents for sensitive PII, phone numbers, emails, credit cards, and scannable QR payloads before they leave your hands.
+        </p>
+
+        <!-- Sharing-Context Selector -->
+        <div class="context-selector-card">
+            <div class="context-label-group">
+                <div class="context-icon-box">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div>
+                    <h4>Sharing Context:</h4>
+                    <p id="contextDescText">Tuned for student assignments & research papers</p>
+                </div>
+            </div>
+
+            <div class="context-chips">
+                <button type="button" class="context-chip active" data-context="academic" onclick="setSharingContext('academic')">
+                    🎓 Academic
+                </button>
+                <button type="button" class="context-chip" data-context="professional" onclick="setSharingContext('professional')">
+                    💼 Professional
+                </button>
+                <button type="button" class="context-chip" data-context="private" onclick="setSharingContext('private')">
+                    🔒 Private
+                </button>
+                <button type="button" class="context-chip" data-context="public" onclick="setSharingContext('public')">
+                    🌐 Public
+                </button>
+            </div>
+        </div>
+
+        <!-- Prominent Drag and Drop Upload Card -->
+        <div class="upload-card-container">
+            <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data" class="upload-dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                <input type="hidden" id="sharingContextInput" name="sharing_context" value="academic">
+                <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp" onchange="handleFileSelect(event)" style="display: none;">
+                
+                <div class="dropzone-idle" id="dropzoneIdle">
+                    <div class="upload-circle-icon">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <h3>Drag & Drop your Screenshot, Image, or PDF</h3>
+                    <p>Supports PNG, JPG, WEBP, PDF • Up to 30 MB • 100% On-Device</p>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-solid fa-folder-open"></i> Choose File
+                        </button>
+                        <button type="button" class="btn btn-cherry" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-solid fa-magnifying-glass-shield"></i> Run Privacy Scan
+                        </button>
+                    </div>
+
+                    <!-- Selected file pill preview -->
+                    <div id="fileSelectionPreview" style="display: none; margin-top: 16px; background: var(--bg-warm-subtle); border: 1px solid var(--border-warm); padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text-charcoal);">
+                        <i class="fa-solid fa-file" style="color: var(--cherry-primary);"></i>
+                        <span id="selectedFileName">document.pdf</span>
+                    </div>
+                </div>
+
+                <div class="dropzone-scanning" id="dropzoneScanning" style="display: none;">
+                    <div class="radar-scan-box">
+                        <div class="radar-sweep"></div>
+                        <i class="fa-solid fa-shield-halved scan-pulse-icon"></i>
+                    </div>
+                    <h3 id="scanStatusTitle" style="font-size: 1.25rem; color: var(--text-charcoal); margin-bottom: 6px;">Performing Deep Privacy Scan...</h3>
+                    <p id="scanStatusSubtitle" style="color: var(--text-muted); font-size: 0.88rem;">Extracting text streams, verifying Verhoeff/Luhn checksums & decoding QR payloads...</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- 1-Click Interactive Demo Showcase -->
+<section class="samples-section" id="samples">
+    <div class="section-head">
+        <span class="section-subhead"><i class="fa-solid fa-bolt"></i> Instant Demo Testing</span>
+        <h2>Try Preloaded Fictional Demo Samples</h2>
+        <p>No files ready? Test the full scanning, QR X-Ray inspection, and permanent redaction flow with 1 click using synthetic test files:</p>
+    </div>
+
+    <div class="samples-grid">
+        {% for s in samples %}
+        <div class="sample-card">
+            <div class="sample-tag">{{ s.badge }}</div>
+            <div class="sample-icon-wrap">
+                <i class="fa-solid fa-{{ s.icon }}"></i>
+            </div>
+            <h3>{{ s.name }}</h3>
+            <p>{{ s.desc }}</p>
+            <div class="sample-bottom-bar">
+                <span class="sample-type">{{ s.type }}</span>
+                <button type="button" class="btn-sample-run" onclick="loadSample('{{ s.id }}')">
+                    <i class="fa-solid fa-play"></i> Test Document
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Novelty & Architectural Mitigations -->
+<section class="features-section" id="features">
+    <div class="section-head">
+        <span class="section-subhead"><i class="fa-solid fa-shield-check"></i> Defensive Architecture</span>
+        <h2>Why ShareSafe Is Different</h2>
+        <p>Most basic redaction tools leave dangerous privacy loopholes. ShareSafe mitigates each critical flaw:</p>
+    </div>
+
+    <div class="features-grid">
+        <!-- Novelty Card -->
+        <div class="feature-card novelty-highlight-card">
+            <div class="novelty-badge-pill">STANDOUT NOVELTY</div>
+            <div class="feature-icon-circle">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <h3>QR Payload Deep-Inspection (X-Ray)</h3>
+            <p><strong>The Hidden QR Blindspot:</strong> When users redact an Aadhaar card or bill, they black out the visible text but leave the QR code intact! ShareSafe decodes the QR payload, flags embedded UPI addresses or demographic XML, and defaults it to being redacted.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-circle">
+                <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <h3>True PDF Vector Flattening</h3>
+            <p><strong>Stopping Pseudo-Redactions:</strong> Simple black boxes merely overlay visual rectangles in PDFs, leaving selectable text underneath for <code>pdftotext</code>. ShareSafe destroys underlying text streams and rasterizes pages at high DPI so text recovery is impossible.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-circle">
+                <i class="fa-solid fa-check-double"></i>
+            </div>
+            <h3>Algorithmic Checksum Validation</h3>
+            <p><strong>No Alert Fatigue:</strong> Rather than flagging random 10 or 12 digit strings, ShareSafe executes the <strong>Verhoeff algorithm</strong> for Indian Aadhaar and the <strong>Luhn algorithm</strong> for Credit/Debit cards to catch genuine leaks.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-circle">
+                <i class="fa-solid fa-certificate"></i>
+            </div>
+            <h3>Tamper-Evident Redaction Certificate</h3>
+            <p><strong>Cryptographic Proof:</strong> Export a verifiable PDF and JSON receipt containing SHA-256 pre/post file hashes certifying all PII and metadata were wiped, without exposing the raw secret values.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-circle">
+                <i class="fa-solid fa-eraser"></i>
+            </div>
+            <h3>Zero-Leak Metadata Stripping</h3>
+            <p><strong>Location & Camera Wiping:</strong> Automatically scrubs EXIF tags, GPS coordinates, camera serials, author history, and PDF <code>/Info</code> dictionaries during export.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon-circle">
+                <i class="fa-solid fa-pen-ruler"></i>
+            </div>
+            <h3>Manual Redaction Crosshair Tool</h3>
+            <p><strong>Full Precision:</strong> Click and drag custom redaction boxes over handwritten signatures, logos, stamps, or faces that automated OCR might miss.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 5-Step Workflow -->
+<section class="workflow-section">
+    <div class="section-head">
+        <span class="section-subhead"><i class="fa-solid fa-route"></i> Streamlined Workflow</span>
+        <h2>How It Works</h2>
+    </div>
+
+    <div style="display: flex; gap: 14px; justify-content: space-between; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 180px; background: var(--bg-card); border: 1px solid var(--border-warm); border-radius: var(--radius-md); padding: 22px 18px; text-align: center; box-shadow: var(--shadow-subtle);">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--cherry-soft); color: var(--cherry-primary); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">1</div>
+            <h4 style="font-size: 1rem; color: var(--text-charcoal); margin-bottom: 4px;">Upload</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Drop image, screenshot or PDF</p>
+        </div>
+        <div style="flex: 1; min-width: 180px; background: var(--bg-card); border: 1px solid var(--border-warm); border-radius: var(--radius-md); padding: 22px 18px; text-align: center; box-shadow: var(--shadow-subtle);">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--cherry-soft); color: var(--cherry-primary); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">2</div>
+            <h4 style="font-size: 1rem; color: var(--text-charcoal); margin-bottom: 4px;">Deep Scan</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">PyMuPDF, OCR & QR X-Ray</p>
+        </div>
+        <div style="flex: 1; min-width: 180px; background: var(--bg-card); border: 1px solid var(--border-warm); border-radius: var(--radius-md); padding: 22px 18px; text-align: center; box-shadow: var(--shadow-subtle);">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--cherry-soft); color: var(--cherry-primary); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">3</div>
+            <h4 style="font-size: 1rem; color: var(--text-charcoal); margin-bottom: 4px;">Risk Rating</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Context-aware threat score</p>
+        </div>
+        <div style="flex: 1; min-width: 180px; background: var(--bg-card); border: 1px solid var(--border-warm); border-radius: var(--radius-md); padding: 22px 18px; text-align: center; box-shadow: var(--shadow-subtle);">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--cherry-soft); color: var(--cherry-primary); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">4</div>
+            <h4 style="font-size: 1rem; color: var(--text-charcoal); margin-bottom: 4px;">Hide or Keep</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Blackout, Blur, or Stamp</p>
+        </div>
+        <div style="flex: 1; min-width: 180px; background: var(--bg-card); border: 1px solid var(--border-warm); border-radius: var(--radius-md); padding: 22px 18px; text-align: center; box-shadow: var(--shadow-subtle);">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--cherry-soft); color: var(--cherry-primary); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">5</div>
+            <h4 style="font-size: 1rem; color: var(--text-charcoal); margin-bottom: 4px;">Safe Copy</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Flattened file + Audit receipt</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

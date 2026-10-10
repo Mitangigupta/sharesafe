@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShareSafe | Intelligent PII Redaction & QR Threat Audit{% endblock %}</title>
+    <!-- Modern Warm Typography & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="cherry-theme">
+    <!-- Header Navigation -->
+    {% block header %}
+    <!-- Privacy Trust Banner -->
+    <header class="privacy-strip">
+        <div class="strip-content">
+            <span class="privacy-dot"></span>
+            <i class="fa-solid fa-shield-halved"></i>
+            <span><strong>100% Local On-Device Processing:</strong> Your files never leave this machine. Zero cloud telemetry. Auto-purged after session.</span>
+        </div>
+        <div class="strip-actions">
+            <span class="badge-tag-dark"><i class="fa-solid fa-lock"></i> Student & Privacy Friendly</span>
+        </div>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <div class="brand-icon-cherry">
+                    <i class="fa-solid fa-shield-cat"></i>
+                </div>
+                <div>
+                    <div class="brand-title">Share<span>Safe</span></div>
+                    <div class="brand-subline">CYBERSECURITY PRIVACY CHECKER</div>
+                </div>
+            </a>
+
+            <div class="nav-links">
+                <a href="/" class="nav-link"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="/#samples" class="nav-link"><i class="fa-solid fa-folder-open"></i> Demo Files</a>
+                <a href="/#features" class="nav-link"><i class="fa-solid fa-sparkles"></i> Features</a>
+                <button type="button" class="ocr-chip" onclick="openOcrModal()">
+                    <i class="fa-solid fa-eye"></i> OCR Engine
+                    <span class="chip-dot {{ 'active' if ocr_status and ocr_status.available else 'warning' }}"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <!-- Flash Messages -->
+    <div class="flash-wrapper" style="max-width: 1200px; margin: 12px auto; padding: 0 24px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-alert" style="background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; padding: 12px 18px; border-radius: 12px; font-size: 0.88rem; font-weight: 600;">
+                <i class="fa-solid fa-circle-info"></i> {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="content-container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% block footer %}
+    <footer class="cyber-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="footer-brand">Share<span>Safe</span> Privacy Suite</div>
+                <p>A student-project friendly privacy checker built with Flask, PyMuPDF, OpenCV, and Regex. Scans screenshots, IDs, and PDFs to stop accidental leaks before sharing.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Engine Capabilities</h4>
+                <ul>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> Verhoeff Checksum (Aadhaar)</li>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> Luhn Mod-10 (Credit Cards)</li>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> True PDF Vector Flattening</li>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> QR Payload Threat X-Ray</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Sharing Contexts</h4>
+                <p>Tailored risk evaluation for <strong>Academic</strong> submissions, <strong>Professional</strong> team sharing, <strong>Private</strong> peer transfers, and <strong>Public</strong> social posting.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 ShareSafe Privacy Suite. Local Ephemeral Sandboxing Active.</span>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <!-- OCR Settings Modal -->
+    <div id="ocrModal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-sliders" style="color: var(--cherry-primary);"></i> Tesseract OCR Engine Settings</h3>
+                <button type="button" class="close-btn" onclick="closeOcrModal()" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: var(--bg-warm-subtle); border: 1px solid var(--border-warm); border-radius: 12px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-weight: 700; font-size: 0.88rem; color: var(--text-charcoal);">Current Status:</span>
+                        <span id="ocrStatusBadge" class="badge-tag-dark" style="background: var(--cherry-soft); color: var(--cherry-primary); font-weight: 700;">Checking...</span>
+                    </div>
+                    <p id="ocrStatusMessage" style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">Loading engine status...</p>
+                </div>
+
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px; display: flex; gap: 10px; font-size: 0.82rem; color: #166534;">
+                    <i class="fa-solid fa-circle-check" style="font-size: 1.2rem; margin-top: 2px;"></i>
+                    <div>
+                        <strong>Digital PDF Advantage:</strong> Digital PDFs are extracted with 100% precision via PyMuPDF native vector engine with zero binary dependencies.
+                    </div>
+                </div>
+
+                <div>
+                    <label for="tesseractCustomPath" style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-charcoal); margin-bottom: 6px;">Custom Tesseract Executable Path (Windows):</label>
+                    <input type="text" id="tesseractCustomPath" class="input-field" placeholder="C:\Program Files\Tesseract-OCR\tesseract.exe" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-warm); border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem; outline: none;">
+                    <small style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Specify full path to tesseract.exe if installed via Winget or Scoop.</small>
+                </div>
+                <div id="ocrUpdateAlert" style="display: none; padding: 10px; border-radius: 8px; font-size: 0.82rem;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeOcrModal()">Close</button>
+                <button type="button" class="btn btn-cherry" onclick="saveOcrPath()"><i class="fa-solid fa-floppy-disk"></i> Test & Save Path</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Threat Inspector Modal -->
+    <div id="qrModal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-qrcode" style="color: var(--cherry-primary);"></i> QR Code Payload Threat Inspector</h3>
+                <button type="button" class="close-btn" onclick="closeQrModal()" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="qr-threat-banner" id="qrThreatBanner">
+                    <div class="threat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div>
+                        <h4 id="qrThreatTitle" style="font-size: 1.05rem; color: var(--cherry-dark); margin-bottom: 4px;">UPI Payment Link Detected</h4>
+                        <p id="qrThreatDesc" style="font-size: 0.84rem; color: var(--text-body); line-height: 1.45;">Contains scannable personal routing data that bypasses visual redaction.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-charcoal); display: block; margin-bottom: 6px;">Decoded Raw Payload:</label>
+                    <pre id="qrRawPayload" class="code-block">upi://pay?pa=...</pre>
+                </div>
+
+                <div id="qrFieldsWrapper" style="display: none;">
+                    <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-charcoal); display: block; margin-bottom: 6px;">Extracted PII Fields:</label>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;" id="qrFieldsTable">
+                        <thead>
+                            <tr style="background: var(--bg-warm-subtle);"><th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-warm);">Field</th><th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-warm);">Extracted Value</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeQrModal()">Close Inspector</button>
+                <button type="button" class="btn btn-cherry" onclick="redactThisQr()"><i class="fa-solid fa-eye-slash"></i> Redact This QR Code</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
