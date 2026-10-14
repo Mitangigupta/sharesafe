@@ -4,10 +4,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
+# Vercel's serverless filesystem is read-only except for /tmp
+RUNTIME_DIR = Path('/tmp/sharesafe') if os.environ.get('VERCEL') else BASE_DIR
+
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'sharesafe-secret-key-cyber-guard-2026')
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-    OUTPUT_FOLDER = os.path.join(BASE_DIR, 'outputs')
+    UPLOAD_FOLDER = os.path.join(RUNTIME_DIR, 'uploads')
+    OUTPUT_FOLDER = os.path.join(RUNTIME_DIR, 'outputs')
     SAMPLES_FOLDER = os.path.join(BASE_DIR, 'samples')
     MAX_CONTENT_LENGTH = 30 * 1024 * 1024  # 30 MB max upload
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'bmp', 'pdf'}
@@ -35,4 +38,5 @@ class Config:
 
 os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(Config.OUTPUT_FOLDER, exist_ok=True)
-os.makedirs(Config.SAMPLES_FOLDER, exist_ok=True)
+if not os.environ.get('VERCEL'):
+    os.makedirs(Config.SAMPLES_FOLDER, exist_ok=True)
