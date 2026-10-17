@@ -252,80 +252,59 @@ class DocumentScanner:
 
     def _extract_pdf_word_matches(self, words: List[Tuple], zoom: float, page_num: int) -> List[Dict[str, Any]]:
         """Matches sensitive regex patterns against reconstructed PDF word streams and maps coordinates."""
-        detections = []
         if not words:
-            return detections
+            return []
 
-        # Group words by block and line for contextual scanning
-        # word: (x0, y0, x1, y1, text, block_no, line_no, word_no)
-        lines_dict = {}
+        # Convert PDF word tuples to standardized word dicts
+        # tuple: (x0, y0, x1, y1, text, block_no, line_no, word_no)
+        norm_words = []
         for w in words:
-            key = (w[5], w[6])  # (block_no, line_no)
-            if key not in lines_dict:
-                lines_dict[key] = []
-            lines_dict[key].append(w)
+            px0, py0, px1, py1, txt = w[:5]
+            bx = px0 * zoom
+            by = py0 * zoom
+            bw = (px1 - px0) * zoom
+            bh = (py1 - py0) * zoom
+            norm_words.append({
+                'text': txt,
+                'bbox': [bx, by, bw, bh],
+                'block_num': w[5],
+                'line_num': w[6]
+            })
 
-        # Scan each line
-        for key, line_words in lines_dict.items():
-            full_line_text = " ".join([w[4] for w in line_words])
-            line_matches = self.detector.scan_text(full_line_text)
-
-            for match in line_matches:
-                char_start, char_end = match['char_span']
-                matched_str = match['value']
-
-                # Locate bounding box of words contributing to this span
-                current_char = 0
-                relevant_words = []
-                for w in line_words:
-                    word_len = len(w[4])
-                    word_start = current_char
-                    word_end = current_char + word_len
-
-                    # Check overlap
-                    if not (word_end < char_start or word_start > char_end):
-                        relevant_words.append(w)
-
-                    current_char += word_len + 1  # accounts for space
-
-                if relevant_words:
-                    # Calculate union bbox in PDF points, then scale by zoom
-                    x0 = min(w[0] for w in relevant_words) * zoom
-                    y0 = min(w[1] for w in relevant_words) * zoom
-                    x1 = max(w[2] for w in relevant_words) * zoom
-                    y1 = max(w[3] for w in relevant_words) * zoom
-
-                    padding = 2.0
-                    bbox = [
-                        round(max(0, x0 - padding), 1),
-                        round(max(0, y0 - padding), 1),
-                        round((x1 - x0) + (padding * 2), 1),
-                        round((y1 - y0) + (padding * 2), 1)
-                    ]
-
-                    match_copy = dict(match)
-                    match_copy['id'] = f"det_{uuid.uuid4().hex[:8]}"
-                    match_copy['page'] = page_num
-                    match_copy['bbox'] = bbox
-                    detections.append(match_copy)
-
-        return detections
+        return self._extract_ocr_word_matches(norm_words, page_num)
 
     def _extract_ocr_word_matches(self, ocr_words: List[Dict[str, Any]], page_num: int) -> List[Dict[str, Any]]:
-        """Matches sensitive regex patterns against Tesseract OCR word stream with bounding box interpolation."""
-        detections = []
+        """Matches sensitive regex patterns against OCR word stream with spatial line clustering,
+        sliding-window multi-word interpolation, and intelligent deduplication."""
         if not ocr_words:
-            return detections
+            return []
 
-        # Group words by block and line
-        lines_dict = {}
-        for w in ocr_words:
-            key = (w.get('block_num', 0), w.get('line_num', 0))
-            if key not in lines_dict:
-                lines_dict[key] = []
-            lines_dict[key].append(w)
+        detections = []
+        # Sort words primarily top-to-bottom, secondarily left-to-right
+        sorted_words = sorted(ocr_words, key=lambda w: (w['bbox'][1] + w['bbox'][3] / 2, w['bbox'][0]))
 
-        for key, line_words in lines_dict.items():
+        # 1. Spatial line clustering based on vertical baseline center
+        lines = []
+        for w in sorted_words:
+            w_cy = w['bbox'][1] + w['bbox'][3] / 2
+            w_h = w['bbox'][3]
+            placed = False
+            for line in lines:
+                line_cy = sum(lw['bbox'][1] + lw['bbox'][3] / 2 for lw in line) / len(line)
+                line_h = sum(lw['bbox'][3] for lw in line) / len(line)
+                if abs(w_cy - line_cy) <= max(w_h, line_h) * 0.7:
+                    line.append(w)
+                    placed = True
+                    break
+            if not placed:
+                lines.append([w])
+
+        for line in lines:
+            line.sort(key=lambda w: w['bbox'][0])
+        lines.sort(key=lambda line: sum(w['bbox'][1] for w in line) / len(line))
+
+        # 2. Line-by-line scanning with exact word bounding box calculation
+        for line_words in lines:
             full_line_text = " ".join([w['text'] for w in line_words])
             line_matches = self.detector.scan_text(full_line_text)
 
@@ -339,7 +318,8 @@ class DocumentScanner:
                     word_start = current_char
                     word_end = current_char + word_len
 
-                    if not (word_end < char_start or word_start > char_end):
+                    # Check overlap (strict bounds)
+                    if not (word_end <= char_start or word_start >= char_end):
                         relevant_words.append(w)
 
                     current_char += word_len + 1
@@ -350,7 +330,7 @@ class DocumentScanner:
                     x1 = max(w['bbox'][0] + w['bbox'][2] for w in relevant_words)
                     y1 = max(w['bbox'][1] + w['bbox'][3] for w in relevant_words)
 
-                    padding = 2.0
+                    padding = 3.0
                     bbox = [
                         round(max(0, x0 - padding), 1),
                         round(max(0, y0 - padding), 1),
@@ -364,4 +344,125 @@ class DocumentScanner:
                     match_copy['bbox'] = bbox
                     detections.append(match_copy)
 
-        return detections
+        # 3. Sliding-window sequence scanning across reading order (catches multi-token PII split across line breaks)
+        reading_order_words = [w for line in lines for w in line]
+        n_words = len(reading_order_words)
+        for k in (2, 3, 4, 5, 6):
+            for i in range(n_words - k + 1):
+                chunk = reading_order_words[i : i + k]
+                chunk_text = " ".join([w['text'] for w in chunk])
+                chunk_matches = self.detector.scan_text(chunk_text)
+                for match in chunk_matches:
+                    char_start, char_end = match['char_span']
+                    current_char = 0
+                    relevant_words = []
+                    for w in chunk:
+                        word_len = len(w['text'])
+                        word_start = current_char
+                        word_end = current_char + word_len
+                        if not (word_end <= char_start or word_start >= char_end):
+                            relevant_words.append(w)
+                        current_char += word_len + 1
+
+                    if relevant_words:
+                        x0 = min(w['bbox'][0] for w in relevant_words)
+                        y0 = min(w['bbox'][1] for w in relevant_words)
+                        x1 = max(w['bbox'][0] + w['bbox'][2] for w in relevant_words)
+                        y1 = max(w['bbox'][1] + w['bbox'][3] for w in relevant_words)
+                        padding = 3.0
+                        bbox = [
+                            round(max(0, x0 - padding), 1),
+                            round(max(0, y0 - padding), 1),
+                            round((x1 - x0) + (padding * 2), 1),
+                            round((y1 - y0) + (padding * 2), 1)
+                        ]
+                        match_copy = dict(match)
+                        match_copy['id'] = f"det_{uuid.uuid4().hex[:8]}"
+                        match_copy['page'] = page_num
+                        match_copy['bbox'] = bbox
+                        detections.append(match_copy)
+
+        # 4. Deduplicate items to prevent repeated boxes
+        return self._deduplicate_detections(detections)
+
+    def _deduplicate_detections(self, detections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Deduplicates detection items based on spatial bounding-box overlap (IoU) and normalized value."""
+        if not detections:
+            return []
+
+        # Sort with highest risk first, then prefer longer matched values (e.g. 16-digit card over 12-digit subset), then tighter bounding box area
+        severity_rank = {'CRITICAL': 4, 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1}
+        def sort_key(d):
+            b = d.get('bbox')
+            area = (b[2] * b[3]) if (b and len(b) >= 4) else 1e9
+            return (-severity_rank.get(d.get('risk', 'LOW'), 0), -len(d.get('value', '')), area)
+
+        sorted_dets = sorted(detections, key=sort_key)
+
+        unique_dets = []
+        for d in sorted_dets:
+            b1 = d.get('bbox')
+            norm1 = re.sub(r'\D', '', d.get('value', '')).lower() or d.get('value', '').lower()
+
+            is_dup = False
+            for u in unique_dets:
+                b2 = u.get('bbox')
+                norm2 = re.sub(r'\D', '', u.get('value', '')).lower() or u.get('value', '').lower()
+
+                # Check normalized value match with spatial proximity or exact text match
+                if norm1 and norm2 and (norm1 == norm2 or (len(norm1) >= 8 and (norm1 in norm2 or norm2 in norm1))):
+                    if b1 and b2:
+                        iou = self._compute_iou(b1, b2)
+                        # If boxes overlap or are very close, it's a duplicate
+                        if iou > 0.15 or self._is_box_inside(b1, b2) or self._is_box_inside(b2, b1):
+                            is_dup = True
+                            break
+                    else:
+                        is_dup = True
+                        break
+
+                # Check general spatial overlap for same entity category
+                if b1 and b2 and d.get('type') == u.get('type'):
+                    iou = self._compute_iou(b1, b2)
+                    if iou > 0.35 or self._is_box_inside(b1, b2):
+                        is_dup = True
+                        break
+
+            if not is_dup:
+                unique_dets.append(d)
+
+        return unique_dets
+
+    @staticmethod
+    def _is_box_inside(inner: List[float], outer: List[float]) -> bool:
+        """Returns True if inner box is largely contained inside outer box."""
+        ix1, iy1, iw, ih = inner
+        ox1, oy1, ow, oh = outer
+        return (ix1 >= ox1 - 5 and iy1 >= oy1 - 5 and
+                ix1 + iw <= ox1 + ow + 5 and iy1 + ih <= oy1 + oh + 5)
+
+    @staticmethod
+    def _compute_iou(b1: List[float], b2: List[float]) -> float:
+        """Computes Intersection over Union of two [x, y, w, h] bounding boxes."""
+        x1_a, y1_a, w_a, h_a = b1
+        x2_a, y2_a = x1_a + w_a, y1_a + h_a
+
+        x1_b, y1_b, w_b, h_b = b2
+        x2_b, y2_b = x1_b + w_b, y1_b + h_b
+
+        xi1 = max(x1_a, x1_b)
+        yi1 = max(y1_a, y1_b)
+        xi2 = min(x2_a, x2_b)
+        yi2 = min(y2_a, y2_b)
+
+        inter_w = max(0.0, xi2 - xi1)
+        inter_h = max(0.0, yi2 - yi1)
+        inter_area = inter_w * inter_h
+
+        area_a = w_a * h_a
+        area_b = w_b * h_b
+        union_area = area_a + area_b - inter_area
+
+        if union_area <= 0:
+            return 0.0
+        return inter_area / union_area

@@ -24,6 +24,12 @@ try {
     $bmp = Await ($dec.GetSoftwareBitmapAsync()) ([Windows.Graphics.Imaging.SoftwareBitmap])
     $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages()
     if (-not $engine) {
+        $avail = [Windows.Media.Ocr.OcrEngine]::AvailableRecognizerLanguages
+        if ($avail -and $avail.Count -gt 0) {
+            $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromLanguage($avail[0])
+        }
+    }
+    if (-not $engine) {
         Write-Output "[]"
         exit 0
     }
