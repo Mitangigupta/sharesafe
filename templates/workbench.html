@@ -114,26 +114,29 @@
             <!-- Tab Content 1: Threats & PII -->
             <div class="sidebar-tab-pane active" id="paneThreats">
                 <!-- Executive Risk Scorecard -->
-                <div class="risk-card risk-card-lavish" style="--risk-color: {{ session_data.risk_summary.badge_color }};">
-                    <div class="risk-card-top">
-                        <div class="risk-title-group">
-                            <span class="risk-badge" style="background-color: {{ session_data.risk_summary.badge_color }};">
-                                {{ session_data.risk_summary.level }} RISK
-                            </span>
-                            <h4>Threat Score {{ session_data.risk_summary.score }}/100</h4>
+                <div>
+                    <span class="section-index-tag">&mdash; RISK SCORECARD</span>
+                    <div class="risk-card risk-card-lavish" style="--risk-color: {{ session_data.risk_summary.badge_color }};">
+                        <div class="risk-card-top">
+                            <div class="risk-title-group">
+                                <span class="risk-badge" style="background-color: {{ session_data.risk_summary.badge_color }};">
+                                    {{ session_data.risk_summary.level }} RISK
+                                </span>
+                                <h4>Threat Score {{ session_data.risk_summary.score }}/100</h4>
+                            </div>
+                            <div class="risk-meter-ring" style="--risk-pct: {{ session_data.risk_summary.score }}%; --ring-color: {{ session_data.risk_summary.badge_color }};">
+                                <span>{{ session_data.risk_summary.score }}%</span>
+                            </div>
                         </div>
-                        <div class="risk-meter-ring" style="--risk-pct: {{ session_data.risk_summary.score }}%; --ring-color: {{ session_data.risk_summary.badge_color }};">
-                            <span>{{ session_data.risk_summary.score }}%</span>
+                        
+                        <p class="risk-desc">{{ session_data.risk_summary.recommendation }}</p>
+                        
+                        <div class="risk-stats-row">
+                            <span class="stat-pill stat-critical"><i class="fa-solid fa-circle-exclamation"></i> {{ session_data.risk_summary.critical_count }} Critical</span>
+                            <span class="stat-pill stat-high"><i class="fa-solid fa-triangle-exclamation"></i> {{ session_data.risk_summary.high_count }} High</span>
+                            <span class="stat-pill stat-med"><i class="fa-solid fa-circle-dot"></i> {{ session_data.risk_summary.medium_count }} Med</span>
+                            <span class="stat-pill stat-low"><i class="fa-solid fa-circle-info"></i> {{ session_data.risk_summary.low_count }} Low</span>
                         </div>
-                    </div>
-                    
-                    <p class="risk-desc">{{ session_data.risk_summary.recommendation }}</p>
-                    
-                    <div class="risk-stats-row">
-                        <span class="stat-pill stat-critical"><i class="fa-solid fa-circle-exclamation"></i> {{ session_data.risk_summary.critical_count }} Critical</span>
-                        <span class="stat-pill stat-high"><i class="fa-solid fa-triangle-exclamation"></i> {{ session_data.risk_summary.high_count }} High</span>
-                        <span class="stat-pill stat-med"><i class="fa-solid fa-circle-dot"></i> {{ session_data.risk_summary.medium_count }} Med</span>
-                        <span class="stat-pill stat-low"><i class="fa-solid fa-circle-info"></i> {{ session_data.risk_summary.low_count }} Low</span>
                     </div>
                 </div>
 
@@ -146,9 +149,12 @@
 
                 <!-- Detected Entities List Container -->
                 <div class="detections-section">
-                    <div class="detections-list-header">
-                        <h5><i class="fa-solid fa-list-check text-ruby"></i> Detected Exposure Items ({{ session_data.detections|length }})</h5>
-                        <span class="header-note">Toggle check to redact</span>
+                    <div>
+                        <span class="section-index-tag">&mdash; EXPOSURE DETECTIONS</span>
+                        <div class="detections-list-header">
+                            <h5><i class="fa-solid fa-list-check text-ruby"></i> Detected Exposure Items ({{ session_data.detections|length }})</h5>
+                            <span class="header-note">Toggle check to redact</span>
+                        </div>
                     </div>
 
                     <div class="detections-list" id="detectionsList">

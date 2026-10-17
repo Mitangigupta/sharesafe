@@ -7,44 +7,38 @@
     <!-- Professional Luxury Typography & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="cherry-theme">
     <!-- Header Navigation -->
     {% block header %}
-    <!-- Privacy Trust Banner -->
-    <header class="privacy-strip">
-        <div class="strip-content">
-            <span class="privacy-dot"></span>
-            <i class="fa-solid fa-shield-halved"></i>
-            <span><strong>100% Sovereign Local Processing:</strong> Documents never leave this device. Zero cloud telemetry. Memory auto-purged on close.</span>
-        </div>
-        <div class="strip-actions">
-            <span class="badge-tag-dark"><i class="fa-solid fa-lock"></i> Air-Gapped Privacy Architecture</span>
-        </div>
-    </header>
-
     <!-- Navigation Bar -->
     <nav class="main-nav">
         <div class="nav-container">
             <a href="/" class="nav-brand">
-                <div class="brand-icon-cherry">
-                    <i class="fa-solid fa-shield-cat"></i>
-                </div>
-                <div>
+                <div class="brand-monogram">S</div>
+                <div class="brand-text-block">
                     <div class="brand-title">Share<span>Safe</span></div>
-                    <div class="brand-subline">SOVEREIGN PRIVACY & THREAT STUDIO</div>
+                    <div class="brand-subline">PRIVACY &bull; STUDIO</div>
                 </div>
             </a>
 
-            <div class="nav-links">
-                <a href="/" class="nav-link"><i class="fa-solid fa-compass"></i> Overview</a>
-                <a href="/#samples" class="nav-link"><i class="fa-solid fa-layer-group"></i> Demo Vault</a>
+            <!-- Central Minimalist Search / Command Bar -->
+            <div class="nav-search-box" onclick="triggerFilePicker()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search scans, detected PII, credentials...</span>
+                <kbd>/</kbd>
+            </div>
+
+            <div class="nav-actions">
                 <button type="button" class="ocr-chip" onclick="openOcrModal()">
                     <i class="fa-solid fa-sliders"></i> Engine Config
                     <span class="chip-dot {{ 'active' if ocr_status and ocr_status.available else 'warning' }}"></span>
+                </button>
+                <button type="button" class="btn-nav-primary" onclick="triggerFilePicker()">
+                    <i class="fa-solid fa-plus"></i> New Scan
                 </button>
             </div>
         </div>

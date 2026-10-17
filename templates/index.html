@@ -1,77 +1,181 @@
 {% extends "base.html" %}
 
-{% block title %}ShareSafe | Before You Share, Know What You Reveal{% endblock %}
+{% block title %}ShareSafe | Sovereign Privacy & Redaction Studio{% endblock %}
 
 {% block content %}
-<section class="hero-section">
-    <div class="hero-box">
-        <div class="hero-tag">
-            <i class="fa-solid fa-shield-halved"></i> Defensive Privacy Checker
-        </div>
-
-        <!-- Bold Requested Hero Statement -->
-        <h1 class="hero-title">
-            Before You Share,<br/>
-            <span class="highlight-cherry">Know What You Reveal.</span>
-        </h1>
-
-        <p class="hero-subtitle">
-            Scan your screenshots, identity cards, invoices, and documents for sensitive PII, phone numbers, emails, credit cards, and scannable QR payloads before they leave your hands.
-        </p>
-
-        <!-- Sharing-Context Selector -->
-        <div class="context-selector-card">
-            <div class="context-label-group">
-                <div class="context-icon-box">
-                    <i class="fa-solid fa-sliders"></i>
+<div class="page-grid-backdrop">
+    <!-- Hero Section: Split Showcase Layout Inspired by Executive Dashboard Reference -->
+    <section class="hero-section">
+        <div class="hero-split-container">
+            <!-- Left Column: Title, Indicators & Sharing Profiles -->
+            <div class="hero-left-col">
+                <div class="hero-status-pill">
+                    <span class="pulse-indicator"></span>
+                    <span>Local Sandbox Active &bull; Zero Cloud Telemetry</span>
                 </div>
-                <div>
-                    <h4>Sharing Context:</h4>
-                    <p id="contextDescText">Tuned for student assignments & research papers</p>
+
+                <div class="hero-category-tag">
+                    <i class="fa-solid fa-shield-halved text-ruby"></i>
+                    <span>Sovereign Privacy &bull; Zero-Trust Document Sanitization</span>
+                </div>
+
+                <h1 class="hero-headline">
+                    Defensive <span class="headline-gradient">Privacy Studio</span>
+                </h1>
+
+                <div class="hero-metadata-badges">
+                    <span class="meta-badge"><i class="fa-solid fa-microchip"></i> Verhoeff & Luhn</span>
+                    <span class="meta-badge"><i class="fa-solid fa-vector-square"></i> Vector Anti-Recovery</span>
+                    <span class="meta-badge"><i class="fa-solid fa-qrcode"></i> QR Payload X-Ray</span>
+                </div>
+
+                <p class="hero-lead-text">
+                    Audit slide decks, identity records, healthcare invoices, and screenshots for sensitive credentials before external distribution.
+                </p>
+
+                <!-- Sharing Profile Selector -->
+                <div class="sharing-profile-bar">
+                    <span class="profile-label">Sharing Context:</span>
+                    <div class="profile-chips">
+                        <button type="button" class="profile-chip active" data-context="academic" onclick="setSharingContext('academic')">
+                            🎓 Academic
+                        </button>
+                        <button type="button" class="profile-chip" data-context="professional" onclick="setSharingContext('professional')">
+                            💼 Enterprise
+                        </button>
+                        <button type="button" class="profile-chip" data-context="private" onclick="setSharingContext('private')">
+                            🔒 Private
+                        </button>
+                        <button type="button" class="profile-chip" data-context="public" onclick="setSharingContext('public')">
+                            🌐 Public
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="context-chips">
-                <button type="button" class="context-chip active" data-context="academic" onclick="setSharingContext('academic')">
-                    🎓 Academic
-                </button>
-                <button type="button" class="context-chip" data-context="professional" onclick="setSharingContext('professional')">
-                    💼 Professional
-                </button>
-                <button type="button" class="context-chip" data-context="private" onclick="setSharingContext('private')">
-                    🔒 Private
-                </button>
-                <button type="button" class="context-chip" data-context="public" onclick="setSharingContext('public')">
-                    🌐 Public
-                </button>
+            <!-- Right Column: Floating Obsidian Telemetry Card (Reference Style) -->
+            <div class="hero-right-col">
+                <div class="telemetry-card">
+                    <div class="telemetry-card-header">
+                        <span class="telemetry-label">&mdash; ENGINE TELEMETRY</span>
+                        <span class="telemetry-live-pill"><span class="telemetry-dot"></span> Live</span>
+                    </div>
+
+                    <div class="telemetry-metric-row">
+                        <span class="telemetry-big-num">100<small>%</small></span>
+                        <span class="telemetry-metric-sub">/ on-device RAM</span>
+                    </div>
+
+                    <!-- Visual Sensor Matrix -->
+                    <div class="telemetry-matrix">
+                        <div class="matrix-cell active" title="Verhoeff Checksum Active"></div>
+                        <div class="matrix-cell active" title="Luhn Mod-10 Active"></div>
+                        <div class="matrix-cell active" title="WinRT OCR Active"></div>
+                        <div class="matrix-cell active" title="Vector Stream Parser Active"></div>
+                        <div class="matrix-cell active" title="EXIF Stripper Active"></div>
+                        <div class="matrix-cell active" title="QR Payload Decoder Active"></div>
+                        <div class="matrix-cell active" title="SHA-256 Hasher Active"></div>
+                        <div class="matrix-cell active" title="Raster Flattener Active"></div>
+
+                        <div class="matrix-cell active" title="Aadhaar Candidate Parser"></div>
+                        <div class="matrix-cell active" title="PAN Card Entity Classifier"></div>
+                        <div class="matrix-cell active" title="Credit Card Precedence Engine"></div>
+                        <div class="matrix-cell active" title="Sliding-Window Spatial Cluster"></div>
+                        <div class="matrix-cell active" title="DOB & Phone Guardrails"></div>
+                        <div class="matrix-cell active" title="High-DPI Raster Engine"></div>
+                        <div class="matrix-cell active" title="Tamper-Evident Signer"></div>
+                        <div class="matrix-cell active" title="Zero Telemetry Firewall"></div>
+
+                        <div class="matrix-cell active"></div>
+                        <div class="matrix-cell active"></div>
+                        <div class="matrix-cell active"></div>
+                        <div class="matrix-cell active"></div>
+                        <div class="matrix-cell active"></div>
+                        <div class="matrix-cell active"></div>
+                        <div class="matrix-cell active"></div>
+                        <div class="matrix-cell active"></div>
+
+                        <div class="matrix-cell muted"></div>
+                        <div class="matrix-cell muted"></div>
+                        <div class="matrix-cell muted"></div>
+                        <div class="matrix-cell muted"></div>
+                        <div class="matrix-cell muted"></div>
+                        <div class="matrix-cell muted"></div>
+                        <div class="matrix-cell muted"></div>
+                        <div class="matrix-cell muted"></div>
+                    </div>
+
+                    <div class="telemetry-card-footer">
+                        <span>4 Engine Pipelines Active</span>
+                        <span class="telemetry-highlight">0 Bytes Cloud Egress</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Prominent Drag and Drop Upload Card -->
-        <div class="upload-card-container">
+        <!-- Metric Ribbon (Matching 4-Column Divided Card in Reference Image) -->
+        <div class="metrics-ribbon">
+            <div class="metric-ribbon-col">
+                <div class="metric-col-header">
+                    <span>CHECKSUM VERIFICATION</span>
+                    <i class="fa-solid fa-circle-check text-ruby"></i>
+                </div>
+                <div class="metric-col-val">Verhoeff & Luhn</div>
+                <div class="metric-col-sub">Zero false positive alert fatigue</div>
+            </div>
+
+            <div class="metric-ribbon-col">
+                <div class="metric-col-header">
+                    <span>VECTOR FLATTENING</span>
+                    <i class="fa-solid fa-layer-group text-ruby"></i>
+                </div>
+                <div class="metric-col-val">Anti-Recovery</div>
+                <div class="metric-col-sub">Text streams wiped at binary level</div>
+            </div>
+
+            <div class="metric-ribbon-col">
+                <div class="metric-col-header">
+                    <span>METADATA FORENSICS</span>
+                    <i class="fa-solid fa-fingerprint text-ruby"></i>
+                </div>
+                <div class="metric-col-val">EXIF & GPS Auto-Wipe</div>
+                <div class="metric-col-sub">Hardware & author tags destroyed</div>
+            </div>
+
+            <div class="metric-ribbon-col">
+                <div class="metric-col-header">
+                    <span>QR PAYLOAD X-RAY</span>
+                    <i class="fa-solid fa-qrcode text-ruby"></i>
+                </div>
+                <div class="metric-col-val">UPI & XML Decode</div>
+                <div class="metric-col-sub">Bypasses visual redaction traps</div>
+            </div>
+        </div>
+
+        <!-- Refined Upload Dropzone Card -->
+        <div class="upload-section-wrapper" id="uploadSection">
             <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data" class="upload-dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
                 <input type="hidden" id="sharingContextInput" name="sharing_context" value="academic">
                 <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp" onchange="handleFileSelect(event)" style="display: none;">
                 
                 <div class="dropzone-idle" id="dropzoneIdle">
                     <div class="upload-circle-icon">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
                     </div>
-                    <h3>Drag & Drop your Screenshot, Image, or PDF</h3>
-                    <p>Supports PNG, JPG, WEBP, PDF • Up to 30 MB • 100% On-Device</p>
+                    <h3>Drag & Drop Document, Slide, or Image</h3>
+                    <p>Supported Formats: PDF, PNG, JPG, WEBP, BMP &bull; Up to 30 MB &bull; Processed 100% in local memory</p>
                     
-                    <div style="display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
-                            <i class="fa-solid fa-folder-open"></i> Choose File
+                    <div class="dropzone-actions-cluster">
+                        <button type="button" class="btn-ref-outline" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-regular fa-folder-open"></i> Browse Local Files
                         </button>
-                        <button type="button" class="btn btn-cherry" onclick="document.getElementById('fileInput').click()">
-                            <i class="fa-solid fa-magnifying-glass-shield"></i> Run Privacy Scan
+                        <button type="button" class="btn-ref-primary" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-solid fa-shield-halved"></i> Run Sovereign Scan
                         </button>
                     </div>
 
-                    <!-- Selected file pill preview -->
-                    <div id="fileSelectionPreview" style="display: none; margin-top: 16px; background: var(--bg-warm-subtle); border: 1px solid var(--border-warm); padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text-charcoal);">
-                        <i class="fa-solid fa-file" style="color: var(--cherry-primary);"></i>
+                    <div id="fileSelectionPreview" style="display: none;" class="file-pill-preview">
+                        <i class="fa-solid fa-file-shield text-ruby"></i>
                         <span id="selectedFileName">document.pdf</span>
                     </div>
                 </div>
@@ -81,42 +185,50 @@
                         <div class="radar-sweep"></div>
                         <i class="fa-solid fa-shield-halved scan-pulse-icon"></i>
                     </div>
-                    <h3 id="scanStatusTitle" style="font-size: 1.25rem; color: var(--text-charcoal); margin-bottom: 6px;">Performing Deep Privacy Scan...</h3>
-                    <p id="scanStatusSubtitle" style="color: var(--text-muted); font-size: 0.88rem;">Extracting text streams, verifying Verhoeff/Luhn checksums & decoding QR payloads...</p>
+                    <h3 id="scanStatusTitle" class="scan-status-title">Performing Deep Privacy Scan...</h3>
+                    <p id="scanStatusSubtitle" class="scan-status-sub">Decompiling vector streams, applying OCR, and checking Verhoeff/Luhn checksums...</p>
                     <div class="progress-bar-container">
                         <div class="progress-bar-fill"></div>
                     </div>
                 </div>
             </form>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- 1-Click Interactive Demo Showcase -->
-<section class="samples-section" id="samples">
-    <div class="section-head">
-        <span class="section-subhead"><i class="fa-solid fa-bolt"></i> Instant Demo Testing</span>
-        <h2>Try Preloaded Fictional Demo Samples</h2>
-        <p>No files ready? Test the full scanning, QR X-Ray inspection, and permanent redaction flow with 1 click using synthetic test files:</p>
-    </div>
-
-    <div class="samples-grid">
-        {% for s in samples %}
-        <div class="sample-card">
-            <div class="sample-tag">{{ s.badge }}</div>
-            <div class="sample-icon-wrap">
-                <i class="fa-solid fa-{{ s.icon }}"></i>
+    <!-- Demo Samples Section (Index Header Style from Reference) -->
+    <section class="samples-section" id="samples">
+        <div class="section-index-header">
+            <div>
+                <span class="section-index-tag">&mdash; DEMO VAULT</span>
+                <h3 class="section-index-title">Try Preloaded Fictional Demo Samples</h3>
             </div>
-            <h3>{{ s.name }}</h3>
-            <p>{{ s.desc }}</p>
-            <div class="sample-bottom-bar">
-                <span class="sample-type">{{ s.type }}</span>
-                <button type="button" class="btn-sample-run" onclick="loadSample('{{ s.id }}')">
-                    <i class="fa-solid fa-play"></i> Test Document
-                </button>
+            <div class="section-index-meta">
+                <span>Synthetic Sample Suites &bull; 1-Click Verification</span>
             </div>
         </div>
-        {% endfor %}
-    </div>
-</section>
+
+        <div class="samples-grid">
+            {% for s in samples %}
+            <div class="sample-card-refined">
+                <div class="sample-card-header">
+                    <span class="sample-badge-pill">{{ s.badge }}</span>
+                    <span class="sample-type-tag">{{ s.type }}</span>
+                </div>
+                <div class="sample-card-body">
+                    <div class="sample-icon-circle">
+                        <i class="fa-solid fa-{{ s.icon }}"></i>
+                    </div>
+                    <h4>{{ s.name }}</h4>
+                    <p>{{ s.desc }}</p>
+                </div>
+                <div class="sample-card-footer">
+                    <button type="button" class="btn-sample-trigger" onclick="loadSample('{{ s.id }}')">
+                        <i class="fa-solid fa-play"></i> Test Document
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
 {% endblock %}

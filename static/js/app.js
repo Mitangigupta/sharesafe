@@ -2,6 +2,22 @@
  * ShareSafe - Main Application JavaScript (Uploads, Demos, Modals)
  */
 
+function triggerFilePicker() {
+    const input = document.getElementById('fileInput');
+    if (input) {
+        input.click();
+    } else {
+        window.location.href = '/#uploadSection';
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        triggerFilePicker();
+    }
+});
+
 // Drag & Drop Handlers
 function handleDragOver(e) {
     e.preventDefault();
