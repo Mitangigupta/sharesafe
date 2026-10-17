@@ -4,111 +4,50 @@
 
 {% block content %}
 <div class="page-grid-backdrop">
-    <!-- Hero Section: Split Showcase Layout Inspired by Executive Dashboard Reference -->
+    <!-- Hero Section: Focused & Refined Layout -->
     <section class="hero-section">
-        <div class="hero-split-container">
-            <!-- Left Column: Title, Indicators & Sharing Profiles -->
-            <div class="hero-left-col">
-                <div class="hero-status-pill">
-                    <span class="pulse-indicator"></span>
-                    <span>Local Sandbox Active &bull; Zero Cloud Telemetry</span>
-                </div>
-
-                <div class="hero-category-tag">
-                    <i class="fa-solid fa-shield-halved text-ruby"></i>
-                    <span>Sovereign Privacy &bull; Zero-Trust Document Sanitization</span>
-                </div>
-
-                <h1 class="hero-headline">
-                    Defensive <span class="headline-gradient">Privacy Studio</span>
-                </h1>
-
-                <div class="hero-metadata-badges">
-                    <span class="meta-badge"><i class="fa-solid fa-microchip"></i> Verhoeff & Luhn</span>
-                    <span class="meta-badge"><i class="fa-solid fa-vector-square"></i> Vector Anti-Recovery</span>
-                    <span class="meta-badge"><i class="fa-solid fa-qrcode"></i> QR Payload X-Ray</span>
-                </div>
-
-                <p class="hero-lead-text">
-                    Audit slide decks, identity records, healthcare invoices, and screenshots for sensitive credentials before external distribution.
-                </p>
-
-                <!-- Sharing Profile Selector -->
-                <div class="sharing-profile-bar">
-                    <span class="profile-label">Sharing Context:</span>
-                    <div class="profile-chips">
-                        <button type="button" class="profile-chip active" data-context="academic" onclick="setSharingContext('academic')">
-                            🎓 Academic
-                        </button>
-                        <button type="button" class="profile-chip" data-context="professional" onclick="setSharingContext('professional')">
-                            💼 Enterprise
-                        </button>
-                        <button type="button" class="profile-chip" data-context="private" onclick="setSharingContext('private')">
-                            🔒 Private
-                        </button>
-                        <button type="button" class="profile-chip" data-context="public" onclick="setSharingContext('public')">
-                            🌐 Public
-                        </button>
-                    </div>
-                </div>
+        <div class="hero-center-box">
+            <div class="hero-status-pill">
+                <span class="pulse-indicator"></span>
+                <span>On-Device Privacy Engine &bull; Zero Cloud Telemetry</span>
             </div>
 
-            <!-- Right Column: Floating Obsidian Telemetry Card (Reference Style) -->
-            <div class="hero-right-col">
-                <div class="telemetry-card">
-                    <div class="telemetry-card-header">
-                        <span class="telemetry-label">&mdash; ENGINE TELEMETRY</span>
-                        <span class="telemetry-live-pill"><span class="telemetry-dot"></span> Live</span>
-                    </div>
+            <div class="hero-category-tag">
+                <i class="fa-solid fa-shield-halved text-ruby"></i>
+                <span>Sovereign Privacy &bull; Zero-Trust Document Sanitization</span>
+            </div>
 
-                    <div class="telemetry-metric-row">
-                        <span class="telemetry-big-num">100<small>%</small></span>
-                        <span class="telemetry-metric-sub">/ on-device RAM</span>
-                    </div>
+            <h1 class="hero-headline">
+                Before You Share,<br/>
+                <span class="headline-gradient">Know What You Reveal.</span>
+            </h1>
 
-                    <!-- Visual Sensor Matrix -->
-                    <div class="telemetry-matrix">
-                        <div class="matrix-cell active" title="Verhoeff Checksum Active"></div>
-                        <div class="matrix-cell active" title="Luhn Mod-10 Active"></div>
-                        <div class="matrix-cell active" title="WinRT OCR Active"></div>
-                        <div class="matrix-cell active" title="Vector Stream Parser Active"></div>
-                        <div class="matrix-cell active" title="EXIF Stripper Active"></div>
-                        <div class="matrix-cell active" title="QR Payload Decoder Active"></div>
-                        <div class="matrix-cell active" title="SHA-256 Hasher Active"></div>
-                        <div class="matrix-cell active" title="Raster Flattener Active"></div>
+            <div class="hero-metadata-badges">
+                <span class="meta-badge"><i class="fa-solid fa-microchip text-ruby"></i> Verhoeff & Luhn Checksums</span>
+                <span class="meta-badge"><i class="fa-solid fa-vector-square text-ruby"></i> Vector Anti-Recovery</span>
+                <span class="meta-badge"><i class="fa-solid fa-qrcode text-ruby"></i> QR Payload X-Ray</span>
+            </div>
 
-                        <div class="matrix-cell active" title="Aadhaar Candidate Parser"></div>
-                        <div class="matrix-cell active" title="PAN Card Entity Classifier"></div>
-                        <div class="matrix-cell active" title="Credit Card Precedence Engine"></div>
-                        <div class="matrix-cell active" title="Sliding-Window Spatial Cluster"></div>
-                        <div class="matrix-cell active" title="DOB & Phone Guardrails"></div>
-                        <div class="matrix-cell active" title="High-DPI Raster Engine"></div>
-                        <div class="matrix-cell active" title="Tamper-Evident Signer"></div>
-                        <div class="matrix-cell active" title="Zero Telemetry Firewall"></div>
+            <p class="hero-lead-text">
+                Audit screenshots, identity cards, slide decks, and invoices for sensitive credentials and scannable QR payloads before they leave your hands.
+            </p>
 
-                        <div class="matrix-cell active"></div>
-                        <div class="matrix-cell active"></div>
-                        <div class="matrix-cell active"></div>
-                        <div class="matrix-cell active"></div>
-                        <div class="matrix-cell active"></div>
-                        <div class="matrix-cell active"></div>
-                        <div class="matrix-cell active"></div>
-                        <div class="matrix-cell active"></div>
-
-                        <div class="matrix-cell muted"></div>
-                        <div class="matrix-cell muted"></div>
-                        <div class="matrix-cell muted"></div>
-                        <div class="matrix-cell muted"></div>
-                        <div class="matrix-cell muted"></div>
-                        <div class="matrix-cell muted"></div>
-                        <div class="matrix-cell muted"></div>
-                        <div class="matrix-cell muted"></div>
-                    </div>
-
-                    <div class="telemetry-card-footer">
-                        <span>4 Engine Pipelines Active</span>
-                        <span class="telemetry-highlight">0 Bytes Cloud Egress</span>
-                    </div>
+            <!-- Sharing Profile Selector -->
+            <div class="sharing-profile-bar">
+                <span class="profile-label">Sharing Context:</span>
+                <div class="profile-chips">
+                    <button type="button" class="profile-chip active" data-context="academic" onclick="setSharingContext('academic')">
+                        🎓 Academic
+                    </button>
+                    <button type="button" class="profile-chip" data-context="professional" onclick="setSharingContext('professional')">
+                        💼 Enterprise
+                    </button>
+                    <button type="button" class="profile-chip" data-context="private" onclick="setSharingContext('private')">
+                        🔒 Private
+                    </button>
+                    <button type="button" class="profile-chip" data-context="public" onclick="setSharingContext('public')">
+                        🌐 Public
+                    </button>
                 </div>
             </div>
         </div>
