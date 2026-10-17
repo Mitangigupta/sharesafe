@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ShareSafe | Intelligent PII Redaction & QR Threat Audit{% endblock %}</title>
-    <!-- Modern Warm Typography & Icons -->
+    <!-- Professional Luxury Typography & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -19,10 +19,10 @@
         <div class="strip-content">
             <span class="privacy-dot"></span>
             <i class="fa-solid fa-shield-halved"></i>
-            <span><strong>100% Local On-Device Processing:</strong> Your files never leave this machine. Zero cloud telemetry. Auto-purged after session.</span>
+            <span><strong>100% Sovereign Local Processing:</strong> Documents never leave this device. Zero cloud telemetry. Memory auto-purged on close.</span>
         </div>
         <div class="strip-actions">
-            <span class="badge-tag-dark"><i class="fa-solid fa-lock"></i> Student & Privacy Friendly</span>
+            <span class="badge-tag-dark"><i class="fa-solid fa-lock"></i> Air-Gapped Privacy Architecture</span>
         </div>
     </header>
 
@@ -35,16 +35,16 @@
                 </div>
                 <div>
                     <div class="brand-title">Share<span>Safe</span></div>
-                    <div class="brand-subline">CYBERSECURITY PRIVACY CHECKER</div>
+                    <div class="brand-subline">SOVEREIGN PRIVACY & THREAT STUDIO</div>
                 </div>
             </a>
 
             <div class="nav-links">
-                <a href="/" class="nav-link"><i class="fa-solid fa-house"></i> Home</a>
-                <a href="/#samples" class="nav-link"><i class="fa-solid fa-folder-open"></i> Demo Files</a>
-                <a href="/#features" class="nav-link"><i class="fa-solid fa-sparkles"></i> Features</a>
+                <a href="/" class="nav-link"><i class="fa-solid fa-compass"></i> Overview</a>
+                <a href="/#samples" class="nav-link"><i class="fa-solid fa-layer-group"></i> Demo Vault</a>
+                <a href="/#features" class="nav-link"><i class="fa-solid fa-microchip"></i> Engine Architecture</a>
                 <button type="button" class="ocr-chip" onclick="openOcrModal()">
-                    <i class="fa-solid fa-eye"></i> OCR Engine
+                    <i class="fa-solid fa-sliders"></i> Engine Config
                     <span class="chip-dot {{ 'active' if ocr_status and ocr_status.available else 'warning' }}"></span>
                 </button>
             </div>
@@ -75,25 +75,25 @@
     <footer class="cyber-footer">
         <div class="footer-container">
             <div class="footer-col">
-                <div class="footer-brand">Share<span>Safe</span> Privacy Suite</div>
-                <p>A student-project friendly privacy checker built with Flask, PyMuPDF, OpenCV, and Regex. Scans screenshots, IDs, and PDFs to stop accidental leaks before sharing.</p>
+                <div class="footer-brand">Share<span>Safe</span> Executive Privacy Suite</div>
+                <p>Enterprise-grade defensive privacy architecture engineered with PyMuPDF, OpenCV, and algorithmic pattern verification. Prevents identity leaks and sensitive data exposure before public or team distribution.</p>
             </div>
             <div class="footer-col">
                 <h4>Engine Capabilities</h4>
                 <ul>
-                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> Verhoeff Checksum (Aadhaar)</li>
-                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> Luhn Mod-10 (Credit Cards)</li>
-                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> True PDF Vector Flattening</li>
-                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> QR Payload Threat X-Ray</li>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> Verhoeff Algorithmic Checksum (Aadhaar)</li>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> Luhn Mod-10 Verification (Payment Cards)</li>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> Permanent PDF Vector Stream Flattening</li>
+                    <li><i class="fa-solid fa-check" style="color: #fb7185;"></i> QR Payload Deep Threat Forensic X-Ray</li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4>Sharing Contexts</h4>
-                <p>Tailored risk evaluation for <strong>Academic</strong> submissions, <strong>Professional</strong> team sharing, <strong>Private</strong> peer transfers, and <strong>Public</strong> social posting.</p>
+                <h4>Defensive Profiles</h4>
+                <p>Tailored risk evaluation for <strong>Academic</strong> submissions, <strong>Professional</strong> enterprise audits, <strong>Private</strong> peer transfers, and <strong>Public</strong> social posting.</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; 2026 ShareSafe Privacy Suite. Local Ephemeral Sandboxing Active.</span>
+            <span>&copy; 2026 ShareSafe Privacy Suite. Local Ephemeral Sandboxing Active • Zero Cloud Telemetry.</span>
         </div>
     </footer>
     {% endblock %}

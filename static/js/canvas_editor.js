@@ -203,6 +203,7 @@ function setupDrawingCanvas() {
         };
 
         manualRedactions.push(newManual);
+        if (typeof switchSidebarTab === 'function') switchSidebarTab('manual');
         updateManualRedactionsUI();
         renderBoundingBoxes();
     };
@@ -216,8 +217,9 @@ function toggleDrawMode() {
 
     if (isDrawMode) {
         btn.classList.add('active');
-        text.innerText = 'Exit Drawing Mode';
+        text.innerText = 'Exit Drawing';
         canvas.classList.add('active-draw');
+        if (typeof switchSidebarTab === 'function') switchSidebarTab('manual');
     } else {
         btn.classList.remove('active');
         text.innerText = 'Draw Manual Box';
@@ -230,10 +232,11 @@ function updateManualRedactionsUI() {
     const count = document.getElementById('manualCount');
     if (!list || !count) return;
 
-    count.innerText = manualRedactions.length;
+    const badge = document.getElementById('manualCountBadge');
+    if (badge) badge.innerText = manualRedactions.length;
 
     if (manualRedactions.length === 0) {
-        list.innerHTML = `<p class="manual-empty-text">Click "Draw Manual Box" above and drag anywhere on the document preview to redact custom regions.</p>`;
+        list.innerHTML = `<div class="manual-empty-text"><i class="fa-solid fa-draw-polygon"></i><p>No manual boxes added yet. Activate drawing mode to redact custom regions.</p></div>`;
         return;
     }
 

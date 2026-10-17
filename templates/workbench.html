@@ -1,44 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}ShareSafe Workbench | {{ session_data.file_name }}{% endblock %}
+{% block title %}ShareSafe Executive Studio | {{ session_data.file_name }}{% endblock %}
 
 {% block header %}{% endblock %}
 
 {% block content %}
 <div class="workbench-layout" id="workbenchRoot">
-    <!-- Unified Top Studio Toolbar -->
+    <!-- Executive Top Studio Toolbar -->
     <header class="workbench-toolbar">
+        <!-- Left: Brand & File Identification -->
         <div class="toolbar-left">
             <a href="/" class="btn-icon btn-back-home" title="Return to Dashboard">
-                <i class="fa-solid fa-arrow-left"></i>
+                <i class="fa-solid fa-chevron-left"></i>
             </a>
             <a href="/" class="brand-mini-link">
                 <div class="brand-icon-mini"><i class="fa-solid fa-shield-cat"></i></div>
                 <div class="brand-name-mini">Share<span>Safe</span></div>
             </a>
             <div class="file-meta-header">
-                <span class="file-title" title="{{ session_data.file_name }}">
-                    <i class="fa-solid fa-file-shield"></i> {{ session_data.file_name }}
+                <span class="file-title-pill" title="{{ session_data.file_name }}">
+                    <i class="fa-solid fa-file-shield text-ruby"></i>
+                    <span class="file-name-text">{{ session_data.file_name }}</span>
                 </span>
-                <span class="badge-tag">
-                    <i class="fa-solid fa-layer-group"></i> {{ session_data.page_count|default(session_data.pages|length) }} Page(s)
+                <span class="badge-tag-studio">
+                    <i class="fa-solid fa-layer-group"></i> {{ session_data.page_count|default(session_data.pages|length) }} {% if (session_data.page_count|default(session_data.pages|length)) == 1 %}Page{% else %}Pages{% endif %}
                 </span>
             </div>
         </div>
 
+        <!-- Center: Perspective View Switcher & Canvas Controls -->
         <div class="toolbar-center">
             <!-- View Mode Switcher -->
             <div class="view-mode-tabs">
                 <button type="button" class="tab-btn active" id="tabOriginal" onclick="switchViewMode('original')" title="View interactive bounding boxes">
-                    <i class="fa-solid fa-layer-group"></i> Interactive Overlay
+                    <i class="fa-solid fa-eye"></i> <span>Interactive Overlay</span>
                 </button>
                 <button type="button" class="tab-btn" id="tabSplit" onclick="switchViewMode('split')" style="display: none;" title="Compare before & after redaction">
-                    <i class="fa-solid fa-code-compare"></i> Before / After Split Slider
+                    <i class="fa-solid fa-code-compare"></i> <span>Before / After Split</span>
                 </button>
                 <button type="button" class="tab-btn" id="tabRedacted" onclick="switchViewMode('redacted')" style="display: none;" title="View final redacted document">
-                    <i class="fa-solid fa-shield-check"></i> Redacted Safe Document
+                    <i class="fa-solid fa-shield-check"></i> <span>Sanitized Result</span>
                 </button>
             </div>
+
+            <div class="toolbar-divider-v"></div>
 
             <!-- Canvas Zoom Controls -->
             <div class="canvas-zoom-controls">
@@ -49,18 +54,20 @@
             </div>
 
             {% if (session_data.page_count|default(session_data.pages|length)) > 1 %}
+            <div class="toolbar-divider-v"></div>
             <div class="page-nav-controls">
                 <button type="button" class="btn-ctrl" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                <span>Page <strong id="currentPageNum">1</strong> of {{ session_data.page_count|default(session_data.pages|length) }}</span>
+                <span class="page-indicator">Page <strong id="currentPageNum">1</strong> of {{ session_data.page_count|default(session_data.pages|length) }}</span>
                 <button type="button" class="btn-ctrl" onclick="changePage(1)"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
             {% endif %}
         </div>
 
+        <!-- Right: Actions, Style Picker & Redaction CTA -->
         <div class="toolbar-right">
-            <!-- Global Style Selector -->
+            <!-- Redaction Style Selector -->
             <div class="style-selector-group">
-                <label for="globalRedactionStyle"><i class="fa-solid fa-brush"></i> Style:</label>
+                <span class="style-label"><i class="fa-solid fa-paintbrush"></i> Style</span>
                 <select id="globalRedactionStyle" class="select-styled" onchange="updateGlobalStyle(this.value)">
                     <option value="blackout" selected>⬛ Solid Blackout</option>
                     <option value="blur">💧 Gaussian Blur</option>
@@ -71,137 +78,191 @@
             </div>
 
             <!-- Manual Drawing Mode Toggle -->
-            <button type="button" class="btn btn-outline" id="drawModeBtn" onclick="toggleDrawMode()" title="Draw custom redaction boxes over signatures, stamps, or faces">
+            <button type="button" class="btn-studio btn-studio-secondary" id="drawModeBtn" onclick="toggleDrawMode()" title="Draw custom redaction boxes over signatures, stamps, or photos">
                 <i class="fa-solid fa-pen-ruler"></i> <span id="drawModeText">Draw Manual Box</span>
             </button>
 
             <!-- Purge Session -->
-            <button type="button" class="btn btn-danger-outline" onclick="purgeCurrentSession()" title="Permanently erase this session from memory">
-                <i class="fa-solid fa-trash-can"></i> Purge
+            <button type="button" class="btn-studio btn-studio-ghost" onclick="purgeCurrentSession()" title="Permanently discard session from memory">
+                <i class="fa-solid fa-trash-can"></i>
             </button>
 
             <!-- Primary Redact & Export Action -->
-            <button type="button" class="btn btn-primary btn-glow" id="applyRedactBtn" onclick="executeRedaction()">
-                <i class="fa-solid fa-user-shield"></i> Redact & Export Safe Copy
+            <button type="button" class="btn-studio btn-studio-primary btn-glow" id="applyRedactBtn" onclick="executeRedaction()">
+                <i class="fa-solid fa-shield-halved"></i> <span>Sanitize & Export</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Workspace Split -->
+    <!-- Main Studio Workspace Split -->
     <div class="workbench-main">
-        <!-- Left Sidebar: Detections & Risk Panel -->
+        <!-- Spacious Left Sidebar: Detections & Forensic Intelligence -->
         <aside class="workbench-sidebar">
-            <!-- Risk Level Scorecard -->
-            <div class="risk-card" style="border-top: 4px solid {{ session_data.risk_summary.badge_color }};">
-                <div class="risk-card-header">
+            <!-- Sidebar Segmented Navigation Tabs -->
+            <div class="sidebar-tab-nav">
+                <button type="button" class="sidebar-tab-btn active" id="tabThreatsBtn" onclick="switchSidebarTab('threats')">
+                    <i class="fa-solid fa-shield-virus"></i> Threats & PII <span class="sidebar-pill-count">{{ session_data.detections|length }}</span>
+                </button>
+                <button type="button" class="sidebar-tab-btn" id="tabManualBtn" onclick="switchSidebarTab('manual')">
+                    <i class="fa-solid fa-pen-to-square"></i> Manual <span class="sidebar-pill-count" id="manualCountBadge">0</span>
+                </button>
+                <button type="button" class="sidebar-tab-btn" id="tabMetaBtn" onclick="switchSidebarTab('metadata')">
+                    <i class="fa-solid fa-fingerprint"></i> Metadata
+                </button>
+            </div>
+
+            <!-- Tab Content 1: Threats & PII -->
+            <div class="sidebar-tab-pane active" id="paneThreats">
+                <!-- Executive Risk Scorecard -->
+                <div class="risk-card risk-card-lavish" style="--risk-color: {{ session_data.risk_summary.badge_color }};">
+                    <div class="risk-card-top">
+                        <div class="risk-title-group">
+                            <span class="risk-badge" style="background-color: {{ session_data.risk_summary.badge_color }};">
+                                {{ session_data.risk_summary.level }} RISK
+                            </span>
+                            <h4>Threat Score {{ session_data.risk_summary.score }}/100</h4>
+                        </div>
+                        <div class="risk-meter-ring" style="--risk-pct: {{ session_data.risk_summary.score }}%; --ring-color: {{ session_data.risk_summary.badge_color }};">
+                            <span>{{ session_data.risk_summary.score }}%</span>
+                        </div>
+                    </div>
+                    
+                    <p class="risk-desc">{{ session_data.risk_summary.recommendation }}</p>
+                    
+                    <div class="risk-stats-row">
+                        <span class="stat-pill stat-critical"><i class="fa-solid fa-circle-exclamation"></i> {{ session_data.risk_summary.critical_count }} Critical</span>
+                        <span class="stat-pill stat-high"><i class="fa-solid fa-triangle-exclamation"></i> {{ session_data.risk_summary.high_count }} High</span>
+                        <span class="stat-pill stat-med"><i class="fa-solid fa-circle-dot"></i> {{ session_data.risk_summary.medium_count }} Med</span>
+                        <span class="stat-pill stat-low"><i class="fa-solid fa-circle-info"></i> {{ session_data.risk_summary.low_count }} Low</span>
+                    </div>
+                </div>
+
+                <!-- Quick Selection Action Bar -->
+                <div class="sidebar-actions-row">
+                    <button type="button" class="btn-chip" onclick="selectCriticalAndHigh()"><i class="fa-solid fa-check-double text-ruby"></i> Select Critical/High</button>
+                    <button type="button" class="btn-chip" onclick="selectAllDetections()"><i class="fa-solid fa-square-check"></i> Select All</button>
+                    <button type="button" class="btn-chip" onclick="deselectAllDetections()"><i class="fa-regular fa-square"></i> Clear</button>
+                </div>
+
+                <!-- Detected Entities List Container -->
+                <div class="detections-section">
+                    <div class="detections-list-header">
+                        <h5><i class="fa-solid fa-list-check text-ruby"></i> Detected Exposure Items ({{ session_data.detections|length }})</h5>
+                        <span class="header-note">Toggle check to redact</span>
+                    </div>
+
+                    <div class="detections-list" id="detectionsList">
+                        {% if session_data.detections|length == 0 %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fa-solid fa-shield-check"></i></div>
+                            <h6>Zero Threat Patterns Detected</h6>
+                            <p>No automated sensitive credentials found. Use <strong>Draw Manual Box</strong> from the top toolbar to redact visual regions.</p>
+                        </div>
+                        {% endif %}
+
+                        {% for d in session_data.detections %}
+                        <div class="detection-item risk-border-{{ d.risk|lower }}" id="item-{{ d.id }}" onmouseenter="highlightBox('{{ d.id }}')" onmouseleave="unhighlightBox('{{ d.id }}')">
+                            <div class="item-checkbox-col">
+                                <label class="custom-toggle" title="Toggle Redaction for this Item">
+                                    <input type="checkbox" class="styled-checkbox det-checkbox" id="chk-{{ d.id }}" data-id="{{ d.id }}" {% if d.risk in ['CRITICAL', 'HIGH'] %}checked{% endif %} onchange="onCheckboxChange('{{ d.id }}')">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="item-info-col">
+                                <div class="item-title-row">
+                                    <span class="item-label">{{ d.label }}</span>
+                                    <span class="risk-tag risk-tag-{{ d.risk|lower }}">{{ d.risk }}</span>
+                                </div>
+                                <div class="item-value-row">
+                                    <code class="masked-code">{{ d.masked }}</code>
+                                </div>
+                                <div class="item-meta-row">
+                                    <span class="meta-item"><i class="fa-regular fa-file"></i> Page {{ d.page }}</span>
+                                    <span class="meta-item"><i class="fa-solid fa-tag"></i> {{ d.category }}</span>
+                                    {% if d.type == 'qr_code' %}
+                                    <button type="button" class="btn-xs btn-threat-inspect" onclick="openQrThreatInspector('{{ d.id }}')">
+                                        <i class="fa-solid fa-qrcode"></i> Inspect QR Payload
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Manual Redactions -->
+            <div class="sidebar-tab-pane" id="paneManual" style="display: none;">
+                <div class="manual-tab-intro">
+                    <div class="manual-intro-icon"><i class="fa-solid fa-paintbrush"></i></div>
                     <div>
-                        <span class="risk-badge" style="background-color: {{ session_data.risk_summary.badge_color }};">
-                            {{ session_data.risk_summary.level }} RISK
+                        <h6>Custom Redaction Canvas</h6>
+                        <p>Click <strong>"Draw Manual Box"</strong> in the top toolbar and drag across any area of the document preview.</p>
+                    </div>
+                </div>
+
+                <div class="manual-redactions-container">
+                    <div class="detections-list-header">
+                        <h5><i class="fa-solid fa-pen-ruler text-ruby"></i> Manual Regions (<span id="manualCount">0</span>)</h5>
+                    </div>
+                    <div id="manualList" class="manual-list">
+                        <div class="manual-empty-text">
+                            <i class="fa-solid fa-draw-polygon"></i>
+                            <p>No manual boxes added yet. Activate drawing mode to redact signatures, photo IDs, or proprietary logos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 3: Metadata & Forensic Integrity -->
+            <div class="sidebar-tab-pane" id="paneMetadata" style="display: none;">
+                <div class="metadata-card">
+                    <div class="metadata-header">
+                        <div>
+                            <h6><i class="fa-solid fa-fingerprint text-ruby"></i> Latent Metadata Forensics</h6>
+                            <p class="meta-sub">EXIF, GPS coordinates, author history & software tags</p>
+                        </div>
+                        <span class="badge-tag-studio {{ 'badge-warning' if session_data.metadata.metadata_count > 0 else 'badge-success' }}">
+                            {{ session_data.metadata.metadata_count }} Tag(s)
                         </span>
-                        <h4>Threat Score: {{ session_data.risk_summary.score }}/100</h4>
                     </div>
-                    <div class="risk-meter-circle">
-                        <span>{{ session_data.risk_summary.score }}%</span>
-                    </div>
-                </div>
-                <p class="risk-desc">{{ session_data.risk_summary.recommendation }}</p>
-                <div class="risk-stats-row">
-                    <span class="stat-pill stat-critical"><i class="fa-solid fa-circle-exclamation"></i> {{ session_data.risk_summary.critical_count }} Crit</span>
-                    <span class="stat-pill stat-high"><i class="fa-solid fa-triangle-exclamation"></i> {{ session_data.risk_summary.high_count }} High</span>
-                    <span class="stat-pill stat-med"><i class="fa-solid fa-circle-dot"></i> {{ session_data.risk_summary.medium_count }} Med</span>
-                    <span class="stat-pill stat-low"><i class="fa-solid fa-info"></i> {{ session_data.risk_summary.low_count }} Low</span>
-                </div>
-            </div>
 
-            <!-- Quick Selection Toolbar -->
-            <div class="sidebar-actions-row">
-                <button type="button" class="btn-chip" onclick="selectCriticalAndHigh()"><i class="fa-solid fa-check-double"></i> Select All Critical/High</button>
-                <button type="button" class="btn-chip" onclick="selectAllDetections()"><i class="fa-solid fa-square-check"></i> Select All</button>
-                <button type="button" class="btn-chip" onclick="deselectAllDetections()"><i class="fa-solid fa-square"></i> Clear</button>
-            </div>
-
-            <!-- Detected Entities List -->
-            <div class="detections-section">
-                <div class="detections-list-header">
-                    <h5><i class="fa-solid fa-list-check"></i> Detected PII & Payloads ({{ session_data.detections|length }})</h5>
-                </div>
-
-                <div class="detections-list" id="detectionsList">
-                    {% if session_data.detections|length == 0 %}
-                    <div class="empty-state">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <p>No automated sensitive patterns detected on this page. You can use the <strong>Draw Manual Box</strong> tool to redact any visual area.</p>
-                    </div>
-                    {% endif %}
-
-                    {% for d in session_data.detections %}
-                    <div class="detection-item risk-border-{{ d.risk|lower }}" id="item-{{ d.id }}" onmouseenter="highlightBox('{{ d.id }}')" onmouseleave="unhighlightBox('{{ d.id }}')">
-                        <div class="item-checkbox-col">
-                            <input type="checkbox" class="styled-checkbox det-checkbox" id="chk-{{ d.id }}" data-id="{{ d.id }}" {% if d.risk in ['CRITICAL', 'HIGH'] %}checked{% endif %} onchange="onCheckboxChange('{{ d.id }}')">
-                        </div>
-                        <div class="item-info-col">
-                            <div class="item-title-row">
-                                <span class="item-label">{{ d.label }}</span>
-                                <span class="risk-tag risk-tag-{{ d.risk|lower }}">{{ d.risk }}</span>
-                            </div>
-                            <div class="item-value-row">
-                                <code>{{ d.masked }}</code>
-                            </div>
-                            <div class="item-meta-row">
-                                <span><i class="fa-solid fa-file"></i> Page {{ d.page }}</span>
-                                <span><i class="fa-solid fa-tag"></i> {{ d.category }}</span>
-                                {% if d.type == 'qr_code' %}
-                                <button type="button" class="btn-xs btn-threat-inspect" onclick="openQrThreatInspector('{{ d.id }}')">
-                                    <i class="fa-solid fa-magnifying-glass-arrow-right"></i> Inspect Payload Threat
-                                </button>
-                                {% endif %}
-                            </div>
+                    <div class="meta-scrub-banner">
+                        <i class="fa-solid fa-shield-halved text-emerald"></i>
+                        <div>
+                            <strong>Automatic Scrubbing Active:</strong> All latent document properties, creator names, and GPS coordinate markers will be stripped during export.
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
 
-            <!-- Manual Redactions Section -->
-            <div class="manual-redactions-container">
-                <div class="detections-list-header">
-                    <h5><i class="fa-solid fa-pen-to-square"></i> Manual Redactions (<span id="manualCount">0</span>)</h5>
-                </div>
-                <div id="manualList" class="manual-list">
-                    <p class="manual-empty-text">Click "Draw Manual Box" above and drag anywhere on the document preview to redact custom regions.</p>
-                </div>
-            </div>
-
-            <!-- Metadata Inspection Card -->
-            <div class="metadata-card">
-                <div class="metadata-header">
-                    <h6><i class="fa-solid fa-fingerprint"></i> File Metadata Scrubbing</h6>
-                    <span class="badge-tag {{ 'badge-warning' if session_data.metadata.metadata_count > 0 else 'badge-success' }}">
-                        {{ session_data.metadata.metadata_count }} Tag(s)
-                    </span>
-                </div>
-                <p class="meta-desc">
-                    {% if session_data.metadata.metadata_count > 0 %}
-                    Latent EXIF, GPS or author metadata detected. ShareSafe will strip all tags during export.
+                    {% if session_data.metadata.summary_tags %}
+                    <label class="meta-section-label">Detected Latent Tags:</label>
+                    <div class="meta-tags-preview">
+                        {% for tag in session_data.metadata.summary_tags %}
+                        <span class="meta-tag-pill"><i class="fa-solid fa-tag"></i> {{ tag }}</span>
+                        {% endfor %}
+                    </div>
                     {% else %}
-                    No latent metadata tags detected. Document is metadata-clean.
+                    <div class="meta-clean-notice">
+                        <i class="fa-solid fa-circle-check text-emerald"></i> Clean Stream: Zero latent EXIF or author tags found.
+                    </div>
                     {% endif %}
-                </p>
-                <div class="meta-tags-preview">
-                    {% for tag in session_data.metadata.summary_tags %}
-                    <span class="meta-tag-pill"><i class="fa-solid fa-tag"></i> {{ tag }}</span>
-                    {% endfor %}
+
+                    <div class="meta-integrity-box">
+                        <h6><i class="fa-solid fa-lock text-ruby"></i> Cryptographic Audit Certificate</h6>
+                        <p>Upon redaction, ShareSafe will compute SHA-256 pre/post hashes and sign a verifiable audit certificate confirming vector layer destruction.</p>
+                    </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Center: Interactive Document Canvas Viewport -->
+        <!-- Center: Spacious Interactive Document Canvas Viewport -->
         <main class="workbench-canvas-area">
             <!-- Viewport Container -->
             <div class="canvas-scroll-container" id="canvasContainer">
                 <!-- Mode 1: Interactive Overlay Viewport -->
                 <div class="canvas-wrapper" id="overlayViewport">
-                    <img id="pagePreviewImg" src="{{ session_data.pages[0].preview_url }}" alt="Page Preview" class="document-image" onload="initCanvasDimensions()">
+                    <img id="pagePreviewImg" src="{{ session_data.pages[0].preview_url }}" alt="Document Preview" class="document-image" onload="initCanvasDimensions()">
                     <div class="bounding-box-layer" id="boxOverlayLayer"></div>
                     <!-- Manual drawing canvas overlay -->
                     <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
@@ -210,7 +271,7 @@
                 <!-- Mode 2: Before & After Split Slider Viewport -->
                 <div class="split-slider-wrapper" id="splitViewport" style="display: none;">
                     <div class="split-image-container">
-                        <img id="beforeSliderImg" src="{{ session_data.pages[0].preview_url }}" class="split-img before-img" alt="Before">
+                        <img id="beforeSliderImg" src="{{ session_data.pages[0].preview_url }}" class="split-img before-img" alt="Before Redaction">
                         <div class="after-wrapper" id="afterWrapper">
                             <img id="afterSliderImg" src="" class="split-img after-img" alt="After Redaction">
                         </div>
@@ -226,27 +287,29 @@
                 </div>
             </div>
 
-            <!-- Floating Safe Export Drawer (Appears after redaction, dismissible) -->
+            <!-- Floating Executive Export Drawer (Appears after redaction, dismissible) -->
             <div class="export-drawer" id="exportDrawer" style="display: none;">
                 <div class="drawer-header">
                     <div class="drawer-title">
-                        <i class="fa-solid fa-circle-check text-emerald"></i>
+                        <div class="drawer-icon-wrap">
+                            <i class="fa-solid fa-circle-check text-emerald"></i>
+                        </div>
                         <div>
                             <h4>Document Sanitized & Cryptographically Sealed</h4>
-                            <p>Text layers permanently destroyed. EXIF/PDF metadata purged. Ready for distribution.</p>
+                            <p>Text layers permanently destroyed via high-DPI rasterization. EXIF & PDF metadata purged. Ready for safe external distribution.</p>
                         </div>
                     </div>
                     <div class="drawer-downloads">
-                        <a href="#" id="downloadDocBtn" class="btn btn-primary btn-glow" download>
+                        <a href="#" id="downloadDocBtn" class="btn-studio btn-studio-primary btn-glow" download>
                             <i class="fa-solid fa-download"></i> Download Safe Document
                         </a>
-                        <a href="#" id="downloadCertBtn" class="btn btn-secondary" download>
+                        <a href="#" id="downloadCertBtn" class="btn-studio btn-studio-secondary" download>
                             <i class="fa-solid fa-certificate"></i> Audit Certificate (PDF)
                         </a>
-                        <a href="#" id="downloadJsonBtn" class="btn btn-outline" download>
+                        <a href="#" id="downloadJsonBtn" class="btn-studio btn-studio-ghost" download>
                             <i class="fa-solid fa-file-code"></i> JSON Audit Data
                         </a>
-                        <button type="button" class="btn-dismiss-drawer" onclick="document.getElementById('exportDrawer').style.display='none'" title="Dismiss bar">
+                        <button type="button" class="btn-dismiss-drawer" onclick="document.getElementById('exportDrawer').style.display='none'" title="Dismiss drawer">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
@@ -259,6 +322,24 @@
 <!-- Raw Session JSON for Client Scripts -->
 <script id="sessionJsonData" type="application/json">
     {{ session_data | tojson }}
+</script>
+
+<script>
+// Sidebar Tab Switcher Function
+function switchSidebarTab(tabName) {
+    const tabs = ['threats', 'manual', 'metadata'];
+    tabs.forEach(t => {
+        const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn');
+        const pane = document.getElementById('pane' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (t === tabName) {
+            if (btn) btn.classList.add('active');
+            if (pane) { pane.style.display = 'flex'; pane.classList.add('active'); }
+        } else {
+            if (btn) btn.classList.remove('active');
+            if (pane) { pane.style.display = 'none'; pane.classList.remove('active'); }
+        }
+    });
+}
 </script>
 {% endblock %}
 
