@@ -41,7 +41,7 @@ class RiskAssessor:
         if not detections:
             return {
                 'level': 'CLEAN',
-                'badge_color': '#15803d',  # Forest Emerald
+                'badge_color': '#647C70',  # Muted Sage
                 'score': 0,
                 'total_entities': 0,
                 'critical_count': 0,
@@ -49,7 +49,7 @@ class RiskAssessor:
                 'medium_count': 0,
                 'low_count': 0,
                 'category_breakdown': {},
-                'recommendation': 'No sensitive personal or financial information detected. Your document is safe to share.',
+                'recommendation': 'No findings detected by the enabled checks. Document appears clear for distribution.',
                 'can_share_safely': True,
                 'sharing_context': context,
                 'context_desc': context_info['desc']
@@ -83,23 +83,23 @@ class RiskAssessor:
         # Context-aware risk thresholds
         if counts['CRITICAL'] > 0 or score >= 60:
             level = 'CRITICAL'
-            badge_color = '#c92a3e'  # Cherry Red
+            badge_color = '#A74440'  # Deep Red for serious findings
             if context == 'public':
                 recommendation = f"CRITICAL EXPOSURE: {counts['CRITICAL']} Critical & {counts['HIGH']} High risk entities detected. Sharing publicly without redaction risks identity theft or credential hijacking."
             else:
                 recommendation = f"CRITICAL EXPOSURE: Found {counts['CRITICAL']} Critical and {counts['HIGH']} High risk entities. Redaction is strongly recommended before sharing."
         elif counts['HIGH'] > 0 or score >= 35:
             level = 'HIGH'
-            badge_color = '#e11d48'  # Rose Cherry
-            recommendation = f"HIGH PRIVACY RISK: Contains {counts['HIGH']} high-sensitivity identity or financial records. Hide these fields to maintain confidentiality."
+            badge_color = '#C96D67'  # Muted Coral
+            recommendation = f"HIGH PRIVACY RISK: Contains {counts['HIGH']} high-sensitivity identity or credential records. Sanitization recommended to maintain confidentiality."
         elif counts['MEDIUM'] > 0 or score >= 15:
             level = 'MEDIUM'
-            badge_color = '#d97706'  # Warm Amber
-            recommendation = f"MODERATE PRIVACY RISK: {counts['MEDIUM']} direct contact or network identifiers found. Review and hide items you don't wish to disclose."
+            badge_color = '#B27329'  # Warm Amber
+            recommendation = f"MODERATE PRIVACY RISK: {counts['MEDIUM']} direct contact or network identifiers found. Review and sanitize items you do not wish to disclose."
         else:
             level = 'LOW'
-            badge_color = '#0284c7'  # Sky Blue
-            recommendation = f"LOW SENSITIVITY: Found {counts['LOW']} general items (email or web links). Safe for trusted sharing, or hide for anonymity."
+            badge_color = '#5B7470'  # Muted Slate-Sage
+            recommendation = f"LOW SENSITIVITY: Found {counts['LOW']} general items (email or web links). Safe for trusted sharing, or sanitize for anonymity."
 
         return {
             'level': level,

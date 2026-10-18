@@ -1,168 +1,257 @@
 {% extends "base.html" %}
 
-{% block title %}ShareSafe | Sovereign Privacy & Redaction Studio{% endblock %}
+{% block title %}ShareSafe &mdash; Sovereign Privacy & Document Redaction Studio{% endblock %}
 
 {% block content %}
-<div class="page-grid-backdrop">
-    <!-- Hero Section: Focused & Refined Layout -->
+<div class="page-container">
+    <!-- Hero Stage: Optimized First-Screen for Laptop Resolution (Editorial Message + Upload Cockpit) -->
     <section class="hero-section">
-        <div class="hero-center-box">
-            <div class="hero-status-pill">
-                <span class="pulse-indicator"></span>
-                <span>On-Device Privacy Engine &bull; Zero Cloud Telemetry</span>
-            </div>
-
-            <div class="hero-category-tag">
-                <i class="fa-solid fa-shield-halved text-ruby"></i>
-                <span>Sovereign Privacy &bull; Zero-Trust Document Sanitization</span>
-            </div>
-
-            <h1 class="hero-headline">
-                Before You Share,<br/>
-                <span class="headline-gradient">Know What You Reveal.</span>
-            </h1>
-
-            <div class="hero-metadata-badges">
-                <span class="meta-badge"><i class="fa-solid fa-microchip text-ruby"></i> Verhoeff & Luhn Checksums</span>
-                <span class="meta-badge"><i class="fa-solid fa-vector-square text-ruby"></i> Vector Anti-Recovery</span>
-                <span class="meta-badge"><i class="fa-solid fa-qrcode text-ruby"></i> QR Payload X-Ray</span>
-            </div>
-
-            <p class="hero-lead-text">
-                Audit screenshots, identity cards, slide decks, and invoices for sensitive credentials and scannable QR payloads before they leave your hands.
-            </p>
-
-            <!-- Sharing Profile Selector -->
-            <div class="sharing-profile-bar">
-                <span class="profile-label">Sharing Context:</span>
-                <div class="profile-chips">
-                    <button type="button" class="profile-chip active" data-context="academic" onclick="setSharingContext('academic')">
-                        🎓 Academic
-                    </button>
-                    <button type="button" class="profile-chip" data-context="professional" onclick="setSharingContext('professional')">
-                        💼 Enterprise
-                    </button>
-                    <button type="button" class="profile-chip" data-context="private" onclick="setSharingContext('private')">
-                        🔒 Private
-                    </button>
-                    <button type="button" class="profile-chip" data-context="public" onclick="setSharingContext('public')">
-                        🌐 Public
-                    </button>
+        <div class="hero-stage-grid">
+            <!-- Left Column: Editorial Direction, Headline & Sharing Context Selector -->
+            <div class="hero-content-col">
+                <div class="hero-eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    <span class="eyebrow-text">PRIVACY, BEFORE SHARING</span>
                 </div>
-            </div>
-        </div>
 
-        <!-- Metric Ribbon (Matching 4-Column Divided Card in Reference Image) -->
-        <div class="metrics-ribbon">
-            <div class="metric-ribbon-col">
-                <div class="metric-col-header">
-                    <span>CHECKSUM VERIFICATION</span>
-                    <i class="fa-solid fa-circle-check text-ruby"></i>
-                </div>
-                <div class="metric-col-val">Verhoeff & Luhn</div>
-                <div class="metric-col-sub">Zero false positive alert fatigue</div>
-            </div>
+                <h1 class="hero-headline">
+                    Before You Share,<br/>
+                    <span class="hero-editorial-accent">Know What You Reveal.</span>
+                </h1>
 
-            <div class="metric-ribbon-col">
-                <div class="metric-col-header">
-                    <span>VECTOR FLATTENING</span>
-                    <i class="fa-solid fa-layer-group text-ruby"></i>
-                </div>
-                <div class="metric-col-val">Anti-Recovery</div>
-                <div class="metric-col-sub">Text streams wiped at binary level</div>
-            </div>
+                <p class="hero-lead-text">
+                    Inspect documents, images, and presentations for sensitive credentials, latent metadata, and scannable payloads before they leave your hands.
+                </p>
 
-            <div class="metric-ribbon-col">
-                <div class="metric-col-header">
-                    <span>METADATA FORENSICS</span>
-                    <i class="fa-solid fa-fingerprint text-ruby"></i>
-                </div>
-                <div class="metric-col-val">EXIF & GPS Auto-Wipe</div>
-                <div class="metric-col-sub">Hardware & author tags destroyed</div>
-            </div>
-
-            <div class="metric-ribbon-col">
-                <div class="metric-col-header">
-                    <span>QR PAYLOAD X-RAY</span>
-                    <i class="fa-solid fa-qrcode text-ruby"></i>
-                </div>
-                <div class="metric-col-val">UPI & XML Decode</div>
-                <div class="metric-col-sub">Bypasses visual redaction traps</div>
-            </div>
-        </div>
-
-        <!-- Refined Upload Dropzone Card -->
-        <div class="upload-section-wrapper" id="uploadSection">
-            <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data" class="upload-dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                <input type="hidden" id="sharingContextInput" name="sharing_context" value="academic">
-                <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp" onchange="handleFileSelect(event)" style="display: none;">
-                
-                <div class="dropzone-idle" id="dropzoneIdle">
-                    <div class="upload-circle-icon">
-                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                <!-- Sharing Context Selector (Segmented Control) -->
+                <div class="sharing-context-wrapper">
+                    <div class="context-card-header">
+                        <span class="context-header-kicker"><i class="fa-solid fa-sliders"></i> SHARING CONTEXT</span>
+                        <p class="context-dynamic-desc" id="contextDescText">Tuned for student assignments, coursework, and research papers with standard PII shielding.</p>
                     </div>
-                    <h3>Drag & Drop Document, Slide, or Image</h3>
-                    <p>Supported Formats: PDF, PNG, JPG, WEBP, BMP &bull; Up to 30 MB &bull; Processed 100% in local memory</p>
+                    <div class="segmented-control" role="tablist" aria-label="Sharing Context Selector">
+                        <button type="button" class="segment-btn active" data-context="academic" onclick="setSharingContext('academic')" role="tab" aria-selected="true">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Academic</span>
+                        </button>
+                        <button type="button" class="segment-btn" data-context="professional" onclick="setSharingContext('professional')" role="tab" aria-selected="false">
+                            <i class="fa-solid fa-briefcase"></i>
+                            <span>Enterprise</span>
+                        </button>
+                        <button type="button" class="segment-btn" data-context="private" onclick="setSharingContext('private')" role="tab" aria-selected="false">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <span>Private</span>
+                        </button>
+                        <button type="button" class="segment-btn" data-context="public" onclick="setSharingContext('public')" role="tab" aria-selected="false">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>Public</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Verified Security Posture Chips -->
+                <div class="hero-trust-chips">
+                    <span class="trust-chip"><i class="fa-solid fa-memory"></i> 100% In-Memory RAM</span>
+                    <span class="trust-chip"><i class="fa-solid fa-shield-halved"></i> Zero Cloud Retention</span>
+                    <span class="trust-chip"><i class="fa-solid fa-fingerprint"></i> SHA-256 Audit Seal</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Upload Experience (Immediately Accessible on First Screen) -->
+            <div class="hero-upload-col" id="uploadSection">
+                <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data" class="upload-dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <input type="hidden" id="sharingContextInput" name="sharing_context" value="academic">
+                    <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp" onchange="handleFileSelect(event)" style="display: none;">
                     
-                    <div class="dropzone-actions-cluster">
-                        <button type="button" class="btn-ref-outline" onclick="document.getElementById('fileInput').click()">
-                            <i class="fa-regular fa-folder-open"></i> Browse Local Files
-                        </button>
-                        <button type="button" class="btn-ref-primary" onclick="document.getElementById('fileInput').click()">
-                            <i class="fa-solid fa-shield-halved"></i> Run Sovereign Scan
+                    <!-- State A: Idle / Empty State -->
+                    <div class="dropzone-idle" id="dropzoneIdle">
+                        <div class="upload-shield-symbol" aria-hidden="true">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3L4 6V12C4 17.5 7.4 22.1 12 23C16.6 22.1 20 17.5 20 12V6L12 3Z" stroke="var(--ink-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 8V16M12 8L9 11M12 8L15 11" stroke="var(--coral-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="upload-headline">Drop your document or image here</h3>
+                        <p class="upload-subline">Inspect slides, PDFs, identity credentials, or system configurations</p>
+                        
+                        <div class="upload-actions-row">
+                            <button type="button" class="btn-editorial-primary" onclick="triggerFilePicker()">
+                                <i class="fa-solid fa-arrow-up-from-bracket"></i> Choose File to Audit
+                            </button>
+                        </div>
+
+                        <div class="upload-specs-pill">
+                            <span class="spec-tag"><i class="fa-regular fa-file"></i> PDF, PNG, JPG, WEBP, BMP</span>
+                            <span class="spec-tag"><i class="fa-solid fa-weight-hanging"></i> Max 30 MB</span>
+                            <span class="spec-tag spec-secure"><i class="fa-solid fa-shield-halved"></i> Ephemeral In-Memory</span>
+                        </div>
+
+                        <!-- 1-Click Quick Demo Launcher directly on Upload Card for live presentation ease -->
+                        <div class="dropzone-quick-demos">
+                            <span class="quick-demo-label"><i class="fa-solid fa-bolt text-coral"></i> Or launch a 1-click synthetic demo:</span>
+                            <div class="quick-demo-buttons">
+                                <button type="button" class="btn-quick-sample" onclick="loadSample('aadhaar_pan')" title="Load Aadhaar & PAN sample">
+                                    <i class="fa-solid fa-id-card"></i> Identity Card
+                                </button>
+                                <button type="button" class="btn-quick-sample" onclick="loadSample('medical_invoice')" title="Load Medical Statement sample">
+                                    <i class="fa-solid fa-file-medical"></i> Medical Statement
+                                </button>
+                                <button type="button" class="btn-quick-sample" onclick="loadSample('server_config')" title="Load Cloud Config sample">
+                                    <i class="fa-solid fa-terminal"></i> Cloud Config
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- State B: File Selected State -->
+                    <div class="dropzone-selected" id="dropzoneSelected" style="display: none;">
+                        <div class="selected-file-card">
+                            <div class="file-icon-box">
+                                <i class="fa-solid fa-file-shield text-coral" id="selectedFileIcon"></i>
+                            </div>
+                            <div class="selected-file-details">
+                                <div class="selected-file-name" id="selectedFileName">document.pdf</div>
+                                <div class="selected-file-meta">
+                                    <span id="selectedFileSize">0 KB</span>
+                                    <span class="meta-separator">&bull;</span>
+                                    <span id="selectedFileType">Document</span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-clear-selection" onclick="clearSelectedFile()" title="Remove file" aria-label="Remove selected file">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <div class="selected-actions-row">
+                            <button type="button" class="btn-editorial-secondary" onclick="triggerFilePicker()">
+                                <i class="fa-regular fa-folder-open"></i> Change File
+                            </button>
+                            <button type="button" class="btn-editorial-primary btn-scan-trigger" onclick="submitSelectedFile()">
+                                <i class="fa-solid fa-shield-halved"></i> Run Privacy Scan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- State C: Validation Error State -->
+                    <div class="dropzone-error" id="dropzoneError" style="display: none;">
+                        <div class="error-notice-card">
+                            <div class="error-icon-box"><i class="fa-solid fa-circle-exclamation"></i></div>
+                            <div class="error-text-content">
+                                <h4 id="uploadErrorTitle">Validation Failure</h4>
+                                <p id="uploadErrorMessage">The selected file could not be processed.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-editorial-secondary" onclick="resetUploadDropzone()">
+                            <i class="fa-solid fa-rotate-left"></i> Select Another File
                         </button>
                     </div>
 
-                    <div id="fileSelectionPreview" style="display: none;" class="file-pill-preview">
-                        <i class="fa-solid fa-file-shield text-ruby"></i>
-                        <span id="selectedFileName">document.pdf</span>
+                    <!-- State D: Scanning State -->
+                    <div class="dropzone-scanning" id="dropzoneScanning" style="display: none;">
+                        <div class="scanner-visual">
+                            <div class="scanner-radar-ring"></div>
+                            <div class="scanner-center-shield">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                        </div>
+                        <h3 id="scanStatusTitle" class="scan-status-title">Performing Deep Privacy Scan...</h3>
+                        <p id="scanStatusSubtitle" class="scan-status-sub">Decompiling vector streams, applying OCR, and checking Verhoeff/Luhn checksums...</p>
+                        <div class="scanner-progress-track">
+                            <div class="scanner-progress-bar"></div>
+                        </div>
+                        <div class="scanner-guarantee-note">
+                            <i class="fa-solid fa-lock"></i> Executing in ephemeral memory. No cloud upload will occur.
+                        </div>
                     </div>
-                </div>
-
-                <div class="dropzone-scanning" id="dropzoneScanning" style="display: none;">
-                    <div class="radar-scan-box">
-                        <div class="radar-sweep"></div>
-                        <i class="fa-solid fa-shield-halved scan-pulse-icon"></i>
-                    </div>
-                    <h3 id="scanStatusTitle" class="scan-status-title">Performing Deep Privacy Scan...</h3>
-                    <p id="scanStatusSubtitle" class="scan-status-sub">Decompiling vector streams, applying OCR, and checking Verhoeff/Luhn checksums...</p>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </section>
 
-    <!-- Demo Samples Section (Index Header Style from Reference) -->
-    <section class="samples-section" id="samples">
-        <div class="section-index-header">
-            <div>
-                <span class="section-index-tag">&mdash; DEMO VAULT</span>
-                <h3 class="section-index-title">Try Preloaded Fictional Demo Samples</h3>
+    <!-- Defensive Capabilities: 4-Column Feature Verification Architecture -->
+    <section class="features-overview-section">
+        <div class="section-editorial-header">
+            <div class="section-header-left">
+                <span class="section-kicker">&mdash; DEFENSIVE ENGINES</span>
+                <h2 class="section-title">Core Inspection &amp; Anti-Recovery Capabilities</h2>
+                <p class="section-subtitle">Mathematical validation and irreversible text stream destruction engineered for sovereign privacy.</p>
             </div>
-            <div class="section-index-meta">
-                <span>Synthetic Sample Suites &bull; 1-Click Verification</span>
+        </div>
+
+        <div class="feature-cards-grid">
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-eyebrow">CHECKSUM VERIFICATION</span>
+                    <div class="feature-icon-wrap"><i class="fa-solid fa-microchip"></i></div>
+                </div>
+                <h3 class="feature-title">Verhoeff &amp; Luhn</h3>
+                <p class="feature-desc">Mathematical checksum validation for Aadhaar UID and payment cards to prevent false-positive alert fatigue.</p>
+                <div class="feature-footer-tag"><i class="fa-solid fa-circle-check"></i> Algorithmic Detection</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-eyebrow">VECTOR FLATTENING</span>
+                    <div class="feature-icon-wrap"><i class="fa-solid fa-layer-group"></i></div>
+                </div>
+                <h3 class="feature-title">Anti-Recovery</h3>
+                <p class="feature-desc">Irreversible high-DPI rasterization that permanently destroys underlying PDF text streams and hidden layers.</p>
+                <div class="feature-footer-tag"><i class="fa-solid fa-shield-halved"></i> Permanent Destruction</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-eyebrow">LATENT FORENSICS</span>
+                    <div class="feature-icon-wrap"><i class="fa-solid fa-fingerprint"></i></div>
+                </div>
+                <h3 class="feature-title">EXIF &amp; GPS Stripping</h3>
+                <p class="feature-desc">Deep inspection and automated scrubbing of hardware serials, geolocation coordinates, and author tags.</p>
+                <div class="feature-footer-tag"><i class="fa-solid fa-broom"></i> Automatic Sanitization</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <span class="feature-eyebrow">PAYLOAD FORENSICS</span>
+                    <div class="feature-icon-wrap"><i class="fa-solid fa-qrcode"></i></div>
+                </div>
+                <h3 class="feature-title">QR Payload X-Ray</h3>
+                <p class="feature-desc">Decodes and audits embedded UPI, WiFi, and web routing strings that bypass visual inspection.</p>
+                <div class="feature-footer-tag"><i class="fa-solid fa-magnifying-glass"></i> Threat Decoding</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Samples Section: Preloaded Fictional Test Suites -->
+    <section class="samples-section" id="samples">
+        <div class="section-editorial-header">
+            <div class="section-header-left">
+                <span class="section-kicker">&mdash; DEMO VAULT</span>
+                <h2 class="section-title">Try Preloaded Fictional Demo Samples</h2>
+                <p class="section-subtitle">Experience ShareSafe's detection and raster-flattening pipeline using preloaded fictional samples.</p>
+            </div>
+            <div class="section-header-right">
+                <span class="vault-pill"><i class="fa-solid fa-vial"></i> Synthetic Datasets &bull; 1-Click Verification</span>
             </div>
         </div>
 
         <div class="samples-grid">
             {% for s in samples %}
-            <div class="sample-card-refined">
-                <div class="sample-card-header">
-                    <span class="sample-badge-pill">{{ s.badge }}</span>
-                    <span class="sample-type-tag">{{ s.type }}</span>
+            <div class="sample-card">
+                <div class="sample-card-top">
+                    <span class="sample-badge">{{ s.badge }}</span>
+                    <span class="sample-type">{{ s.type }}</span>
                 </div>
-                <div class="sample-card-body">
+                <div class="sample-card-main">
                     <div class="sample-icon-circle">
                         <i class="fa-solid fa-{{ s.icon }}"></i>
                     </div>
-                    <h4>{{ s.name }}</h4>
-                    <p>{{ s.desc }}</p>
+                    <h3 class="sample-name">{{ s.name }}</h3>
+                    <p class="sample-desc">{{ s.desc }}</p>
                 </div>
-                <div class="sample-card-footer">
-                    <button type="button" class="btn-sample-trigger" onclick="loadSample('{{ s.id }}')">
-                        <i class="fa-solid fa-play"></i> Test Document
+                <div class="sample-card-actions">
+                    <button type="button" class="btn-sample-run" onclick="loadSample('{{ s.id }}')">
+                        <span>Load Sample</span>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
             </div>

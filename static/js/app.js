@@ -1,6 +1,13 @@
 /**
- * ShareSafe - Main Application JavaScript (Uploads, Demos, Modals)
+ * ShareSafe - Sovereign Privacy & Document Redaction Studio
+ * Client Controller: Multi-State Upload Pipeline, Context Selector, Engine Config & QR Inspector
  */
+
+const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30 MB
+const ALLOWED_EXTS = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp'];
+
+let currentStagedFile = null;
+let currentInspectingQrId = null;
 
 function triggerFilePicker() {
     const input = document.getElementById('fileInput');
@@ -11,84 +18,156 @@ function triggerFilePicker() {
     }
 }
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
-        e.preventDefault();
-        triggerFilePicker();
-    }
-});
-
 // Drag & Drop Handlers
 function handleDragOver(e) {
     e.preventDefault();
     e.stopPropagation();
     const zone = document.getElementById('uploadForm');
-    if (zone) zone.classList.add('drag-over');
+    if (zone) zone.classList.add('drag-active');
 }
 
 function handleDragLeave(e) {
     e.preventDefault();
     e.stopPropagation();
     const zone = document.getElementById('uploadForm');
-    if (zone) zone.classList.remove('drag-over');
+    if (zone) zone.classList.remove('drag-active');
 }
 
 function handleDrop(e) {
     e.preventDefault();
     e.stopPropagation();
     const zone = document.getElementById('uploadForm');
-    if (zone) zone.classList.remove('drag-over');
+    if (zone) zone.classList.remove('drag-active');
 
     const dt = e.dataTransfer;
     if (dt && dt.files && dt.files.length > 0) {
-        uploadFileObject(dt.files[0]);
+        stageSelectedFile(dt.files[0]);
     }
 }
 
-function setSharingContext(ctx) {
-    const input = document.getElementById('sharingContextInput');
-    if (input) input.value = ctx;
-
-    const chips = document.querySelectorAll('.context-chip');
-    chips.forEach(chip => {
-        if (chip.getAttribute('data-context') === ctx) {
-            chip.classList.add('active');
-        } else {
-            chip.classList.remove('active');
-        }
-    });
-
-    const desc = document.getElementById('contextDescText');
-    if (desc) {
-        switch (ctx) {
-            case 'academic':
-                desc.innerText = 'Tuned for student assignments & research papers';
-                break;
-            case 'professional':
-                desc.innerText = 'Strict enterprise guardrails for emails, keys, and tokens';
-                break;
-            case 'private':
-                desc.innerText = 'Direct peer sharing: personal identifiers shielded';
-                break;
-            case 'public':
-                desc.innerText = 'Maximum defensive redaction for public social sharing';
-                break;
-        }
-    }
-}
-
+// File Selection Staging & Client Validation
 function handleFileSelect(e) {
     if (e.target.files && e.target.files.length > 0) {
-        uploadFileObject(e.target.files[0]);
+        stageSelectedFile(e.target.files[0]);
     }
 }
 
-function uploadFileObject(file) {
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function stageSelectedFile(file) {
+    if (!file) return;
+
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    // 1. Validate Extension
+    if (!ALLOWED_EXTS.includes(ext)) {
+        showUploadError(
+            'Unsupported File Format',
+            `File extension .${ext} is not supported. Please select a PDF, PNG, JPG, WEBP, or BMP document.`
+        );
+        return;
+    }
+
+    // 2. Validate File Size
+    if (file.size > MAX_FILE_SIZE) {
+        showUploadError(
+            'File Exceeds Size Limit',
+            `File size (${formatBytes(file.size)}) exceeds the maximum allowed limit of 30 MB.`
+        );
+        return;
+    }
+
+    currentStagedFile = file;
+
     const idleBox = document.getElementById('dropzoneIdle');
+    const selectedBox = document.getElementById('dropzoneSelected');
+    const errorBox = document.getElementById('dropzoneError');
     const scanBox = document.getElementById('dropzoneScanning');
 
     if (idleBox) idleBox.style.display = 'none';
-    if (scanBox) scanBox.style.display = 'block';
+    if (errorBox) errorBox.style.display = 'none';
+    if (scanBox) scanBox.style.display = 'none';
+    if (selectedBox) selectedBox.style.display = 'flex';
+
+    // Populate metadata
+    const nameEl = document.getElementById('selectedFileName');
+    const sizeEl = document.getElementById('selectedFileSize');
+    const typeEl = document.getElementById('selectedFileType');
+    const iconEl = document.getElementById('selectedFileIcon');
+
+    if (nameEl) nameEl.innerText = file.name;
+    if (sizeEl) sizeEl.innerText = formatBytes(file.size);
+    if (typeEl) typeEl.innerText = ext === 'pdf' ? 'PDF Document' : 'Raster Image (' + ext.toUpperCase() + ')';
+    if (iconEl) {
+        iconEl.className = ext === 'pdf' ? 'fa-solid fa-file-pdf text-coral' : 'fa-solid fa-file-image text-coral';
+    }
+}
+
+function clearSelectedFile() {
+    currentStagedFile = null;
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) fileInput.value = '';
+    resetUploadDropzone();
+}
+
+function resetUploadDropzone() {
+    currentStagedFile = null;
+    const idleBox = document.getElementById('dropzoneIdle');
+    const selectedBox = document.getElementById('dropzoneSelected');
+    const errorBox = document.getElementById('dropzoneError');
+    const scanBox = document.getElementById('dropzoneScanning');
+
+    if (idleBox) idleBox.style.display = 'block';
+    if (selectedBox) selectedBox.style.display = 'none';
+    if (errorBox) errorBox.style.display = 'none';
+    if (scanBox) scanBox.style.display = 'none';
+}
+
+function showUploadError(title, message) {
+    const idleBox = document.getElementById('dropzoneIdle');
+    const selectedBox = document.getElementById('dropzoneSelected');
+    const errorBox = document.getElementById('dropzoneError');
+    const scanBox = document.getElementById('dropzoneScanning');
+
+    if (idleBox) idleBox.style.display = 'none';
+    if (selectedBox) selectedBox.style.display = 'none';
+    if (scanBox) scanBox.style.display = 'none';
+    if (errorBox) {
+        errorBox.style.display = 'flex';
+        const titleEl = document.getElementById('uploadErrorTitle');
+        const msgEl = document.getElementById('uploadErrorMessage');
+        if (titleEl) titleEl.innerText = title;
+        if (msgEl) msgEl.innerText = message;
+    }
+}
+
+function submitSelectedFile() {
+    if (!currentStagedFile) return;
+    executeUploadWithFile(currentStagedFile);
+}
+
+function executeUploadWithFile(file) {
+    const idleBox = document.getElementById('dropzoneIdle');
+    const selectedBox = document.getElementById('dropzoneSelected');
+    const scanBox = document.getElementById('dropzoneScanning');
+    const errorBox = document.getElementById('dropzoneError');
+
+    if (idleBox) idleBox.style.display = 'none';
+    if (selectedBox) selectedBox.style.display = 'none';
+    if (errorBox) errorBox.style.display = 'none';
+    if (scanBox) scanBox.style.display = 'flex';
+
+    // Status progression messaging
+    const title = document.getElementById('scanStatusTitle');
+    const sub = document.getElementById('scanStatusSubtitle');
+    if (title) title.innerText = 'Performing Deep Privacy Scan...';
+    if (sub) sub.innerText = 'Decompiling vector streams, applying OCR, and checking Verhoeff/Luhn checksums...';
 
     const formData = new FormData();
     formData.append('file', file);
@@ -101,32 +180,82 @@ function uploadFileObject(file) {
         method: 'POST',
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success && data.redirect_url) {
+    .then(async res => {
+        let data = null;
+        try {
+            data = await res.json();
+        } catch (e) {
+            data = null;
+        }
+        if (!res.ok) {
+            const errorMsg = (data && data.error) ? data.error : `Server communication error (${res.status} ${res.statusText})`;
+            showUploadError('Analysis Failed', errorMsg);
+            return;
+        }
+        if (data && data.success && data.redirect_url) {
+            if (sub) sub.innerText = 'Verification complete. Transferring to Privacy Studio...';
             window.location.href = data.redirect_url;
         } else {
-            alert('Upload error: ' + (data.error || 'Failed to analyze file.'));
-            if (idleBox) idleBox.style.display = 'block';
-            if (scanBox) scanBox.style.display = 'none';
+            showUploadError('Analysis Failed', (data && data.error) || 'Failed to inspect document.');
         }
     })
     .catch(err => {
-        alert('Upload network error: ' + err.message);
-        if (idleBox) idleBox.style.display = 'block';
-        if (scanBox) scanBox.style.display = 'none';
+        showUploadError('Network Communication Error', err.message);
     });
 }
 
+// Sharing Context Selector
+function setSharingContext(ctx) {
+    const input = document.getElementById('sharingContextInput');
+    if (input) input.value = ctx;
+
+    const buttons = document.querySelectorAll('.segment-btn[data-context], .profile-chip[data-context]');
+    buttons.forEach(btn => {
+        const isTarget = btn.getAttribute('data-context') === ctx;
+        if (isTarget) {
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+        } else {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-selected', 'false');
+        }
+    });
+
+    const desc = document.getElementById('contextDescText');
+    if (desc) {
+        switch (ctx) {
+            case 'academic':
+                desc.innerText = 'Tuned for student assignments, coursework, and research papers with standard PII shielding.';
+                break;
+            case 'professional':
+                desc.innerText = 'Strict enterprise guardrails for API keys, secret tokens, credentials, and financial invoices.';
+                break;
+            case 'private':
+                desc.innerText = 'Direct peer sharing: personal phone numbers, addresses, and identity numbers shielded.';
+                break;
+            case 'public':
+                desc.innerText = 'Maximum defensive redaction for broad social sharing, public slide decks, and external forums.';
+                break;
+        }
+    }
+}
+
+// Demo Vault Sample Loader
 function loadSample(sampleId) {
     const idleBox = document.getElementById('dropzoneIdle');
+    const selectedBox = document.getElementById('dropzoneSelected');
     const scanBox = document.getElementById('dropzoneScanning');
+    const errorBox = document.getElementById('dropzoneError');
 
     if (idleBox) idleBox.style.display = 'none';
+    if (selectedBox) selectedBox.style.display = 'none';
+    if (errorBox) errorBox.style.display = 'none';
     if (scanBox) {
-        scanBox.style.display = 'block';
+        scanBox.style.display = 'flex';
         const title = document.getElementById('scanStatusTitle');
-        if (title) title.innerText = 'Loading & Scanning Fictional Sample...';
+        const sub = document.getElementById('scanStatusSubtitle');
+        if (title) title.innerText = 'Loading Synthetic Demonstration Sample...';
+        if (sub) sub.innerText = 'Simulating forensic extraction on verified synthetic dataset...';
     }
 
     const formData = new FormData();
@@ -140,24 +269,30 @@ function loadSample(sampleId) {
         method: 'POST',
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success && data.redirect_url) {
+    .then(async res => {
+        let data = null;
+        try {
+            data = await res.json();
+        } catch (e) {
+            data = null;
+        }
+        if (!res.ok) {
+            const errorMsg = (data && data.error) ? data.error : `Server communication error (${res.status} ${res.statusText})`;
+            showUploadError('Error Loading Sample', errorMsg);
+            return;
+        }
+        if (data && data.success && data.redirect_url) {
             window.location.href = data.redirect_url;
         } else {
-            alert('Error loading sample: ' + (data.error || 'Unknown error'));
-            if (idleBox) idleBox.style.display = 'block';
-            if (scanBox) scanBox.style.display = 'none';
+            showUploadError('Error Loading Sample', (data && data.error) || 'Failed to load demo document.');
         }
     })
     .catch(err => {
-        alert('Network error loading sample: ' + err.message);
-        if (idleBox) idleBox.style.display = 'block';
-        if (scanBox) scanBox.style.display = 'none';
+        showUploadError('Network Error', err.message);
     });
 }
 
-// OCR Engine Modal Logic
+// Engine Settings Modal Logic
 function openOcrModal() {
     const modal = document.getElementById('ocrModal');
     if (!modal) return;
@@ -171,17 +306,13 @@ function openOcrModal() {
         const input = document.getElementById('tesseractCustomPath');
 
         if (status.available) {
-            badge.className = 'badge-tag';
-            badge.style.background = 'rgba(16, 185, 129, 0.2)';
-            badge.style.color = '#10b981';
+            badge.className = 'engine-chip engine-active';
             badge.innerText = `Active (v${status.version || 'OK'})`;
-            desc.innerText = status.message || 'Tesseract engine is operational.';
+            desc.innerText = status.message || 'Tesseract OCR engine is operational for rasterized images.';
         } else {
-            badge.className = 'badge-tag';
-            badge.style.background = 'rgba(245, 158, 11, 0.2)';
-            badge.style.color = '#f59e0b';
-            badge.innerText = 'Binary Not In Path';
-            desc.innerText = status.message;
+            badge.className = 'engine-chip engine-standard';
+            badge.innerText = 'Standard Fallback Active';
+            desc.innerText = status.message || 'PyMuPDF native extraction active for digital PDFs. OCR binary optional.';
         }
 
         if (status.path && input) {
@@ -210,31 +341,22 @@ function saveOcrPath() {
     .then(res => {
         alertBox.style.display = 'block';
         if (res.success) {
-            alertBox.className = 'flash-alert';
-            alertBox.style.background = 'rgba(16, 185, 129, 0.15)';
-            alertBox.style.borderColor = '#10b981';
-            alertBox.style.color = '#a7f3d0';
+            alertBox.className = 'modal-inline-alert alert-success';
             alertBox.innerText = res.message;
-            setTimeout(() => { openOcrModal(); }, 1000);
+            setTimeout(() => { openOcrModal(); }, 1200);
         } else {
-            alertBox.className = 'flash-alert';
-            alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
-            alertBox.style.borderColor = '#ef4444';
-            alertBox.style.color = '#fecaca';
+            alertBox.className = 'modal-inline-alert alert-error';
             alertBox.innerText = res.message;
         }
     });
 }
 
 // QR Threat Inspector Modal Logic
-let currentInspectingQrId = null;
-
 function openQrThreatInspector(detId) {
     currentInspectingQrId = detId;
     const modal = document.getElementById('qrModal');
     if (!modal) return;
 
-    // Retrieve detection info from session data
     let detection = null;
     if (window.workbenchSession && window.workbenchSession.detections) {
         detection = window.workbenchSession.detections.find(d => d.id === detId);
@@ -242,17 +364,15 @@ function openQrThreatInspector(detId) {
 
     if (!detection) return;
 
-    const banner = document.getElementById('qrThreatBanner');
     const title = document.getElementById('qrThreatTitle');
     const desc = document.getElementById('qrThreatDesc');
     const raw = document.getElementById('qrRawPayload');
     const tbody = document.querySelector('#qrFieldsTable tbody');
 
-    title.innerText = detection.label || 'QR Code Detected';
-    desc.innerText = detection.details || 'Scannable payload detected.';
+    title.innerText = detection.label || 'QR Payload Detected';
+    desc.innerText = detection.details || 'Scannable routing payload discovered.';
     raw.innerText = detection.value || '[No decoded string]';
 
-    // Clear and populate fields
     if (tbody) {
         tbody.innerHTML = '';
         const fields = detection.extracted_fields || {};
@@ -297,37 +417,23 @@ function escapeHtml(str) {
     });
 }
 
-// Global Nav Search & Keyboard Shortcut handler
+// Global Keyboard Shortcut & Nav Search Handler
 document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('globalNavSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value;
-            if (typeof window.handleNavSearch === 'function') {
-                window.handleNavSearch(query);
-            }
-        });
-    }
-
     document.addEventListener('keydown', (e) => {
-        // Pressing '/' focuses search input unless already typing in a field
         if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
             e.preventDefault();
-            if (searchInput) {
-                searchInput.focus();
-                searchInput.select();
+            const searchField = document.getElementById('findingsSearchInput');
+            if (searchField) {
+                searchField.focus();
+                searchField.select();
+            } else {
+                triggerFilePicker();
             }
         } else if (e.key === 'Escape') {
-            if (searchInput && document.activeElement === searchInput) {
-                searchInput.value = '';
-                if (typeof window.handleNavSearch === 'function') {
-                    window.handleNavSearch('');
-                }
-                searchInput.blur();
-            }
-            if (typeof closeOcrModal === 'function') closeOcrModal();
-            if (typeof closeQrModal === 'function') closeQrModal();
+            closeOcrModal();
+            closeQrModal();
         }
     });
 });
+
 

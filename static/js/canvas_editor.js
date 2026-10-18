@@ -182,9 +182,9 @@ function setupDrawingCanvas() {
         const currentY = (e.clientY - rect.top) / currentZoom;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#ec4899';
+        ctx.strokeStyle = '#C96D67';
         ctx.lineWidth = 2;
-        ctx.fillStyle = 'rgba(236, 72, 153, 0.25)';
+        ctx.fillStyle = 'rgba(201, 109, 103, 0.22)';
 
         const w = currentX - drawStartX;
         const h = currentY - drawStartY;
@@ -365,7 +365,7 @@ function getStyleDisplayName(style) {
         'whiteout': 'Clean Whiteout (100% White)',
         'blur': 'Gaussian Blur (Deep Bokeh)',
         'pixelate': 'Mosaic Pixelate (Vector Grid)',
-        'stamp': 'Redacted Stamp (Obsidian & Ruby)'
+        'stamp': 'Redacted Stamp (Obsidian & Coral)'
     };
     return map[style] || style;
 }
@@ -392,7 +392,7 @@ function showToastNotification(msg) {
         toast.className = 'studio-toast';
         document.body.appendChild(toast);
     }
-    toast.innerHTML = `<i class="fa-solid fa-circle-check text-ruby"></i> <span>${escapeHtml(msg)}</span>`;
+    toast.innerHTML = `<i class="fa-solid fa-circle-check text-sage"></i> <span>${escapeHtml(msg)}</span>`;
     toast.classList.add('visible');
     clearTimeout(window._toastTimeout);
     window._toastTimeout = setTimeout(() => {
@@ -516,7 +516,19 @@ function executeRedaction(callback) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-    .then(r => r.json())
+    .then(async r => {
+        let data = null;
+        try {
+            data = await r.json();
+        } catch (e) {
+            data = null;
+        }
+        if (!r.ok) {
+            const msg = (data && data.error) ? data.error : `Server error (${r.status} ${r.statusText})`;
+            throw new Error(msg);
+        }
+        return data || {};
+    })
     .then(data => {
         if (btn) {
             btn.disabled = false;

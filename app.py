@@ -135,10 +135,20 @@ def upload_file():
             'redirect_url': url_for('workbench', session_id=session_id)
         })
 
+    except (ValueError, pymupdf.FileDataError) as e:
+        SessionManager.purge_session(session_id)
+        return jsonify({'error': f"Invalid or unreadable document file: {str(e)}"}), 400
     except Exception as e:
+        SessionManager.purge_session(session_id)
         import traceback
         traceback.print_exc()
         return jsonify({'error': f"Failed to process document: {str(e)}"}), 500
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return jsonify({
+        'error': 'File exceeds maximum upload limit of 30 MB. Please select a smaller file.'
+    }), 413
 
 @app.route('/api/update-context/<session_id>', methods=['POST'])
 def update_sharing_context(session_id):
