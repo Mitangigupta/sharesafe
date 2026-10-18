@@ -39,22 +39,28 @@ class DocumentRedactor:
                 cv2.rectangle(result, (x1, y1), (x2, y2), (0, 0, 0), -1)
 
             elif style == 'whiteout':
-                # Pure solid white
+                # Pure solid white with clean subtle boundary
                 cv2.rectangle(result, (x1, y1), (x2, y2), (255, 255, 255), -1)
+                cv2.rectangle(result, (x1, y1), (x2, y2), (220, 220, 225), 1)
 
             elif style == 'blur':
-                # Gaussian blur with heavy sigma
+                # Gaussian blur with heavy multi-pass for complete privacy
                 roi = result[y1:y2, x1:x2]
-                # Ensure kernel size is odd and proportional to height
-                ksize = max(15, (min(rw, rh) // 2) * 2 + 1)
-                ksize = min(ksize, 51)
-                blurred_roi = cv2.GaussianBlur(roi, (ksize, ksize), 30)
-                result[y1:y2, x1:x2] = blurred_roi
+                max_k = min(rw, rh)
+                if max_k % 2 == 0:
+                    max_k -= 1
+                ksize = max(3, min(max_k, 31))
+                if ksize >= 3:
+                    blurred_roi = cv2.GaussianBlur(roi, (ksize, ksize), 15)
+                    blurred_roi = cv2.GaussianBlur(blurred_roi, (ksize, ksize), 15)
+                    result[y1:y2, x1:x2] = blurred_roi
+                else:
+                    cv2.rectangle(result, (x1, y1), (x2, y2), (180, 180, 180), -1)
 
             elif style == 'pixelate':
                 # Mosaic pixelation
                 roi = result[y1:y2, x1:x2]
-                pixel_size = max(6, min(rw, rh) // 6)
+                pixel_size = max(4, min(rw, rh) // 4)
                 small_w = max(1, rw // pixel_size)
                 small_h = max(1, rh // pixel_size)
                 small_roi = cv2.resize(roi, (small_w, small_h), interpolation=cv2.INTER_LINEAR)
@@ -66,16 +72,16 @@ class DocumentRedactor:
                 cv2.rectangle(result, (x1, y1), (x2, y2), (18, 18, 24), -1)
                 cv2.rectangle(result, (x1, y1), (x2, y2), (220, 38, 38), 1)  # Red border
 
-                badge_text = f"[{label[:14]}]" if label else "[REDACTED]"
+                badge_text = f"[{label[:12]}]" if label and label != 'REDACTED' else "[REDACTED]"
                 font = cv2.FONT_HERSHEY_SIMPLEX
-                font_scale = min(0.6, max(0.25, (rh / 40.0)))
+                font_scale = min(0.5, max(0.2, (rh / 45.0)))
                 thickness = 1
                 text_size = cv2.getTextSize(badge_text, font, font_scale, thickness)[0]
 
                 text_x = x1 + max(2, (rw - text_size[0]) // 2)
                 text_y = y1 + max(text_size[1] + 2, (rh + text_size[1]) // 2)
 
-                if rw > 30 and rh > 14:
+                if rw > 35 and rh > 12:
                     cv2.putText(result, badge_text, (text_x, text_y), font, font_scale, (255, 255, 255), thickness, cv2.LINE_AA)
 
             else:
@@ -134,33 +140,21 @@ class DocumentRedactor:
             # Find all redactions for this page
             page_redacts = [r for r in redactions if r.get('page') == page_num]
 
-            # 1. Native PyMuPDF content stream redactions (physically removes text objects from PDF stream)
-            for r in page_redacts:
-                bbox = r.get('bbox')
-                if bbox and len(bbox) == 4:
-                    # Convert from preview pixel coords back to PDF points
-                    x, y, w, h = bbox
-                    pdf_rect = pymupdf.Rect(x / zoom, y / zoom, (x + w) / zoom, (y + h) / zoom)
-                    page.add_redact_annot(pdf_rect, fill=(0, 0, 0))
-
-            page.apply_redactions()
-
-            # 2. To support all custom redaction styles (blur, pixelate, stamp) and prevent font dictionary recovery,
-            # render page pixmap and apply custom styling
+            # 1. Render original page to high-DPI pixmap before altering
             pix = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom))
+
             # Convert pixmap to numpy BGR image
             img_bytes = pix.tobytes("png")
             nparr = np.frombuffer(img_bytes, np.uint8)
             img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # Apply stylized effects
+            # 2. Apply stylized effects (blur, pixelate, whiteout, blackout, stamp) directly to image pixels
             redacted_np = cls.redact_image_np(img_np, page_redacts)
 
-            # Encode back to clean image
+            # 3. Encode back to clean image
             _, encoded_png = cv2.imencode(".png", redacted_np)
             
-            # Create a brand new clean flattened PDF page
-            # Page dimensions in points
+            # 4. Create a brand new clean flattened PDF page with NO text objects or font tables
             rect = page.rect
             new_page = out_doc.new_page(width=rect.width, height=rect.height)
             new_page.insert_image(rect, stream=encoded_png.tobytes())

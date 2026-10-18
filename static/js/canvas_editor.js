@@ -86,6 +86,7 @@ function renderBoundingBoxes() {
     overlay.innerHTML = '';
 
     const { scaleX, scaleY } = getScaleFactors();
+    const searchQuery = (window.currentSearchQuery || '').toLowerCase().trim();
 
     // 1. Render automated detections for this page
     const pageDets = sessionData.detections.filter(d => (d.page || 1) === currentPage);
@@ -94,18 +95,33 @@ function renderBoundingBoxes() {
         if (!d.bbox || d.bbox.length !== 4) return;
         const [x, y, w, h] = d.bbox;
 
+        const isMatch = !searchQuery || 
+            (d.label || '').toLowerCase().includes(searchQuery) ||
+            (d.category || '').toLowerCase().includes(searchQuery) ||
+            (d.masked || '').toLowerCase().includes(searchQuery) ||
+            (d.risk || '').toLowerCase().includes(searchQuery);
+
         const box = document.createElement('div');
         box.id = `box-${d.id}`;
-        box.className = `box-overlay box-${d.risk.toLowerCase()}`;
+        box.className = `box-overlay box-${d.risk.toLowerCase()} box-style-${globalStyle}`;
         if (!selectedIds.has(d.id)) {
             box.classList.add('deselected');
+        }
+        if (searchQuery && !isMatch) {
+            box.classList.add('search-filtered-out');
         }
 
         box.style.left = `${x * scaleX}px`;
         box.style.top = `${y * scaleY}px`;
         box.style.width = `${w * scaleX}px`;
         box.style.height = `${h * scaleY}px`;
-        box.title = `${d.label}: ${d.masked} (${d.risk} Risk)`;
+        box.title = `${d.label}: ${d.masked} (${d.risk} Risk) — Click to Toggle Redaction`;
+
+        // Stamp style label inside box
+        if (selectedIds.has(d.id) && globalStyle === 'stamp') {
+            const shortLabel = (d.label && d.label.length <= 10) ? `[${d.label.toUpperCase()}]` : '[REDACTED]';
+            box.innerHTML = `<span class="stamp-inner-text">${escapeHtml(shortLabel)}</span>`;
+        }
 
         box.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -122,14 +138,20 @@ function renderBoundingBoxes() {
     const pageManuals = manualRedactions.filter(m => m.page === currentPage);
     pageManuals.forEach(m => {
         const [x, y, w, h] = m.bbox;
+        const mStyle = m.style || globalStyle;
         const box = document.createElement('div');
         box.id = `box-${m.id}`;
-        box.className = 'box-overlay box-manual';
+        box.className = `box-overlay box-manual box-style-${mStyle}`;
         box.style.left = `${x * scaleX}px`;
         box.style.top = `${y * scaleY}px`;
         box.style.width = `${w * scaleX}px`;
         box.style.height = `${h * scaleY}px`;
         box.title = `Manual Redaction: ${m.label}`;
+
+        if (mStyle === 'stamp') {
+            box.innerHTML = `<span class="stamp-inner-text">[REDACTED]</span>`;
+        }
+
         overlay.appendChild(box);
     });
 }
@@ -327,7 +349,82 @@ function deselectAllDetections() {
 
 function updateGlobalStyle(newStyle) {
     globalStyle = newStyle;
+    // Update style on all manual redactions
+    manualRedactions.forEach(m => m.style = newStyle);
+    // Immediately re-render bounding boxes to show selected visual style
+    renderBoundingBoxes();
+    // Update style badge labels in detection items
+    updateDetectionsStyleLabels(newStyle);
+    // Display executive toast notification
+    showToastNotification(`Redaction Style: ${getStyleDisplayName(newStyle)} applied`);
 }
+
+function getStyleDisplayName(style) {
+    const map = {
+        'blackout': 'Solid Blackout (100% Black)',
+        'whiteout': 'Clean Whiteout (100% White)',
+        'blur': 'Gaussian Blur (Deep Bokeh)',
+        'pixelate': 'Mosaic Pixelate (Vector Grid)',
+        'stamp': 'Redacted Stamp (Obsidian & Ruby)'
+    };
+    return map[style] || style;
+}
+
+function updateDetectionsStyleLabels(style) {
+    const shortNames = {
+        'blackout': 'Blackout',
+        'whiteout': 'Whiteout',
+        'blur': 'Blur',
+        'pixelate': 'Pixelate',
+        'stamp': 'Stamp'
+    };
+    const name = shortNames[style] || style;
+    document.querySelectorAll('.style-name-text').forEach(el => {
+        el.innerText = name;
+    });
+}
+
+function showToastNotification(msg) {
+    let toast = document.getElementById('studioToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'studioToast';
+        toast.className = 'studio-toast';
+        document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<i class="fa-solid fa-circle-check text-ruby"></i> <span>${escapeHtml(msg)}</span>`;
+    toast.classList.add('visible');
+    clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('visible');
+    }, 2500);
+}
+
+// Global Nav Search Filter across detections & canvas
+window.handleNavSearch = function(query) {
+    window.currentSearchQuery = query;
+    const items = document.querySelectorAll('.detection-item');
+    const q = (query || '').toLowerCase().trim();
+
+    items.forEach(item => {
+        const text = item.innerText.toLowerCase();
+        if (!q || text.includes(q)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    renderBoundingBoxes();
+};
+
+// Item click handler (toggles checkbox on row click unless button clicked)
+window.handleDetectionItemClick = function(event, id) {
+    if (event.target.closest('.btn-threat-inspect') || event.target.closest('.custom-toggle')) {
+        return;
+    }
+    toggleDetection(id);
+};
 
 function highlightBox(id) {
     const box = document.getElementById(`box-${id}`);
@@ -401,12 +498,12 @@ function changePage(delta) {
 }
 
 // Redaction Execution Pipeline
-function executeRedaction() {
+function executeRedaction(callback) {
     const btn = document.getElementById('applyRedactBtn');
-    if (!btn) return;
-
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Redacting & Flattening...`;
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Redacting & Flattening...`;
+    }
 
     const payload = {
         selected_detection_ids: Array.from(selectedIds),
@@ -421,8 +518,10 @@ function executeRedaction() {
     })
     .then(r => r.json())
     .then(data => {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-user-shield"></i> Redact & Export Safe Copy`;
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>Sanitize & Export</span>`;
+        }
 
         if (!data.success) {
             alert("Redaction error: " + (data.error || "Failed to redact document."));
@@ -435,8 +534,8 @@ function executeRedaction() {
         // Enable view mode tabs
         const tabSplit = document.getElementById('tabSplit');
         const tabRedacted = document.getElementById('tabRedacted');
-        if (tabSplit) tabSplit.style.display = 'inline-block';
-        if (tabRedacted) tabRedacted.style.display = 'inline-block';
+        if (tabSplit) tabSplit.style.display = 'inline-flex';
+        if (tabRedacted) tabRedacted.style.display = 'inline-flex';
 
         // Update slider images
         const afterImg = document.getElementById('afterSliderImg');
@@ -460,19 +559,35 @@ function executeRedaction() {
         const drawer = document.getElementById('exportDrawer');
         if (drawer) drawer.style.display = 'block';
 
-        // Automatically switch to Split Comparison Slider view!
-        switchViewMode('split');
-        setTimeout(syncAfterImageDimensions, 100);
+        showToastNotification("Document Sanitized & Cryptographically Sealed");
+
+        if (typeof callback === 'function') {
+            callback();
+        } else {
+            // Automatically switch to Split Comparison Slider view
+            switchViewMode('split');
+            setTimeout(syncAfterImageDimensions, 100);
+        }
     })
     .catch(err => {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-user-shield"></i> Redact & Export Safe Copy`;
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>Sanitize & Export</span>`;
+        }
         alert("Network error: " + err.message);
     });
 }
 
 // Switch between Original Overlay, Split Slider, and Redacted Solo
 function switchViewMode(mode) {
+    if ((mode === 'split' || mode === 'redacted') && redactedPreviews.length === 0) {
+        showToastNotification("Generating sanitized copy for comparison...");
+        executeRedaction(() => {
+            switchViewMode(mode);
+        });
+        return;
+    }
+
     const overlayView = document.getElementById('overlayViewport');
     const splitView = document.getElementById('splitViewport');
     const redactedView = document.getElementById('redactedViewport');

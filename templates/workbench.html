@@ -35,10 +35,10 @@
                 <button type="button" class="tab-btn active" id="tabOriginal" onclick="switchViewMode('original')" title="View interactive bounding boxes">
                     <i class="fa-solid fa-eye"></i> <span>Interactive Overlay</span>
                 </button>
-                <button type="button" class="tab-btn" id="tabSplit" onclick="switchViewMode('split')" style="display: none;" title="Compare before & after redaction">
+                <button type="button" class="tab-btn" id="tabSplit" onclick="switchViewMode('split')" title="Compare before & after redaction">
                     <i class="fa-solid fa-code-compare"></i> <span>Before / After Split</span>
                 </button>
-                <button type="button" class="tab-btn" id="tabRedacted" onclick="switchViewMode('redacted')" style="display: none;" title="View final redacted document">
+                <button type="button" class="tab-btn" id="tabRedacted" onclick="switchViewMode('redacted')" title="View final redacted document">
                     <i class="fa-solid fa-shield-check"></i> <span>Sanitized Result</span>
                 </button>
             </div>
@@ -167,7 +167,7 @@
                         {% endif %}
 
                         {% for d in session_data.detections %}
-                        <div class="detection-item risk-border-{{ d.risk|lower }}" id="item-{{ d.id }}" onmouseenter="highlightBox('{{ d.id }}')" onmouseleave="unhighlightBox('{{ d.id }}')">
+                        <div class="detection-item risk-border-{{ d.risk|lower }}" id="item-{{ d.id }}" onclick="handleDetectionItemClick(event, '{{ d.id }}')" onmouseenter="highlightBox('{{ d.id }}')" onmouseleave="unhighlightBox('{{ d.id }}')">
                             <div class="item-checkbox-col">
                                 <label class="custom-toggle" title="Toggle Redaction for this Item">
                                     <input type="checkbox" class="styled-checkbox det-checkbox" id="chk-{{ d.id }}" data-id="{{ d.id }}" {% if d.risk in ['CRITICAL', 'HIGH'] %}checked{% endif %} onchange="onCheckboxChange('{{ d.id }}')">
@@ -185,6 +185,9 @@
                                 <div class="item-meta-row">
                                     <span class="meta-item"><i class="fa-regular fa-file"></i> Page {{ d.page }}</span>
                                     <span class="meta-item"><i class="fa-solid fa-tag"></i> {{ d.category }}</span>
+                                    <span class="item-style-pill" id="stylePill-{{ d.id }}" title="Current redaction style">
+                                        <i class="fa-solid fa-paintbrush"></i> <span class="style-name-text">Blackout</span>
+                                    </span>
                                     {% if d.type == 'qr_code' %}
                                     <button type="button" class="btn-xs btn-threat-inspect" onclick="openQrThreatInspector('{{ d.id }}')">
                                         <i class="fa-solid fa-qrcode"></i> Inspect QR Payload

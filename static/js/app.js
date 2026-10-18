@@ -296,3 +296,38 @@ function escapeHtml(str) {
         }[m];
     });
 }
+
+// Global Nav Search & Keyboard Shortcut handler
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('globalNavSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            if (typeof window.handleNavSearch === 'function') {
+                window.handleNavSearch(query);
+            }
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        // Pressing '/' focuses search input unless already typing in a field
+        if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+            e.preventDefault();
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        } else if (e.key === 'Escape') {
+            if (searchInput && document.activeElement === searchInput) {
+                searchInput.value = '';
+                if (typeof window.handleNavSearch === 'function') {
+                    window.handleNavSearch('');
+                }
+                searchInput.blur();
+            }
+            if (typeof closeOcrModal === 'function') closeOcrModal();
+            if (typeof closeQrModal === 'function') closeQrModal();
+        }
+    });
+});
+
