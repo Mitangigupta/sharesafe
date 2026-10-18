@@ -15,6 +15,7 @@ class Config:
     MAX_CONTENT_LENGTH = 30 * 1024 * 1024  # 30 MB max upload
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'bmp', 'pdf'}
     SESSION_TTL_MINUTES = 30
+    SEND_FILE_MAX_AGE_DEFAULT = 0
 
     # Auto-detect Tesseract OCR executable on Windows and Linux/macOS
     _tess_env = os.environ.get('TESSERACT_CMD')
