@@ -702,36 +702,32 @@ function switchViewMode(mode) {
 }
 
 // Split slider events
-function syncAfterImageDimensions() {
-    const beforeImg = document.getElementById('beforeSliderImg');
-    const afterImg = document.getElementById('afterSliderImg');
-    const afterWrap = document.getElementById('afterWrapper');
-    const container = document.querySelector('.split-image-container');
+let currentSliderPct = 50;
 
-    if (beforeImg && afterImg) {
-        const w = beforeImg.clientWidth || beforeImg.naturalWidth;
-        const h = beforeImg.clientHeight || beforeImg.naturalHeight;
-        if (w > 0 && h > 0) {
-            afterImg.style.width = `${w}px`;
-            afterImg.style.height = `${h}px`;
-            if (container) {
-                container.style.width = `${w}px`;
-                container.style.height = `${h}px`;
-            }
-            if (afterWrap) {
-                afterWrap.style.width = `${w}px`;
-                afterWrap.style.height = `${h}px`;
-            }
-        }
+function setSliderPct(pct) {
+    currentSliderPct = Math.max(0, Math.min(100, pct));
+    const afterWrap = document.getElementById('afterWrapper');
+    const divider = document.getElementById('sliderDivider');
+    if (afterWrap) {
+        // Reveal Sanitized Copy on the LEFT (0% to pct%):
+        afterWrap.style.clipPath = `polygon(0% 0%, ${currentSliderPct}% 0%, ${currentSliderPct}% 100%, 0% 100%)`;
+        afterWrap.style.webkitClipPath = `polygon(0% 0%, ${currentSliderPct}% 0%, ${currentSliderPct}% 100%, 0% 100%)`;
     }
+    if (divider) {
+        divider.style.left = `${currentSliderPct}%`;
+    }
+}
+
+function syncAfterImageDimensions() {
+    // Sizing is automatically and responsively handled by CSS (100% overlay)
+    setSliderPct(currentSliderPct);
 }
 
 function initSplitSliderEvents() {
     const divider = document.getElementById('sliderDivider');
-    const afterWrap = document.getElementById('afterWrapper');
     const container = document.querySelector('.split-image-container');
 
-    if (!divider || !afterWrap || !container) return;
+    if (!divider || !container) return;
 
     let isSliding = false;
 
@@ -740,18 +736,11 @@ function initSplitSliderEvents() {
         if (rect.width <= 0) return;
         const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
         const pct = (offsetX / rect.width) * 100;
-
-        // Clip afterWrapper (Sanitized Copy on right):
-        // 0 to pct% is Original Document (visible underneath)
-        // pct% to 100% is Sanitized Copy (clipped afterWrapper on top)
-        afterWrap.style.clipPath = `polygon(${pct}% 0%, 100% 0%, 100% 100%, ${pct}% 100%)`;
-        afterWrap.style.webkitClipPath = `polygon(${pct}% 0%, 100% 0%, 100% 100%, ${pct}% 100%)`;
-        divider.style.left = `${pct}%`;
+        setSliderPct(pct);
     }
 
     divider.addEventListener('pointerdown', (e) => {
         isSliding = true;
-        divider.setPointerCapture?.(e.pointerId);
         e.preventDefault();
     });
 
@@ -773,6 +762,8 @@ function initSplitSliderEvents() {
     window.addEventListener('pointercancel', () => {
         isSliding = false;
     });
+
+    setSliderPct(50);
 }
 
 // Purge Session Data Immediately

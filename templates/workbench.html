@@ -326,14 +326,14 @@
                 <!-- Mode 2: Before & After Split Slider Viewport -->
                 <div class="split-slider-wrapper" id="splitViewport" style="display: none;">
                     <div class="split-status-badges-bar">
-                        <span class="split-badge-tag badge-tag-before"><i class="fa-solid fa-eye text-coral"></i> Original Document (Exposed PII)</span>
-                        <span class="split-badge-hint"><i class="fa-solid fa-arrows-left-right"></i> Drag center handle to verify permanent redaction</span>
                         <span class="split-badge-tag badge-tag-after"><i class="fa-solid fa-shield-halved text-sage"></i> Sanitized Copy (Raster Flattened)</span>
+                        <span class="split-badge-hint"><i class="fa-solid fa-arrows-left-right"></i> Drag slider handle to compare redacted vs original</span>
+                        <span class="split-badge-tag badge-tag-before"><i class="fa-solid fa-eye text-coral"></i> Original Document (Exposed PII)</span>
                     </div>
                     <div class="split-image-container">
-                        <img id="beforeSliderImg" src="{{ session_data.pages[0].preview_url }}" class="split-img before-img" alt="Before Redaction">
+                        <img id="beforeSliderImg" src="{{ session_data.pages[0].preview_url }}" class="split-img before-img" alt="Original Document" draggable="false">
                         <div class="after-wrapper" id="afterWrapper">
-                            <img id="afterSliderImg" src="" class="split-img after-img" alt="After Redaction">
+                            <img id="afterSliderImg" src="" class="split-img after-img" alt="Sanitized Copy" draggable="false">
                         </div>
                         <div class="slider-divider" id="sliderDivider">
                             <div class="divider-handle"><i class="fa-solid fa-arrows-left-right"></i></div>
@@ -418,5 +418,5 @@ function switchSidebarTab(tabName) {
 {% block footer %}{% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.3"></script>
+<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.4"></script>
 {% endblock %}
