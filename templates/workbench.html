@@ -65,6 +65,11 @@
                 </button>
             </div>
 
+            <div id="previewStatusBadge" class="preview-status-badge" style="display: none;">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Updating sanitized view...</span>
+            </div>
+
             {% if (session_data.page_count|default(session_data.pages|length)) > 1 %}
             <div class="toolbar-divider"></div>
             <div class="page-nav-group">
@@ -192,7 +197,7 @@
                 <div class="detections-container">
                     <div class="detections-header-bar">
                         <span class="detections-title">Detected Exposure Findings ({{ session_data.detections|length }})</span>
-                        <span class="detections-toggle-hint">Toggle to sanitize</span>
+                        <span class="detections-toggle-hint" id="selectedCountHint">Toggle to sanitize</span>
                     </div>
 
                     <div class="detections-list" id="detectionsList">
@@ -413,5 +418,5 @@ function switchSidebarTab(tabName) {
 {% block footer %}{% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.2"></script>
+<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.3"></script>
 {% endblock %}

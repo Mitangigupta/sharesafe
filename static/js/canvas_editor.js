@@ -13,6 +13,11 @@ let isDrawMode = false;
 let isDrawing = false;
 let drawStartX = 0, drawStartY = 0;
 let redactedPreviews = [];
+let isDirty = true;
+let currentViewMode = 'original';
+let autoRedactTimer = null;
+let isRedacting = false;
+let pendingRedact = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const rawData = document.getElementById('sessionJsonData');
@@ -32,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedIds.add(d.id);
         }
     });
+    updateSidebarSelectedCount();
 
     const img = document.getElementById('pagePreviewImg');
     if (img) {
@@ -227,7 +233,7 @@ function setupDrawingCanvas() {
         manualRedactions.push(newManual);
         if (typeof switchSidebarTab === 'function') switchSidebarTab('manual');
         updateManualRedactionsUI();
-        renderBoundingBoxes();
+        notifySelectionChanged();
     };
 }
 
@@ -282,7 +288,51 @@ function updateManualRedactionsUI() {
 function deleteManualRedaction(manualId) {
     manualRedactions = manualRedactions.filter(m => m.id !== manualId);
     updateManualRedactionsUI();
+    notifySelectionChanged();
+}
+
+function updateSidebarSelectedCount() {
+    const hint = document.getElementById('selectedCountHint');
+    if (hint && sessionData && sessionData.detections) {
+        const total = sessionData.detections.length;
+        const selectedCount = sessionData.detections.filter(d => selectedIds.has(d.id)).length;
+        hint.innerText = `${selectedCount} of ${total} selected`;
+    }
+}
+
+function notifySelectionChanged() {
+    isDirty = true;
     renderBoundingBoxes();
+    updateSidebarSelectedCount();
+
+    // If currently viewing split or redacted mode, auto-update the sanitized preview
+    if (currentViewMode === 'split' || currentViewMode === 'redacted') {
+        debouncedAutoRedact(250);
+    }
+}
+
+function debouncedAutoRedact(delay = 250) {
+    clearTimeout(autoRedactTimer);
+    showUpdatingBadge(true);
+    autoRedactTimer = setTimeout(() => {
+        executeRedaction(() => {
+            showUpdatingBadge(false);
+        }, true);
+    }, delay);
+}
+
+function showUpdatingBadge(show) {
+    const badge = document.getElementById('previewStatusBadge');
+    if (!badge) return;
+    if (show) {
+        badge.style.display = 'inline-flex';
+        badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Updating preview...</span>`;
+    } else {
+        badge.innerHTML = `<i class="fa-solid fa-check text-sage"></i> <span>Preview updated</span>`;
+        setTimeout(() => {
+            if (!isRedacting && badge) badge.style.display = 'none';
+        }, 1200);
+    }
 }
 
 // Detection toggles and selections
@@ -293,14 +343,14 @@ function toggleDetection(id) {
         selectedIds.add(id);
     }
     syncCheckbox(id);
-    renderBoundingBoxes();
+    notifySelectionChanged();
 }
 
 window.setDetectionSelected = function(id, isSelected) {
     if (isSelected) selectedIds.add(id);
     else selectedIds.delete(id);
     syncCheckbox(id);
-    renderBoundingBoxes();
+    notifySelectionChanged();
 };
 
 function onCheckboxChange(id) {
@@ -309,7 +359,7 @@ function onCheckboxChange(id) {
         if (chk.checked) selectedIds.add(id);
         else selectedIds.delete(id);
     }
-    renderBoundingBoxes();
+    notifySelectionChanged();
 }
 
 function syncCheckbox(id) {
@@ -323,7 +373,7 @@ function selectAllDetections() {
     if (!sessionData) return;
     sessionData.detections.forEach(d => selectedIds.add(d.id));
     document.querySelectorAll('.det-checkbox').forEach(c => c.checked = true);
-    renderBoundingBoxes();
+    notifySelectionChanged();
 }
 
 function selectCriticalAndHigh() {
@@ -338,25 +388,25 @@ function selectCriticalAndHigh() {
         const id = c.getAttribute('data-id');
         c.checked = selectedIds.has(id);
     });
-    renderBoundingBoxes();
+    notifySelectionChanged();
 }
 
 function deselectAllDetections() {
     selectedIds.clear();
     document.querySelectorAll('.det-checkbox').forEach(c => c.checked = false);
-    renderBoundingBoxes();
+    notifySelectionChanged();
 }
 
 function updateGlobalStyle(newStyle) {
     globalStyle = newStyle;
     // Update style on all manual redactions
     manualRedactions.forEach(m => m.style = newStyle);
-    // Immediately re-render bounding boxes to show selected visual style
-    renderBoundingBoxes();
     // Update style badge labels in detection items
     updateDetectionsStyleLabels(newStyle);
     // Display executive toast notification
     showToastNotification(`Redaction Style: ${getStyleDisplayName(newStyle)} applied`);
+    // Re-render bounding boxes and sync with sanitized view
+    notifySelectionChanged();
 }
 
 function getStyleDisplayName(style) {
@@ -498,9 +548,16 @@ function changePage(delta) {
 }
 
 // Redaction Execution Pipeline
-function executeRedaction(callback) {
+function executeRedaction(callback, isAuto = false) {
+    if (isRedacting) {
+        pendingRedact = true;
+        return;
+    }
+    isRedacting = true;
+    showUpdatingBadge(true);
+
     const btn = document.getElementById('applyRedactBtn');
-    if (btn) {
+    if (btn && !isAuto) {
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Redacting & Flattening...`;
     }
@@ -530,18 +587,23 @@ function executeRedaction(callback) {
         return data || {};
     })
     .then(data => {
+        isRedacting = false;
+        isDirty = false;
+
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>Sanitize & Export</span>`;
+            btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>Sanitize &amp; Export</span>`;
         }
 
         if (!data.success) {
-            alert("Redaction error: " + (data.error || "Failed to redact document."));
+            showUpdatingBadge(false);
+            if (!isAuto) alert("Redaction error: " + (data.error || "Failed to redact document."));
             return;
         }
 
-        // Store redacted preview urls
-        redactedPreviews = data.redacted_previews || [];
+        // Cache-busted preview URLs to guarantee immediate DOM refresh
+        const cacheBuster = Date.now();
+        redactedPreviews = (data.redacted_previews || []).map(url => `${url}?t=${cacheBuster}`);
 
         // Enable view mode tabs
         const tabSplit = document.getElementById('tabSplit');
@@ -549,14 +611,16 @@ function executeRedaction(callback) {
         if (tabSplit) tabSplit.style.display = 'inline-flex';
         if (tabRedacted) tabRedacted.style.display = 'inline-flex';
 
-        // Update slider images
+        // Update slider and solo preview images with cache-busted URLs
         const afterImg = document.getElementById('afterSliderImg');
         const soloImg = document.getElementById('redactedSoloImg');
-        if (afterImg && redactedPreviews.length > 0) {
+        if (afterImg && redactedPreviews.length >= currentPage) {
             afterImg.onload = () => { syncAfterImageDimensions(); };
             afterImg.src = redactedPreviews[currentPage - 1];
         }
-        if (soloImg && redactedPreviews.length > 0) soloImg.src = redactedPreviews[currentPage - 1];
+        if (soloImg && redactedPreviews.length >= currentPage) {
+            soloImg.src = redactedPreviews[currentPage - 1];
+        }
 
         // Setup download URLs
         const docBtn = document.getElementById('downloadDocBtn');
@@ -567,38 +631,49 @@ function executeRedaction(callback) {
         if (certBtn) certBtn.href = data.download_certificate_url;
         if (jsonBtn) jsonBtn.href = data.download_json_url;
 
-        // Reveal bottom safe export drawer
-        const drawer = document.getElementById('exportDrawer');
-        if (drawer) drawer.style.display = 'block';
+        // If manual click on Sanitize & Export, reveal bottom export drawer and toast
+        if (!isAuto) {
+            const drawer = document.getElementById('exportDrawer');
+            if (drawer) drawer.style.display = 'block';
+            showToastNotification("Document Sanitized & Cryptographically Sealed");
+        }
 
-        showToastNotification("Document Sanitized & Cryptographically Sealed");
+        showUpdatingBadge(false);
 
-        if (typeof callback === 'function') {
+        if (pendingRedact) {
+            pendingRedact = false;
+            debouncedAutoRedact(50);
+        } else if (typeof callback === 'function') {
             callback();
-        } else {
-            // Automatically switch to Split Comparison Slider view
+        } else if (!isAuto) {
             switchViewMode('split');
             setTimeout(syncAfterImageDimensions, 100);
         }
     })
     .catch(err => {
+        isRedacting = false;
+        showUpdatingBadge(false);
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>Sanitize & Export</span>`;
+            btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>Sanitize &amp; Export</span>`;
         }
-        alert("Network error: " + err.message);
+        if (!isAuto) {
+            alert("Network error: " + err.message);
+        }
     });
 }
 
 // Switch between Original Overlay, Split Slider, and Redacted Solo
 function switchViewMode(mode) {
-    if ((mode === 'split' || mode === 'redacted') && redactedPreviews.length === 0) {
+    if ((mode === 'split' || mode === 'redacted') && (isDirty || redactedPreviews.length === 0)) {
         showToastNotification("Generating sanitized copy for comparison...");
         executeRedaction(() => {
             switchViewMode(mode);
         });
         return;
     }
+
+    currentViewMode = mode;
 
     const overlayView = document.getElementById('overlayViewport');
     const splitView = document.getElementById('splitViewport');
@@ -630,7 +705,9 @@ function switchViewMode(mode) {
 function syncAfterImageDimensions() {
     const beforeImg = document.getElementById('beforeSliderImg');
     const afterImg = document.getElementById('afterSliderImg');
+    const afterWrap = document.getElementById('afterWrapper');
     const container = document.querySelector('.split-image-container');
+
     if (beforeImg && afterImg) {
         const w = beforeImg.clientWidth || beforeImg.naturalWidth;
         const h = beforeImg.clientHeight || beforeImg.naturalHeight;
@@ -640,6 +717,10 @@ function syncAfterImageDimensions() {
             if (container) {
                 container.style.width = `${w}px`;
                 container.style.height = `${h}px`;
+            }
+            if (afterWrap) {
+                afterWrap.style.width = `${w}px`;
+                afterWrap.style.height = `${h}px`;
             }
         }
     }
@@ -654,22 +735,42 @@ function initSplitSliderEvents() {
 
     let isSliding = false;
 
+    function updateSlider(clientX) {
+        const rect = container.getBoundingClientRect();
+        if (rect.width <= 0) return;
+        const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        const pct = (offsetX / rect.width) * 100;
+
+        // Clip afterWrapper (Sanitized Copy on right):
+        // 0 to pct% is Original Document (visible underneath)
+        // pct% to 100% is Sanitized Copy (clipped afterWrapper on top)
+        afterWrap.style.clipPath = `polygon(${pct}% 0%, 100% 0%, 100% 100%, ${pct}% 100%)`;
+        afterWrap.style.webkitClipPath = `polygon(${pct}% 0%, 100% 0%, 100% 100%, ${pct}% 100%)`;
+        divider.style.left = `${pct}%`;
+    }
+
     divider.addEventListener('pointerdown', (e) => {
         isSliding = true;
+        divider.setPointerCapture?.(e.pointerId);
+        e.preventDefault();
+    });
+
+    container.addEventListener('pointerdown', (e) => {
+        isSliding = true;
+        updateSlider(e.clientX);
         e.preventDefault();
     });
 
     window.addEventListener('pointermove', (e) => {
         if (!isSliding) return;
-        const rect = container.getBoundingClientRect();
-        const offsetX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        const pct = (offsetX / rect.width) * 100;
-
-        afterWrap.style.width = `${pct}%`;
-        divider.style.left = `${pct}%`;
+        updateSlider(e.clientX);
     });
 
     window.addEventListener('pointerup', () => {
+        isSliding = false;
+    });
+
+    window.addEventListener('pointercancel', () => {
         isSliding = false;
     });
 }
