@@ -18,6 +18,114 @@ app.config.from_object(Config)
 
 scanner = DocumentScanner()
 
+def generate_preview_images(file_path: str, session_dir: str, is_pdf: bool):
+    """Renders page preview images (page_1.png, page_2.png, ...) in session_dir."""
+    if is_pdf:
+        import pymupdf
+        doc = pymupdf.open(file_path)
+        for page_idx in range(len(doc)):
+            page = doc[page_idx]
+            zoom = 150 / 72
+            mat = pymupdf.Matrix(zoom, zoom)
+            pix = page.get_pixmap(matrix=mat)
+            pix.save(os.path.join(session_dir, f"page_{page_idx + 1}.png"))
+        doc.close()
+    else:
+        dest_preview = os.path.join(session_dir, "page_1.png")
+        if file_path != dest_preview and os.path.exists(file_path):
+            shutil.copyfile(file_path, dest_preview)
+
+def restore_session_if_needed(session_id, client_session_data=None):
+    """
+    Guarantees session persistence across stateless serverless instances (e.g. Vercel).
+    If ephemeral session files were purged or routed to a different lambda container,
+    re-hydrates the session directory, original file, and previews automatically.
+    """
+    upload_dir = SessionManager.get_session_upload_dir(session_id)
+    info_path = os.path.join(upload_dir, 'session_info.json')
+
+    if os.path.exists(info_path):
+        try:
+            with open(info_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+
+    sample_map = {
+        'aadhaar_pan': 'aadhaar_pan_sample.png',
+        'medical_invoice': 'medical_invoice.pdf',
+        'server_config': 'server_config.png'
+    }
+
+    sample_id = None
+    file_name = None
+
+    if client_session_data and isinstance(client_session_data, dict):
+        sample_id = client_session_data.get('sample_id')
+        file_name = client_session_data.get('file_name')
+
+    if not sample_id and file_name:
+        for s_id, s_file in sample_map.items():
+            if s_file == file_name:
+                sample_id = s_id
+                break
+
+    # If this corresponds to a demo sample, re-create the session from disk
+    if sample_id and sample_id in sample_map:
+        src_sample = os.path.join(Config.SAMPLES_FOLDER, sample_map[sample_id])
+        if not os.path.exists(src_sample):
+            from samples.generate_samples import create_sample_aadhaar_pan, create_sample_medical_pdf, create_sample_server_config
+            if sample_id == 'aadhaar_pan': create_sample_aadhaar_pan()
+            elif sample_id == 'medical_invoice': create_sample_medical_pdf()
+            elif sample_id == 'server_config': create_sample_server_config()
+
+        if os.path.exists(src_sample):
+            dest_filename = sample_map[sample_id]
+            dest_path = os.path.join(upload_dir, dest_filename)
+            shutil.copyfile(src_sample, dest_path)
+
+            if client_session_data and 'detections' in client_session_data:
+                session_data = dict(client_session_data)
+                session_data['original_path'] = dest_path
+                session_data['sample_id'] = sample_id
+                generate_preview_images(dest_path, upload_dir, session_data.get('is_pdf', False))
+            else:
+                scan_res = scanner.scan_file(dest_path, upload_dir, original_filename=dest_filename)
+                meta_res = MetadataCleaner.inspect_file(dest_path)
+                session_data = {
+                    'session_id': session_id,
+                    'file_name': scan_res['file_name'],
+                    'sample_id': sample_id,
+                    'is_pdf': scan_res['is_pdf'],
+                    'page_count': scan_res.get('page_count', len(scan_res.get('pages', []))),
+                    'sharing_context': 'academic',
+                    'original_path': dest_path,
+                    'pages': scan_res['pages'],
+                    'detections': scan_res['detections'],
+                    'risk_summary': scan_res['risk_summary'],
+                    'metadata': meta_res
+                }
+
+            with open(info_path, 'w', encoding='utf-8') as f:
+                json.dump(session_data, f, indent=2)
+            return session_data
+
+    # If client passed file_base64
+    if client_session_data and client_session_data.get('file_base64') and file_name:
+        import base64
+        dest_path = os.path.join(upload_dir, file_name)
+        with open(dest_path, 'wb') as f:
+            f.write(base64.b64decode(client_session_data['file_base64']))
+        session_data = dict(client_session_data)
+        session_data['original_path'] = dest_path
+        generate_preview_images(dest_path, upload_dir, session_data.get('is_pdf', False))
+        with open(info_path, 'w', encoding='utf-8') as f:
+            json.dump(session_data, f, indent=2)
+        return session_data
+
+    return None
+
+
 @app.before_request
 def trigger_periodic_cleanup():
     # Purge expired sessions (older than 30 mins) lazily on incoming requests
@@ -119,10 +227,24 @@ def upload_file():
         scan_result = scanner.scan_file(target_path, upload_dir, sharing_context=sharing_context, original_filename=display_name)
         meta_result = MetadataCleaner.inspect_file(target_path)
 
+        # Identify sample_id if applicable
+        sample_map = {
+            'aadhaar_pan': 'aadhaar_pan_sample.png',
+            'medical_invoice': 'medical_invoice.pdf',
+            'server_config': 'server_config.png'
+        }
+        detected_sample_id = sample_id
+        if not detected_sample_id:
+            for s_k, s_v in sample_map.items():
+                if s_v == display_name:
+                    detected_sample_id = s_k
+                    break
+
         # Save session metadata json
         session_info = {
             'session_id': session_id,
             'file_name': scan_result['file_name'],
+            'sample_id': detected_sample_id,
             'is_pdf': scan_result['is_pdf'],
             'page_count': scan_result.get('page_count', len(scan_result.get('pages', []))),
             'sharing_context': sharing_context,
@@ -189,6 +311,11 @@ def workbench(session_id):
     info_path = os.path.join(upload_dir, 'session_info.json')
 
     if not os.path.exists(info_path):
+        sample_param = request.args.get('sample')
+        if sample_param:
+            restore_session_if_needed(session_id, {'sample_id': sample_param})
+
+    if not os.path.exists(info_path):
         flash("Session expired or document not found. Please upload again.", "warning")
         return redirect(url_for('index'))
 
@@ -202,6 +329,8 @@ def serve_preview(session_id, filename):
     upload_dir = SessionManager.get_session_upload_dir(session_id)
     file_path = os.path.join(upload_dir, filename)
     if not os.path.exists(file_path):
+        restore_session_if_needed(session_id)
+    if not os.path.exists(file_path):
         return "Not found", 404
     return send_file(file_path)
 
@@ -213,17 +342,41 @@ def serve_output_preview(session_id, filename):
         return "Not found", 404
     return send_file(file_path)
 
+@app.route('/api/re-establish-session/<session_id>', methods=['POST'])
+def reestablish_session(session_id):
+    data = request.get_json() or {}
+    client_session_data = data.get('session_data')
+    session_data = restore_session_if_needed(session_id, client_session_data)
+    if session_data:
+        return jsonify({'success': True, 'session_id': session_id})
+    return jsonify({'error': 'Unable to re-establish session. Please upload the file again.'}), 400
+
 @app.route('/api/redact/<session_id>', methods=['POST'])
 def apply_redaction(session_id):
     upload_dir = SessionManager.get_session_upload_dir(session_id)
     output_dir = SessionManager.get_session_output_dir(session_id)
     info_path = os.path.join(upload_dir, 'session_info.json')
 
-    if not os.path.exists(info_path):
-        return jsonify({'error': 'Session expired or invalid'}), 404
+    data = request.get_json() or {}
+    client_session_data = data.get('session_data')
 
-    with open(info_path, 'r', encoding='utf-8') as f:
-        session_data = json.load(f)
+    session_data = None
+    if os.path.exists(info_path):
+        try:
+            with open(info_path, 'r', encoding='utf-8') as f:
+                session_data = json.load(f)
+        except Exception:
+            session_data = None
+
+    if not session_data:
+        session_data = restore_session_if_needed(session_id, client_session_data)
+
+    if not session_data or not os.path.exists(session_data.get('original_path', '')):
+        return jsonify({
+            'error': 'Session expired or invalid',
+            'session_expired': True,
+            'message': 'The cloud hosting container has recycled. Click "Restore Session" to re-establish your session.'
+        }), 404
 
     data = request.get_json() or {}
     selected_ids = set(data.get('selected_detection_ids', []))
@@ -271,8 +424,11 @@ def apply_redaction(session_id):
             output_filename=out_filename
         )
 
-        # Render preview images for the redacted document to enable before/after slider
+        # Render preview images for the redacted document
+        import base64
         redacted_previews = []
+        redacted_previews_data = []
+
         if is_pdf:
             import pymupdf
             out_doc = pymupdf.open(safe_output_path)
@@ -280,13 +436,21 @@ def apply_redaction(session_id):
                 zoom = 150 / 72
                 pix = out_doc[p_idx].get_pixmap(matrix=pymupdf.Matrix(zoom, zoom))
                 p_name = f"redacted_page_{p_idx + 1}.png"
-                pix.save(os.path.join(output_dir, p_name))
+                p_file = os.path.join(output_dir, p_name)
+                pix.save(p_file)
                 redacted_previews.append(f"/output-preview/{session_id}/{p_name}")
+                with open(p_file, 'rb') as pf:
+                    b64 = base64.b64encode(pf.read()).decode('utf-8')
+                    redacted_previews_data.append(f"data:image/png;base64,{b64}")
             out_doc.close()
         else:
             p_name = f"redacted_page_1.png"
-            shutil.copyfile(safe_output_path, os.path.join(output_dir, p_name))
+            p_file = os.path.join(output_dir, p_name)
+            shutil.copyfile(safe_output_path, p_file)
             redacted_previews.append(f"/output-preview/{session_id}/{p_name}")
+            with open(p_file, 'rb') as pf:
+                b64 = base64.b64encode(pf.read()).decode('utf-8')
+                redacted_previews_data.append(f"data:image/png;base64,{b64}")
 
         # Generate Cryptographic Audit Certificate
         audit_data = CertificateGenerator.generate_audit_data(
@@ -303,9 +467,20 @@ def apply_redaction(session_id):
         with open(cert_json_path, 'w', encoding='utf-8') as f:
             json.dump(audit_data, f, indent=2)
 
+        # Base64 encoded outputs for instant in-browser download
+        with open(safe_output_path, 'rb') as f:
+            doc_b64 = base64.b64encode(f.read()).decode('utf-8')
+        with open(cert_pdf_path, 'rb') as f:
+            cert_b64 = base64.b64encode(f.read()).decode('utf-8')
+
         return jsonify({
             'success': True,
             'redacted_previews': redacted_previews,
+            'redacted_previews_data': redacted_previews_data,
+            'document_base64': doc_b64,
+            'certificate_base64': cert_b64,
+            'download_filename': f"safe_{session_data['file_name']}",
+            'mime_type': 'application/pdf' if is_pdf else 'image/png',
             'audit_data': audit_data,
             'download_document_url': url_for('download_document', session_id=session_id),
             'download_certificate_url': url_for('download_certificate', session_id=session_id),
@@ -324,6 +499,9 @@ def download_document(session_id):
     info_path = os.path.join(upload_dir, 'session_info.json')
 
     if not os.path.exists(info_path):
+        restore_session_if_needed(session_id)
+
+    if not os.path.exists(info_path):
         return "Session expired", 404
 
     with open(info_path, 'r', encoding='utf-8') as f:
@@ -336,11 +514,33 @@ def download_document(session_id):
 
     out_file = os.path.join(output_dir, f"safe_sanitized_{session_id[:8]}{target_ext}")
     if not os.path.exists(out_file):
-        for fname in os.listdir(output_dir):
-            if fname.startswith(f"safe_sanitized_{session_id[:8]}"):
-                out_file = os.path.join(output_dir, fname)
-                break
-        else:
+        if os.path.exists(output_dir):
+            for fname in os.listdir(output_dir):
+                if fname.startswith(f"safe_sanitized_{session_id[:8]}"):
+                    out_file = os.path.join(output_dir, fname)
+                    break
+
+    if not out_file or not os.path.exists(out_file):
+        # Auto-reconstitute sanitized document on the fly if container recycled
+        try:
+            active_redactions = []
+            for d in session_data.get('detections', []):
+                active_redactions.append({
+                    'id': d['id'],
+                    'page': d.get('page', 1),
+                    'bbox': d.get('bbox'),
+                    'style': 'blackout',
+                    'label': d.get('type', 'REDACTED'),
+                    'category': d.get('category', 'General PII')
+                })
+            out_file = DocumentRedactor.redact_document(
+                original_file_path=session_data['original_path'],
+                is_pdf=session_data['is_pdf'],
+                session_dir=output_dir,
+                redactions=active_redactions,
+                output_filename=f"safe_sanitized_{session_id[:8]}{target_ext}"
+            )
+        except Exception:
             return "File not generated yet", 404
 
     return send_file(out_file, as_attachment=True, download_name=safe_filename)
@@ -348,7 +548,26 @@ def download_document(session_id):
 @app.route('/download/<session_id>/certificate')
 def download_certificate(session_id):
     output_dir = SessionManager.get_session_output_dir(session_id)
+    upload_dir = SessionManager.get_session_upload_dir(session_id)
+    info_path = os.path.join(upload_dir, 'session_info.json')
+    if not os.path.exists(info_path):
+        restore_session_if_needed(session_id)
+
     cert_pdf = os.path.join(output_dir, f"ShareSafe_Certificate_{session_id[:8]}.pdf")
+    if not os.path.exists(cert_pdf):
+        if os.path.exists(info_path):
+            try:
+                with open(info_path, 'r', encoding='utf-8') as f:
+                    s_data = json.load(f)
+                audit_data = CertificateGenerator.generate_audit_data(
+                    orig_file_path=s_data['original_path'],
+                    redacted_file_path=s_data['original_path'],
+                    pre_risk=s_data.get('risk_summary', {'level': 'LOW', 'score': 0}),
+                    redactions_applied=[]
+                )
+                CertificateGenerator.create_pdf_certificate(audit_data, cert_pdf)
+            except Exception:
+                pass
     if not os.path.exists(cert_pdf):
         return "Certificate not found", 404
     return send_file(cert_pdf, as_attachment=True, download_name=f"ShareSafe_Audit_Certificate_{session_id[:8]}.pdf")
@@ -356,7 +575,27 @@ def download_certificate(session_id):
 @app.route('/download/<session_id>/audit-json')
 def download_audit_json(session_id):
     output_dir = SessionManager.get_session_output_dir(session_id)
+    upload_dir = SessionManager.get_session_upload_dir(session_id)
+    info_path = os.path.join(upload_dir, 'session_info.json')
+    if not os.path.exists(info_path):
+        restore_session_if_needed(session_id)
+
     cert_json = os.path.join(output_dir, f"ShareSafe_Audit_{session_id[:8]}.json")
+    if not os.path.exists(cert_json):
+        if os.path.exists(info_path):
+            try:
+                with open(info_path, 'r', encoding='utf-8') as f:
+                    s_data = json.load(f)
+                audit_data = CertificateGenerator.generate_audit_data(
+                    orig_file_path=s_data['original_path'],
+                    redacted_file_path=s_data['original_path'],
+                    pre_risk=s_data.get('risk_summary', {'level': 'LOW', 'score': 0}),
+                    redactions_applied=[]
+                )
+                with open(cert_json, 'w', encoding='utf-8') as f:
+                    json.dump(audit_data, f, indent=2)
+            except Exception:
+                pass
     if not os.path.exists(cert_json):
         return "Audit report not found", 404
     return send_file(cert_json, as_attachment=True, download_name=f"ShareSafe_Audit_Data_{session_id[:8]}.json")

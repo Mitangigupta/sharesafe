@@ -1,14 +1,8 @@
 {% extends "base.html" %}
 
-
-
 {% block title %}ShareSafe Studio &mdash; {{ session_data.file_name }}{% endblock %}
 
-
-
 {% block header %}{% endblock %}
-
-
 
 {% block content %}
 
@@ -62,47 +56,27 @@
 
         </div>
 
-
-
         <!-- Center: Perspective View Switcher & Canvas Controls -->
 
         <div class="toolbar-center">
 
             <!-- View Mode Switcher -->
-
-            <div class="segmented-control view-tabs-segmented" role="tablist" aria-label="Document View Mode">
-
-                <button type="button" class="segment-btn active" id="tabOriginal" onclick="switchViewMode('original')" role="tab" aria-selected="true" title="Display unmodified source document and draft annotations">
-
-                    <i class="fa-regular fa-file-lines"></i>
-
-                    <span>Original</span>
-
+            <div class="segmented-control view-tabs-segmented" role="tablist" aria-label="Perspective View Switcher">
+                <button type="button" class="segment-btn active" id="tabOriginal" onclick="switchViewMode('original')" role="tab" aria-selected="true" title="Interactive Draft Redaction Overlay">
+                    <i class="fa-regular fa-eye"></i>
+                    <span>Interactive Overlay</span>
                 </button>
-
-                <button type="button" class="segment-btn" id="tabCompare" onclick="switchViewMode('compare')" role="tab" aria-selected="false" title="Compare original and sanitized documents together">
-
+                <button type="button" class="segment-btn" id="tabSplit" onclick="switchViewMode('split')" role="tab" aria-selected="false" title="Before / After Split Comparison Slider">
                     <i class="fa-solid fa-code-compare"></i>
-
-                    <span>Compare</span>
-
+                    <span>Before / After Split</span>
                 </button>
-
-                <button type="button" class="segment-btn" id="tabSanitized" onclick="switchViewMode('sanitized')" role="tab" aria-selected="false" title="Display sanitized, raster-flattened document">
-
+                <button type="button" class="segment-btn" id="tabRedacted" onclick="switchViewMode('redacted')" role="tab" aria-selected="false" title="Sanitized Flattened Document">
                     <i class="fa-solid fa-shield-halved"></i>
-
-                    <span>Sanitized</span>
-
+                    <span>Sanitized Result</span>
                 </button>
-
             </div>
 
-
-
             <div class="toolbar-divider"></div>
-
-
 
             <!-- Canvas Zoom Controls -->
 
@@ -130,8 +104,6 @@
 
             </div>
 
-
-
             <div id="previewStatusBadge" class="preview-status-badge" style="display: none;">
 
                 <i class="fa-solid fa-spinner fa-spin"></i>
@@ -139,8 +111,6 @@
                 <span>Updating sanitized view...</span>
 
             </div>
-
-
 
             {% if (session_data.page_count|default(session_data.pages|length)) > 1 %}
 
@@ -168,8 +138,6 @@
 
         </div>
 
-
-
         <!-- Right: Actions, Style Picker & Redaction CTA -->
 
         <div class="toolbar-right">
@@ -196,8 +164,6 @@
 
             </div>
 
-
-
             <!-- Manual Drawing Mode Toggle -->
 
             <button type="button" class="btn-editorial-secondary btn-draw-toggle" id="drawModeBtn" onclick="toggleDrawMode()" title="Draw custom redaction regions over signatures, stamps, or photos">
@@ -208,8 +174,6 @@
 
             </button>
 
-
-
             <!-- Purge Session -->
 
             <button type="button" class="btn-toolbar-ghost" onclick="purgeCurrentSession()" title="Permanently destroy this session and files from disk" aria-label="Destroy session files">
@@ -217,8 +181,6 @@
                 <i class="fa-solid fa-trash-can"></i>
 
             </button>
-
-
 
             <!-- Primary Redact & Export Action -->
 
@@ -233,8 +195,6 @@
         </div>
 
     </header>
-
-
 
     <!-- Main Studio Workspace Split -->
 
@@ -278,8 +238,6 @@
 
             </div>
 
-
-
             <!-- Tab Content 1: Threats & PII -->
 
             <div class="sidebar-tab-pane active" id="paneThreats">
@@ -310,11 +268,7 @@
 
                     </div>
 
-                    
-
                     <p class="risk-recommendation-text">{{ session_data.risk_summary.recommendation }}</p>
-
-                    
 
                     <!-- Severity Breakdown Chips -->
 
@@ -347,8 +301,6 @@
                     </div>
 
                 </div>
-
-
 
                 <!-- Quick Selection Action Bar & Filter -->
 
@@ -386,8 +338,6 @@
 
                 </div>
 
-
-
                 <!-- Detected Entities List Container -->
 
                 <div class="detections-container">
@@ -399,8 +349,6 @@
                         <span class="detections-toggle-hint" id="selectedCountHint">Toggle to sanitize</span>
 
                     </div>
-
-
 
                     <div class="detections-list" id="detectionsList">
 
@@ -417,8 +365,6 @@
                         </div>
 
                         {% endif %}
-
-
 
                         {% for d in session_data.detections %}
 
@@ -488,8 +434,6 @@
 
             </div>
 
-
-
             <!-- Tab Content 2: Manual Redactions -->
 
             <div class="sidebar-tab-pane" id="paneManual" style="display: none;">
@@ -507,8 +451,6 @@
                     </div>
 
                 </div>
-
-
 
                 <div class="manual-list-wrapper">
 
@@ -534,8 +476,6 @@
 
             </div>
 
-
-
             <!-- Tab Content 3: Metadata & Forensic Integrity -->
 
             <div class="sidebar-tab-pane" id="paneMetadata" style="display: none;">
@@ -560,8 +500,6 @@
 
                     </div>
 
-
-
                     <div class="scrub-guarantee-banner">
 
                         <i class="fa-solid fa-shield-halved text-sage"></i>
@@ -573,8 +511,6 @@
                         </div>
 
                     </div>
-
-
 
                     {% if session_data.metadata.summary_tags %}
 
@@ -604,8 +540,6 @@
 
                     {% endif %}
 
-
-
                     <div class="audit-certificate-preview-box">
 
                         <div class="cert-box-header">
@@ -625,8 +559,6 @@
             </div>
 
         </aside>
-
-
 
         <!-- Center: Interactive Document Canvas Viewport -->
 
@@ -669,8 +601,6 @@
                     </div>
 
                 </div>
-
-
 
                 <!-- Mode 2: Before & After Comparison Viewport -->
 
@@ -718,8 +648,6 @@
 
                     </div>
 
-
-
                     <!-- Layout A: Interactive Split Slider -->
 
                     <div class="split-image-container" id="compareSliderContainer">
@@ -743,8 +671,6 @@
                         </div>
 
                     </div>
-
-
 
                     <!-- Layout B: Polished Side-by-Side View -->
 
@@ -786,8 +712,6 @@
 
                 </div>
 
-
-
                 <!-- Mode 3: Redacted Safe Document Viewport -->
 
                 <div class="viewport-card canvas-wrapper" id="redactedViewport" style="display: none;">
@@ -809,8 +733,6 @@
                 </div>
 
             </div>
-
-
 
             <!-- Floating Executive Export Drawer (Appears after redaction, dismissible) -->
 
@@ -874,8 +796,6 @@
 
 </div>
 
-
-
 <!-- Raw Session JSON for Client Scripts -->
 
 <script id="sessionJsonData" type="application/json">
@@ -883,8 +803,6 @@
     {{ session_data | tojson }}
 
 </script>
-
-
 
 <script>
 
@@ -944,17 +862,35 @@ function switchSidebarTab(tabName) {
 
 </script>
 
+<!-- Cloud Session Recovery Modal (Appears if serverless host recycles session) -->
+<div class="session-recovery-modal" id="sessionRecoveryModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="recoveryModalTitle">
+    <div class="recovery-modal-backdrop" onclick="closeRecoveryModal()"></div>
+    <div class="recovery-modal-card">
+        <div class="recovery-modal-header">
+            <div class="recovery-icon-badge"><i class="fa-solid fa-cloud-arrow-down text-coral"></i></div>
+            <h3 id="recoveryModalTitle">Session Re-Established</h3>
+        </div>
+        <p class="recovery-modal-desc">
+            The serverless host recycled its temporary storage. Your selected findings and manual redactions have been safely preserved in your browser.
+        </p>
+        <div class="recovery-modal-footer">
+            <button type="button" class="btn-editorial-primary" onclick="reestablishSessionAndRetry()" id="btnModalRestore">
+                <i class="fa-solid fa-arrows-rotate"></i> Restore Session &amp; Export
+            </button>
+            <button type="button" class="btn-editorial-secondary" onclick="closeRecoveryModal()">
+                Dismiss
+            </button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
-
-
 
 {% block footer %}{% endblock %}
 
-
-
 {% block scripts %}
 
-<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.5"></script>
+<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.6"></script>
 
 {% endblock %}
 
