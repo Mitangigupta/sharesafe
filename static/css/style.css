@@ -1363,6 +1363,7 @@ code, pre, kbd {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 140px;
 }
 
 .file-page-tag {
@@ -1468,10 +1469,16 @@ code, pre, kbd {
 }
 
 .page-nav-group {
+    height: 36px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    background: var(--bg-canvas);
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-sm);
+    padding: 0 4px;
+    gap: 4px;
     font-size: 0.78rem;
+    flex-shrink: 0;
 }
 
 .page-count-text {
@@ -1507,8 +1514,19 @@ code, pre, kbd {
 
 .btn-draw-toggle {
     height: 36px;
-    padding: 0 14px;
+    padding: 0 12px;
     font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.btn-draw-toggle i {
+    font-size: 0.85rem;
 }
 
 .btn-draw-toggle.active {
@@ -2292,10 +2310,8 @@ input:checked + .toggle-slider::before {
 .canvas-scroll-container {
     flex: 1;
     overflow: auto;
-    padding: 40px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    padding: 28px 20px 48px;
+    display: block;
 }
 
 .canvas-wrapper {
@@ -2305,7 +2321,8 @@ input:checked + .toggle-slider::before {
     border-radius: 2px;
     background: var(--bg-surface);
     transform-origin: top center;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    line-height: 0;
 }
 
 .document-image {
@@ -2528,6 +2545,9 @@ input:checked + .toggle-slider::before {
     box-shadow: var(--shadow-card);
     border-radius: var(--radius-sm);
     background: #FFFFFF;
+    transform-origin: top center;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    line-height: 0;
 }
 
 .floating-side-pill {
@@ -2707,7 +2727,10 @@ input:checked + .toggle-slider::before {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: fit-content;
+    min-width: min-content;
+    max-width: 100%;
+    margin: 0 auto;
     transform-origin: top center;
 }
 
@@ -3462,3 +3485,27 @@ input:checked + .toggle-slider::before {
     justify-content: flex-end;
     gap: 10px;
 }
+
+
+@media (max-width: 1240px) {
+    .workbench-toolbar {
+        height: auto;
+        min-height: 56px;
+        padding: 8px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .toolbar-left {
+        order: 1;
+    }
+    .toolbar-right {
+        order: 2;
+    }
+    .toolbar-center {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        padding-top: 6px;
+        border-top: 1px solid var(--border-stone-subtle);
+    }
+}

@@ -344,6 +344,11 @@ function setupDrawingCanvas() {
 
 
 
+    if (isDrawMode) {
+        canvas.classList.add('active-draw');
+    } else {
+        canvas.classList.remove('active-draw');
+    }
     const ctx = canvas.getContext('2d');
 
 
@@ -490,21 +495,33 @@ function toggleDrawMode() {
 
     if (isDrawMode) {
 
-        btn.classList.add('active');
+        if (currentViewMode !== 'original') {
 
-        text.innerText = 'Exit Drawing';
+            switchViewMode('original');
 
-        canvas.classList.add('active-draw');
+        }
+
+        if (btn) btn.classList.add('active');
+
+        if (text) text.innerText = 'Exit Drawing';
+
+        if (canvas) {
+
+            setupDrawingCanvas();
+
+            canvas.classList.add('active-draw');
+
+        }
 
         if (typeof switchSidebarTab === 'function') switchSidebarTab('manual');
 
     } else {
 
-        btn.classList.remove('active');
+        if (btn) btn.classList.remove('active');
 
-        text.innerText = 'Draw Manual Box';
+        if (text) text.innerText = 'Draw Manual Box';
 
-        canvas.classList.remove('active-draw');
+        if (canvas) canvas.classList.remove('active-draw');
 
     }
 
@@ -1157,11 +1174,13 @@ function resetCanvasZoom() {
 
 function applyZoom() {
 
-    const wrap = document.getElementById('overlayViewport');
+    const overlayCanvas = document.getElementById('overlayCanvasWrapper') || document.querySelector('#overlayViewport .canvas-wrapper');
 
-    const splitWrap = document.getElementById('splitViewport');
+    const compareSlider = document.getElementById('compareSliderContainer');
 
-    const redWrap = document.getElementById('redactedViewport');
+    const compareSide = document.getElementById('compareSideContainer');
+
+    const redactedCanvas = document.getElementById('redactedCanvasWrapper') || document.getElementById('redactedSoloImg');
 
     const ind = document.getElementById('zoomLevelIndicator');
 
@@ -1171,7 +1190,7 @@ function applyZoom() {
 
 
 
-    [wrap, splitWrap, redWrap].forEach(el => {
+    [overlayCanvas, compareSlider, compareSide, redactedCanvas].forEach(el => {
 
         if (el) el.style.transform = `scale(${currentZoom})`;
 
@@ -1201,6 +1220,14 @@ function changePage(delta) {
 
 
 
+    // Reset scroll position to top of page
+
+    const scrollCont = document.getElementById('canvasContainer');
+
+    if (scrollCont) scrollCont.scrollTop = 0;
+
+
+
     const pageObj = sessionData.pages[currentPage - 1];
 
     const previewImg = document.getElementById('pagePreviewImg');
@@ -1225,7 +1252,7 @@ function changePage(delta) {
 
 
 
-    if (redactedPreviews.length >= currentPage) {
+    if (redactedPreviews.length >= currentPage && redactedPreviews[currentPage - 1]) {
 
         if (afterImg) afterImg.src = redactedPreviews[currentPage - 1];
 
@@ -1233,9 +1260,21 @@ function changePage(delta) {
 
         if (sideSan) sideSan.src = redactedPreviews[currentPage - 1];
 
-    } else if (currentViewMode === 'compare' || currentViewMode === 'split' || currentViewMode === 'sanitized' || currentViewMode === 'redacted') {
+    } else {
 
-        debouncedAutoRedact(50);
+        // Fallback to original image so view is not blank
+
+        if (afterImg) afterImg.src = pageObj.preview_url;
+
+        if (soloImg) soloImg.src = pageObj.preview_url;
+
+        if (sideSan) sideSan.src = pageObj.preview_url;
+
+        if (currentViewMode === 'compare' || currentViewMode === 'split' || currentViewMode === 'sanitized' || currentViewMode === 'redacted') {
+
+            debouncedAutoRedact(50);
+
+        }
 
     }
 
