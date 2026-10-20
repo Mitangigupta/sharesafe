@@ -1,422 +1,960 @@
 {% extends "base.html" %}
 
+
+
 {% block title %}ShareSafe Studio &mdash; {{ session_data.file_name }}{% endblock %}
+
+
 
 {% block header %}{% endblock %}
 
+
+
 {% block content %}
+
 <div class="workbench-layout" id="workbenchRoot">
+
     <!-- Executive Studio Top Toolbar -->
+
     <header class="workbench-toolbar">
+
         <!-- Left: Brand & File Identification -->
+
         <div class="toolbar-left">
+
             <a href="/" class="btn-toolbar-icon" title="Return to Privacy Studio">
+
                 <i class="fa-solid fa-arrow-left"></i>
+
             </a>
+
             <div class="brand-studio-meta">
+
                 <a href="/" class="brand-link-studio">
+
                     <span class="brand-monogram-mini">
+
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+
                             <path d="M12 2L4 5V11C4 16.55 7.42 21.74 12 23C16.58 21.74 20 16.55 20 11V5L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
                         </svg>
+
                     </span>
+
                     <span class="brand-text-studio">Share<span>Safe</span></span>
+
                 </a>
+
                 <span class="studio-separator">/</span>
+
                 <div class="file-pill" title="{{ session_data.file_name }}">
+
                     <i class="fa-solid fa-file-shield text-coral"></i>
+
                     <span class="file-name-text">{{ session_data.file_name }}</span>
+
                     <span class="file-page-tag">{{ session_data.page_count|default(session_data.pages|length) }} {% if (session_data.page_count|default(session_data.pages|length)) == 1 %}Page{% else %}Pages{% endif %}</span>
+
                 </div>
+
             </div>
+
         </div>
+
+
 
         <!-- Center: Perspective View Switcher & Canvas Controls -->
+
         <div class="toolbar-center">
+
             <!-- View Mode Switcher -->
-            <div class="segmented-control view-tabs-segmented" role="tablist">
-                <button type="button" class="segment-btn active" id="tabOriginal" onclick="switchViewMode('original')" title="View interactive bounding boxes">
-                    <i class="fa-regular fa-eye"></i>
-                    <span>Interactive Overlay</span>
+
+            <div class="segmented-control view-tabs-segmented" role="tablist" aria-label="Document View Mode">
+
+                <button type="button" class="segment-btn active" id="tabOriginal" onclick="switchViewMode('original')" role="tab" aria-selected="true" title="Display unmodified source document and draft annotations">
+
+                    <i class="fa-regular fa-file-lines"></i>
+
+                    <span>Original</span>
+
                 </button>
-                <button type="button" class="segment-btn" id="tabSplit" onclick="switchViewMode('split')" title="Compare before & after redaction">
+
+                <button type="button" class="segment-btn" id="tabCompare" onclick="switchViewMode('compare')" role="tab" aria-selected="false" title="Compare original and sanitized documents together">
+
                     <i class="fa-solid fa-code-compare"></i>
-                    <span>Before / After Split</span>
+
+                    <span>Compare</span>
+
                 </button>
-                <button type="button" class="segment-btn" id="tabRedacted" onclick="switchViewMode('redacted')" title="View final redacted document">
+
+                <button type="button" class="segment-btn" id="tabSanitized" onclick="switchViewMode('sanitized')" role="tab" aria-selected="false" title="Display sanitized, raster-flattened document">
+
                     <i class="fa-solid fa-shield-halved"></i>
-                    <span>Sanitized Result</span>
+
+                    <span>Sanitized</span>
+
                 </button>
+
             </div>
 
+
+
             <div class="toolbar-divider"></div>
+
+
 
             <!-- Canvas Zoom Controls -->
+
             <div class="canvas-controls-group">
+
                 <button type="button" class="btn-ctrl-icon" onclick="zoomCanvas(-0.15)" title="Zoom Out" aria-label="Zoom Out">
+
                     <i class="fa-solid fa-minus"></i>
+
                 </button>
+
                 <span class="zoom-indicator-text" id="zoomLevelIndicator">100%</span>
+
                 <button type="button" class="btn-ctrl-icon" onclick="zoomCanvas(0.15)" title="Zoom In" aria-label="Zoom In">
+
                     <i class="fa-solid fa-plus"></i>
+
                 </button>
+
                 <button type="button" class="btn-ctrl-icon" onclick="resetCanvasZoom()" title="Reset Zoom (100%)" aria-label="Reset Zoom">
+
                     <i class="fa-solid fa-arrows-rotate"></i>
+
                 </button>
+
             </div>
+
+
 
             <div id="previewStatusBadge" class="preview-status-badge" style="display: none;">
+
                 <i class="fa-solid fa-spinner fa-spin"></i>
+
                 <span>Updating sanitized view...</span>
+
             </div>
+
+
 
             {% if (session_data.page_count|default(session_data.pages|length)) > 1 %}
+
             <div class="toolbar-divider"></div>
+
             <div class="page-nav-group">
+
                 <button type="button" class="btn-ctrl-icon" onclick="changePage(-1)" title="Previous Page" aria-label="Previous Page">
+
                     <i class="fa-solid fa-chevron-left"></i>
+
                 </button>
+
                 <span class="page-count-text">Page <strong id="currentPageNum">1</strong> of {{ session_data.page_count|default(session_data.pages|length) }}</span>
+
                 <button type="button" class="btn-ctrl-icon" onclick="changePage(1)" title="Next Page" aria-label="Next Page">
+
                     <i class="fa-solid fa-chevron-right"></i>
+
                 </button>
+
             </div>
+
             {% endif %}
+
         </div>
+
+
 
         <!-- Right: Actions, Style Picker & Redaction CTA -->
+
         <div class="toolbar-right">
+
             <!-- Redaction Style Selector -->
+
             <div class="style-selector-container">
+
                 <label for="globalRedactionStyle" class="style-selector-label"><i class="fa-solid fa-paintbrush"></i> Style:</label>
+
                 <select id="globalRedactionStyle" class="select-editorial" onchange="updateGlobalStyle(this.value)" aria-label="Global Redaction Style">
+
                     <option value="blackout" selected>⬛ Solid Blackout</option>
+
                     <option value="blur">💧 Gaussian Blur</option>
+
                     <option value="pixelate">🟩 Mosaic Pixelate</option>
+
                     <option value="stamp">🏷️ Redacted Stamp</option>
+
                     <option value="whiteout">⬜ Clean Whiteout</option>
+
                 </select>
+
             </div>
+
+
 
             <!-- Manual Drawing Mode Toggle -->
+
             <button type="button" class="btn-editorial-secondary btn-draw-toggle" id="drawModeBtn" onclick="toggleDrawMode()" title="Draw custom redaction regions over signatures, stamps, or photos">
+
                 <i class="fa-solid fa-pen-ruler"></i>
-                <span id="drawModeText">Draw Box</span>
+
+                <span id="drawModeText">Draw</span>
+
             </button>
+
+
 
             <!-- Purge Session -->
+
             <button type="button" class="btn-toolbar-ghost" onclick="purgeCurrentSession()" title="Permanently destroy this session and files from disk" aria-label="Destroy session files">
+
                 <i class="fa-solid fa-trash-can"></i>
+
             </button>
+
+
 
             <!-- Primary Redact & Export Action -->
+
             <button type="button" class="btn-editorial-primary btn-sanitize-action" id="applyRedactBtn" onclick="executeRedaction()">
+
                 <i class="fa-solid fa-shield-halved"></i>
+
                 <span>Sanitize &amp; Export</span>
+
             </button>
+
         </div>
+
     </header>
 
+
+
     <!-- Main Studio Workspace Split -->
+
     <div class="workbench-main">
+
         <!-- Spacious Left Sidebar: Detections & Forensic Intelligence -->
+
         <aside class="workbench-sidebar" aria-label="Sidebar Analysis Panel">
+
             <!-- Sidebar Segmented Navigation Tabs -->
+
             <div class="sidebar-tabs-nav" role="tablist">
+
                 <button type="button" class="sidebar-tab-btn active" id="tabThreatsBtn" onclick="switchSidebarTab('threats')" role="tab" aria-selected="true">
+
                     <i class="fa-solid fa-shield-virus"></i>
+
                     <span>Findings</span>
+
                     <span class="sidebar-pill-badge">{{ session_data.detections|length }}</span>
+
                 </button>
+
                 <button type="button" class="sidebar-tab-btn" id="tabManualBtn" onclick="switchSidebarTab('manual')" role="tab" aria-selected="false">
+
                     <i class="fa-solid fa-pen-to-square"></i>
+
                     <span>Manual</span>
+
                     <span class="sidebar-pill-badge" id="manualCountBadge">0</span>
+
                 </button>
+
                 <button type="button" class="sidebar-tab-btn" id="tabMetaBtn" onclick="switchSidebarTab('metadata')" role="tab" aria-selected="false">
+
                     <i class="fa-solid fa-fingerprint"></i>
+
                     <span>Metadata</span>
+
                 </button>
+
             </div>
+
+
 
             <!-- Tab Content 1: Threats & PII -->
+
             <div class="sidebar-tab-pane active" id="paneThreats">
+
                 <!-- Executive Risk Scorecard -->
+
                 <div class="risk-scorecard-box">
+
                     <div class="risk-card-top-row">
+
                         <div class="risk-level-group">
+
                             <span class="risk-status-pill risk-pill-{{ session_data.risk_summary.level|lower }}">
+
                                 {{ session_data.risk_summary.level }} RISK
+
                             </span>
+
                             <h3 class="risk-score-heading">Threat Score {{ session_data.risk_summary.score }}<span class="score-denom">/100</span></h3>
+
                         </div>
+
                         <div class="risk-score-radial" style="--risk-score: {{ session_data.risk_summary.score }};">
+
                             <span>{{ session_data.risk_summary.score }}%</span>
+
                         </div>
+
                     </div>
+
                     
+
                     <p class="risk-recommendation-text">{{ session_data.risk_summary.recommendation }}</p>
+
                     
+
                     <!-- Severity Breakdown Chips -->
+
                     <div class="severity-breakdown-row">
+
                         <span class="severity-chip chip-critical" title="Critical Findings: High financial or identity risk">
+
                             <i class="fa-solid fa-circle-exclamation"></i> {{ session_data.risk_summary.critical_count }} Critical
+
                         </span>
+
                         <span class="severity-chip chip-high" title="High Findings: Credentials, tokens, keys">
+
                             <i class="fa-solid fa-triangle-exclamation"></i> {{ session_data.risk_summary.high_count }} High
+
                         </span>
+
                         <span class="severity-chip chip-med" title="Medium Findings: Phone numbers, internal IPs">
+
                             <i class="fa-solid fa-circle-dot"></i> {{ session_data.risk_summary.medium_count }} Med
+
                         </span>
+
                         <span class="severity-chip chip-low" title="Low Findings: URLs, emails">
+
                             <i class="fa-solid fa-circle-info"></i> {{ session_data.risk_summary.low_count }} Low
+
                         </span>
+
                     </div>
+
                 </div>
+
+
 
                 <!-- Quick Selection Action Bar & Filter -->
+
                 <div class="findings-toolbar">
+
                     <div class="findings-filter-row">
+
                         <i class="fa-solid fa-magnifying-glass"></i>
+
                         <input type="text" id="findingsSearchInput" class="findings-search-field" placeholder="Filter findings by label, type..." oninput="handleNavSearch(this.value)">
+
                     </div>
+
                     <div class="selection-actions-cluster">
+
                         <button type="button" class="btn-tag-action" onclick="selectCriticalAndHigh()" title="Auto-select Critical and High severity items">
+
                             <i class="fa-solid fa-check-double text-coral"></i> Select Critical/High
+
                         </button>
+
                         <button type="button" class="btn-tag-action" onclick="selectAllDetections()" title="Select all detected items">
+
                             <i class="fa-solid fa-square-check"></i> Select All
+
                         </button>
+
                         <button type="button" class="btn-tag-action" onclick="deselectAllDetections()" title="Clear all selections">
+
                             <i class="fa-regular fa-square"></i> Clear
+
                         </button>
+
                     </div>
+
                 </div>
+
+
 
                 <!-- Detected Entities List Container -->
+
                 <div class="detections-container">
+
                     <div class="detections-header-bar">
+
                         <span class="detections-title">Detected Exposure Findings ({{ session_data.detections|length }})</span>
+
                         <span class="detections-toggle-hint" id="selectedCountHint">Toggle to sanitize</span>
+
                     </div>
+
+
 
                     <div class="detections-list" id="detectionsList">
+
                         {% if session_data.detections|length == 0 %}
+
                         <div class="clean-empty-state">
+
                             <div class="clean-icon-circle"><i class="fa-solid fa-shield-check"></i></div>
+
                             <h4>No findings detected by the enabled checks</h4>
+
                             <p>No automated sensitive credentials found in this document. You can use <strong>Draw Box</strong> in the top toolbar to redact visual elements manually.</p>
+
                         </div>
+
                         {% endif %}
 
+
+
                         {% for d in session_data.detections %}
+
                         <div class="detection-item severity-border-{{ d.risk|lower }}" id="item-{{ d.id }}" onclick="handleDetectionItemClick(event, '{{ d.id }}')" onmouseenter="highlightBox('{{ d.id }}')" onmouseleave="unhighlightBox('{{ d.id }}')">
+
                             <div class="item-checkbox-wrapper">
+
                                 <label class="custom-toggle" title="Toggle Redaction for this Item">
+
                                     <input type="checkbox" class="det-checkbox" id="chk-{{ d.id }}" data-id="{{ d.id }}" {% if d.risk in ['CRITICAL', 'HIGH'] %}checked{% endif %} onchange="onCheckboxChange('{{ d.id }}')">
+
                                     <span class="toggle-slider"></span>
+
                                 </label>
+
                             </div>
+
                             <div class="item-content-wrapper">
+
                                 <div class="item-header-line">
+
                                     <span class="item-label-text">{{ d.label }}</span>
+
                                     <span class="severity-badge badge-{{ d.risk|lower }}">{{ d.risk }}</span>
+
                                 </div>
+
                                 <div class="item-value-line">
+
                                     <code class="code-masked-value">{{ d.masked }}</code>
+
                                 </div>
+
                                 <div class="item-footer-tags">
+
                                     <span class="tag-meta"><i class="fa-regular fa-file"></i> Page {{ d.page }}</span>
+
                                     <span class="tag-meta"><i class="fa-solid fa-tag"></i> {{ d.category }}</span>
+
                                     <span class="tag-style-pill" id="stylePill-{{ d.id }}" title="Current redaction visual style">
+
                                         <i class="fa-solid fa-paintbrush"></i> <span class="style-name-text">Blackout</span>
+
                                     </span>
+
                                     {% if d.type == 'qr_code' %}
+
                                     <button type="button" class="btn-threat-inspect" onclick="openQrThreatInspector('{{ d.id }}')">
+
                                         <i class="fa-solid fa-qrcode"></i> Inspect Payload
+
                                     </button>
+
                                     {% endif %}
+
                                 </div>
+
                             </div>
+
                         </div>
+
                         {% endfor %}
+
                     </div>
+
                 </div>
+
             </div>
+
+
 
             <!-- Tab Content 2: Manual Redactions -->
+
             <div class="sidebar-tab-pane" id="paneManual" style="display: none;">
+
                 <div class="manual-intro-card">
+
                     <div class="manual-icon-box"><i class="fa-solid fa-pen-ruler"></i></div>
+
                     <div class="manual-intro-text">
+
                         <h4>Manual Redaction Canvas</h4>
+
                         <p>Activate <strong>"Draw Box"</strong> in the top toolbar and drag across any area of the document preview to redact custom visual regions.</p>
+
                     </div>
+
                 </div>
+
+
 
                 <div class="manual-list-wrapper">
+
                     <div class="detections-header-bar">
+
                         <span class="detections-title">User-Drawn Regions (<span id="manualCount">0</span>)</span>
+
                     </div>
+
                     <div id="manualList" class="manual-items-list">
+
                         <div class="manual-empty-text">
+
                             <i class="fa-solid fa-draw-polygon"></i>
+
                             <p>No manual regions added yet. Activate drawing mode to redact handwritten signatures, photos, or proprietary seals.</p>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
+
 
             <!-- Tab Content 3: Metadata & Forensic Integrity -->
+
             <div class="sidebar-tab-pane" id="paneMetadata" style="display: none;">
+
                 <div class="metadata-forensics-panel">
+
                     <div class="meta-panel-header">
+
                         <div>
+
                             <h4>Latent Metadata Forensics</h4>
+
                             <p class="meta-panel-sub">EXIF camera tags, GPS coordinates, author history &amp; PDF software markers</p>
+
                         </div>
+
                         <span class="meta-tag-counter {{ 'counter-warning' if session_data.metadata.metadata_count > 0 else 'counter-clean' }}">
+
                             {{ session_data.metadata.metadata_count }} Tag(s)
+
                         </span>
+
                     </div>
+
+
 
                     <div class="scrub-guarantee-banner">
+
                         <i class="fa-solid fa-shield-halved text-sage"></i>
+
                         <div>
+
                             <strong>Automatic Scrubbing Active:</strong> All latent document properties, creation dates, device serials, and geolocation coordinates will be stripped upon export.
+
                         </div>
+
                     </div>
+
+
 
                     {% if session_data.metadata.summary_tags %}
+
                     <div class="meta-tags-section">
+
                         <span class="meta-section-heading">Detected Latent Tags:</span>
+
                         <div class="meta-tags-grid">
+
                             {% for tag in session_data.metadata.summary_tags %}
+
                             <span class="meta-pill-item"><i class="fa-solid fa-tag"></i> {{ tag }}</span>
+
                             {% endfor %}
+
                         </div>
+
                     </div>
+
                     {% else %}
+
                     <div class="meta-clean-banner">
+
                         <i class="fa-solid fa-circle-check text-sage"></i> Clean Document Stream: Zero latent EXIF or author tags detected.
+
                     </div>
+
                     {% endif %}
 
+
+
                     <div class="audit-certificate-preview-box">
+
                         <div class="cert-box-header">
+
                             <i class="fa-solid fa-certificate text-coral"></i>
+
                             <h5>Cryptographic Audit Certificate</h5>
+
                         </div>
+
                         <p>ShareSafe computes SHA-256 hashes pre- and post-sanitization, certifying irreversible raster destruction and complete vector text stream elimination.</p>
+
                     </div>
+
                 </div>
+
             </div>
+
         </aside>
 
+
+
         <!-- Center: Interactive Document Canvas Viewport -->
+
         <main class="workbench-canvas-area" aria-label="Document Viewport">
+
             <div class="canvas-scroll-container" id="canvasContainer">
-                <!-- Mode 1: Interactive Overlay Viewport -->
-                <div class="canvas-wrapper" id="overlayViewport">
-                    <img id="pagePreviewImg" src="{{ session_data.pages[0].preview_url }}" alt="Document Preview" class="document-image" onload="initCanvasDimensions()">
-                    <div class="bounding-box-layer" id="boxOverlayLayer"></div>
-                    <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
+
+                <!-- Mode 1: Original Viewport (with draft overlay toggle) -->
+
+                <div class="viewport-card" id="overlayViewport">
+
+                    <div class="viewport-header-bar">
+
+                        <div class="viewport-status-badge badge-draft" id="overlayStatusBadge">
+
+                            <i class="fa-solid fa-file-pen text-coral"></i>
+
+                            <span id="overlayStatusText">Original Document &bull; Draft Redaction Overlays Active</span>
+
+                        </div>
+
+                        <button type="button" class="btn-viewport-sub" id="btnToggleOverlay" onclick="toggleOverlayVisibility()" title="Toggle draft annotation boxes on/off">
+
+                            <i class="fa-regular fa-eye-slash" id="overlayToggleIcon"></i>
+
+                            <span id="overlayToggleText">Hide Draft Boxes</span>
+
+                        </button>
+
+                    </div>
+
+                    <div class="canvas-wrapper">
+
+                        <img id="pagePreviewImg" src="{{ session_data.pages[0].preview_url }}" alt="Document Preview" class="document-image" onload="initCanvasDimensions()">
+
+                        <div class="bounding-box-layer" id="boxOverlayLayer"></div>
+
+                        <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
+
+                    </div>
+
                 </div>
 
-                <!-- Mode 2: Before & After Split Slider Viewport -->
-                <div class="split-slider-wrapper" id="splitViewport" style="display: none;">
+
+
+                <!-- Mode 2: Before & After Comparison Viewport -->
+
+                <div class="viewport-card split-slider-wrapper" id="splitViewport" style="display: none;">
+
                     <div class="split-status-badges-bar">
-                        <span class="split-badge-tag badge-tag-after"><i class="fa-solid fa-shield-halved text-sage"></i> Sanitized Copy (Raster Flattened)</span>
-                        <span class="split-badge-hint"><i class="fa-solid fa-arrows-left-right"></i> Drag slider handle to compare redacted vs original</span>
-                        <span class="split-badge-tag badge-tag-before"><i class="fa-solid fa-eye text-coral"></i> Original Document (Exposed PII)</span>
+
+                        <div class="compare-badges-left">
+
+                            <span class="split-badge-tag badge-tag-after"><i class="fa-solid fa-shield-halved text-sage"></i> Sanitized Copy</span>
+
+                        </div>
+
+                        <div class="compare-center-controls">
+
+                            <div class="compare-subtabs-segmented" role="radiogroup" aria-label="Comparison View Format">
+
+                                <button type="button" class="compare-subtab-btn active" id="btnCompareSlider" onclick="setCompareSubMode('slider')" title="Interactive Split Slider">
+
+                                    <i class="fa-solid fa-arrows-left-right"></i>
+
+                                    <span>Slider</span>
+
+                                </button>
+
+                                <button type="button" class="compare-subtab-btn" id="btnCompareSide" onclick="setCompareSubMode('side-by-side')" title="Side-by-Side Comparison">
+
+                                    <i class="fa-solid fa-table-columns"></i>
+
+                                    <span>Side-by-Side</span>
+
+                                </button>
+
+                            </div>
+
+                            <span class="split-badge-hint" id="splitSliderHint"><i class="fa-solid fa-arrows-left-right"></i> Drag handle or use &larr; &rarr; arrow keys</span>
+
+                        </div>
+
+                        <div class="compare-badges-right">
+
+                            <span class="split-badge-tag badge-tag-before"><i class="fa-solid fa-eye text-coral"></i> Original Document</span>
+
+                        </div>
+
                     </div>
-                    <div class="split-image-container">
+
+
+
+                    <!-- Layout A: Interactive Split Slider -->
+
+                    <div class="split-image-container" id="compareSliderContainer">
+
+                        <div class="floating-side-pill pill-left"><i class="fa-solid fa-shield-halved"></i> Sanitized</div>
+
+                        <div class="floating-side-pill pill-right"><i class="fa-solid fa-eye"></i> Original</div>
+
                         <img id="beforeSliderImg" src="{{ session_data.pages[0].preview_url }}" class="split-img before-img" alt="Original Document" draggable="false">
+
                         <div class="after-wrapper" id="afterWrapper">
+
                             <img id="afterSliderImg" src="" class="split-img after-img" alt="Sanitized Copy" draggable="false">
+
                         </div>
-                        <div class="slider-divider" id="sliderDivider">
+
+                        <div class="slider-divider" id="sliderDivider" tabindex="0" role="slider" aria-label="Comparison divider slider" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+
                             <div class="divider-handle"><i class="fa-solid fa-arrows-left-right"></i></div>
+
                         </div>
+
                     </div>
+
+
+
+                    <!-- Layout B: Polished Side-by-Side View -->
+
+                    <div class="side-by-side-comparison" id="compareSideContainer" style="display: none;">
+
+                        <div class="side-compare-col">
+
+                            <div class="side-col-header">
+
+                                <span class="split-badge-tag badge-tag-before"><i class="fa-solid fa-eye text-coral"></i> Original Document (Unmodified)</span>
+
+                            </div>
+
+                            <div class="side-col-canvas">
+
+                                <img id="sideOrigImg" src="{{ session_data.pages[0].preview_url }}" class="side-compare-img" alt="Original Document" draggable="false">
+
+                            </div>
+
+                        </div>
+
+                        <div class="side-compare-col">
+
+                            <div class="side-col-header">
+
+                                <span class="split-badge-tag badge-tag-after"><i class="fa-solid fa-shield-halved text-sage"></i> Sanitized Copy (Raster Flattened)</span>
+
+                            </div>
+
+                            <div class="side-col-canvas">
+
+                                <img id="sideSanImg" src="" class="side-compare-img" alt="Sanitized Copy" draggable="false">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+
 
                 <!-- Mode 3: Redacted Safe Document Viewport -->
-                <div class="canvas-wrapper" id="redactedViewport" style="display: none;">
+
+                <div class="viewport-card canvas-wrapper" id="redactedViewport" style="display: none;">
+
+                    <div class="viewport-header-bar">
+
+                        <div class="viewport-status-badge badge-sanitized">
+
+                            <i class="fa-solid fa-shield-check text-sage"></i>
+
+                            <span>Sanitized Document &bull; Text Permanently Destroyed &amp; Raster Flattened (Anti-Recovery)</span>
+
+                        </div>
+
+                    </div>
+
                     <img id="redactedSoloImg" src="" alt="Redacted Safe Copy" class="document-image">
+
                 </div>
+
             </div>
+
+
 
             <!-- Floating Executive Export Drawer (Appears after redaction, dismissible) -->
+
             <div class="export-drawer" id="exportDrawer" style="display: none;">
+
                 <div class="drawer-header-row">
+
                     <div class="drawer-info-block">
+
                         <div class="drawer-icon-wrap">
+
                             <i class="fa-solid fa-circle-check text-sage"></i>
+
                         </div>
+
                         <div class="drawer-text-block">
+
                             <h4>Document Sanitized &amp; Cryptographically Sealed</h4>
+
                             <p>Text layers permanently flattened into high-DPI raster graphics. All EXIF &amp; document metadata stripped. Ready for secure public distribution.</p>
+
                         </div>
+
                     </div>
+
                     <div class="drawer-actions-block">
+
                         <a href="#" id="downloadDocBtn" class="btn-editorial-primary" download>
+
                             <i class="fa-solid fa-download"></i> Download Safe Document
+
                         </a>
+
                         <a href="#" id="downloadCertBtn" class="btn-editorial-secondary" download>
+
                             <i class="fa-solid fa-certificate"></i> Audit Certificate (PDF)
+
                         </a>
+
                         <a href="#" id="downloadJsonBtn" class="btn-editorial-secondary" download>
+
                             <i class="fa-solid fa-file-code"></i> JSON Audit Data
+
                         </a>
+
                         <button type="button" class="btn-drawer-close" onclick="document.getElementById('exportDrawer').style.display='none'" title="Dismiss drawer" aria-label="Dismiss export drawer">
+
                             <i class="fa-solid fa-xmark"></i>
+
                         </button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </main>
+
     </div>
+
 </div>
 
+
+
 <!-- Raw Session JSON for Client Scripts -->
+
 <script id="sessionJsonData" type="application/json">
+
     {{ session_data | tojson }}
+
 </script>
 
+
+
 <script>
+
 // Sidebar Tab Switcher Function
+
 function switchSidebarTab(tabName) {
+
     const tabs = ['threats', 'manual', 'metadata'];
+
     tabs.forEach(t => {
+
         const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn');
+
         const pane = document.getElementById('pane' + t.charAt(0).toUpperCase() + t.slice(1));
+
         if (t === tabName) {
+
             if (btn) {
+
                 btn.classList.add('active');
+
                 btn.setAttribute('aria-selected', 'true');
+
             }
+
             if (pane) {
+
                 pane.style.display = 'flex';
+
                 pane.classList.add('active');
+
             }
+
         } else {
+
             if (btn) {
+
                 btn.classList.remove('active');
+
                 btn.setAttribute('aria-selected', 'false');
+
             }
+
             if (pane) {
+
                 pane.style.display = 'none';
+
                 pane.classList.remove('active');
+
             }
+
         }
+
     });
+
 }
+
 </script>
+
 {% endblock %}
+
+
 
 {% block footer %}{% endblock %}
 
+
+
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.4"></script>
+
+<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.5"></script>
+
 {% endblock %}
+
