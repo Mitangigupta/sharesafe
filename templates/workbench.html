@@ -890,7 +890,7 @@ function switchSidebarTab(tabName) {
 
 {% block scripts %}
 
-<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=2.6"></script>
+<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=3.0.0" onerror="this.onerror=null;this.src='/static/js/canvas_editor.js?t=' + Date.now();"></script>
 
 {% endblock %}
 
