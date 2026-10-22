@@ -164,6 +164,16 @@
 
             </div>
 
+            <!-- Primary Redact & Export Action (immediately before Draw Manual Box) -->
+
+            <button type="button" class="btn-editorial-primary btn-sanitize-action" id="applyRedactBtn" onclick="executeRedaction()" title="Apply selected redactions and export sanitized document">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                <span>Sanitize &amp; Export</span>
+
+            </button>
+
             <!-- Manual Drawing Mode Toggle -->
 
             <button type="button" class="btn-editorial-secondary btn-draw-toggle" id="drawModeBtn" onclick="toggleDrawMode()" title="Draw custom redaction regions over signatures, stamps, or photos">
@@ -174,21 +184,11 @@
 
             </button>
 
-            <!-- Purge Session -->
+            <!-- Delete / Clear Session -->
 
             <button type="button" class="btn-toolbar-ghost" onclick="purgeCurrentSession()" title="Permanently destroy this session and files from disk" aria-label="Destroy session files">
 
                 <i class="fa-solid fa-trash-can"></i>
-
-            </button>
-
-            <!-- Primary Redact & Export Action -->
-
-            <button type="button" class="btn-editorial-primary btn-sanitize-action" id="applyRedactBtn" onclick="executeRedaction()">
-
-                <i class="fa-solid fa-shield-halved"></i>
-
-                <span>Sanitize &amp; Export</span>
 
             </button>
 
@@ -894,7 +894,7 @@ function switchSidebarTab(tabName) {
 
 {% block scripts %}
 
-<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=3.2.0" onerror="this.onerror=null;this.src='/static/js/canvas_editor.js?t=' + Date.now();"></script>
+<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=3.3.0" onerror="this.onerror=null;this.src='/static/js/canvas_editor.js?t=' + Date.now();"></script>
 
 {% endblock %}
 
