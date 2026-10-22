@@ -592,7 +592,7 @@
 
                     <div class="canvas-wrapper" id="overlayCanvasWrapper">
 
-                        <img id="pagePreviewImg" src="{{ session_data.pages[0].preview_url }}" alt="Document Preview" class="document-image" onload="initCanvasDimensions()">
+                        <img id="pagePreviewImg" src="{{ session_data.pages[0].preview_data_url|default(session_data.pages[0].preview_url) }}" alt="Document Preview" class="document-image" onload="initCanvasDimensions()">
 
                         <div class="bounding-box-layer" id="boxOverlayLayer"></div>
 
@@ -656,11 +656,11 @@
 
                         <div class="floating-side-pill pill-right"><i class="fa-solid fa-eye"></i> Original</div>
 
-                        <img id="beforeSliderImg" src="{{ session_data.pages[0].preview_url }}" class="split-img before-img" alt="Original Document" draggable="false">
+                        <img id="beforeSliderImg" src="{{ session_data.pages[0].preview_data_url|default(session_data.pages[0].preview_url) }}" class="split-img before-img" alt="Original Document" draggable="false">
 
                         <div class="after-wrapper" id="afterWrapper">
 
-                            <img id="afterSliderImg" src="" class="split-img after-img" alt="Sanitized Copy" draggable="false">
+                            <img id="afterSliderImg" src="{{ session_data.pages[0].preview_data_url|default(session_data.pages[0].preview_url) }}" class="split-img after-img" alt="Sanitized Copy" draggable="false">
 
                         </div>
 
@@ -686,7 +686,7 @@
 
                             <div class="side-col-canvas">
 
-                                <img id="sideOrigImg" src="{{ session_data.pages[0].preview_url }}" class="side-compare-img" alt="Original Document" draggable="false">
+                                <img id="sideOrigImg" src="{{ session_data.pages[0].preview_data_url|default(session_data.pages[0].preview_url) }}" class="side-compare-img" alt="Original Document" draggable="false">
 
                             </div>
 
@@ -702,7 +702,7 @@
 
                             <div class="side-col-canvas">
 
-                                <img id="sideSanImg" src="" class="side-compare-img" alt="Sanitized Copy" draggable="false">
+                                <img id="sideSanImg" src="{{ session_data.pages[0].preview_data_url|default(session_data.pages[0].preview_url) }}" class="side-compare-img" alt="Sanitized Copy" draggable="false">
 
                             </div>
 
@@ -730,7 +730,7 @@
 
                     <div class="canvas-wrapper" id="redactedCanvasWrapper">
 
-                    <img id="redactedSoloImg" src="" alt="Redacted Safe Copy" class="document-image">
+                    <img id="redactedSoloImg" src="{{ session_data.pages[0].preview_data_url|default(session_data.pages[0].preview_url) }}" alt="Redacted Safe Copy" class="document-image">
 
                     </div>
 
@@ -894,7 +894,7 @@ function switchSidebarTab(tabName) {
 
 {% block scripts %}
 
-<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=3.1.0" onerror="this.onerror=null;this.src='/static/js/canvas_editor.js?t=' + Date.now();"></script>
+<script src="{{ url_for('static', filename='js/canvas_editor.js') }}?v=3.2.0" onerror="this.onerror=null;this.src='/static/js/canvas_editor.js?t=' + Date.now();"></script>
 
 {% endblock %}
 

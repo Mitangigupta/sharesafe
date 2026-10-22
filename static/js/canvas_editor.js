@@ -1244,11 +1244,13 @@ function changePage(delta) {
 
 
 
-    if (previewImg) previewImg.src = pageObj.preview_url;
+    const pageSrc = pageObj.preview_data_url || pageObj.preview_url;
 
-    if (beforeImg) beforeImg.src = pageObj.preview_url;
+    if (previewImg) previewImg.src = pageSrc;
 
-    if (sideOrig) sideOrig.src = pageObj.preview_url;
+    if (beforeImg) beforeImg.src = pageSrc;
+
+    if (sideOrig) sideOrig.src = pageSrc;
 
 
 
@@ -1264,11 +1266,11 @@ function changePage(delta) {
 
         // Fallback to original image so view is not blank
 
-        if (afterImg) afterImg.src = pageObj.preview_url;
+        if (afterImg) afterImg.src = pageSrc;
 
-        if (soloImg) soloImg.src = pageObj.preview_url;
+        if (soloImg) soloImg.src = pageSrc;
 
-        if (sideSan) sideSan.src = pageObj.preview_url;
+        if (sideSan) sideSan.src = pageSrc;
 
         if (currentViewMode === 'compare' || currentViewMode === 'split' || currentViewMode === 'sanitized' || currentViewMode === 'redacted') {
 

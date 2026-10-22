@@ -1,6 +1,7 @@
 import os
 import uuid
 import re
+import base64
 from typing import List, Dict, Any, Tuple
 from PIL import Image
 import pymupdf  # Modern PyMuPDF import
@@ -63,6 +64,8 @@ class DocumentScanner:
             preview_filename = f"page_{page_idx + 1}.png"
             preview_path = os.path.join(session_dir, preview_filename)
             pix.save(preview_path)
+            png_bytes = pix.tobytes("png")
+            b64_preview = f"data:image/png;base64,{base64.b64encode(png_bytes).decode('ascii')}"
 
             page_detections = []
 
@@ -95,6 +98,7 @@ class DocumentScanner:
                 'width': page_w,
                 'height': page_h,
                 'preview_url': f"/preview/{os.path.basename(session_dir)}/{preview_filename}",
+                'preview_data_url': b64_preview,
                 'preview_file': preview_filename,
                 'detection_count': len(page_detections)
             })
@@ -114,6 +118,8 @@ class DocumentScanner:
         preview_filename = "page_1.png"
         preview_path = os.path.join(session_dir, preview_filename)
         cv2.imwrite(preview_path, img_np)
+        _, enc = cv2.imencode('.png', img_np)
+        b64_preview = f"data:image/png;base64,{base64.b64encode(enc.tobytes()).decode('ascii')}"
 
         detections = []
 
@@ -244,6 +250,7 @@ class DocumentScanner:
             'width': w,
             'height': h,
             'preview_url': f"/preview/{os.path.basename(session_dir)}/{preview_filename}",
+            'preview_data_url': b64_preview,
             'preview_file': preview_filename,
             'detection_count': len(detections)
         }]

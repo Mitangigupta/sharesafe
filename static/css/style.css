@@ -2548,6 +2548,8 @@ input:checked + .toggle-slider::before {
     transform-origin: top center;
     transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     line-height: 0;
+    min-width: 280px;
+    min-height: 180px;
 }
 
 .floating-side-pill {
