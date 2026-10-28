@@ -218,6 +218,11 @@
 
                 </button>
 
+                <button type="button" class="sidebar-tab-btn" id="tabAssistantBtn" onclick="switchSidebarTab('assistant')" role="tab" aria-selected="false">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Assistant</span>
+                    <span class="sidebar-pill-badge" id="assistantCountBadge">{{ session_data.assistant.stats.pending if session_data.assistant and session_data.assistant.stats else 0 }}</span>
+                </button>
                 <button type="button" class="sidebar-tab-btn" id="tabManualBtn" onclick="switchSidebarTab('manual')" role="tab" aria-selected="false">
 
                     <i class="fa-solid fa-pen-to-square"></i>
@@ -301,6 +306,29 @@
                     </div>
 
                 </div>
+
+                <!-- Privacy Assistant Callout Banner -->
+                {% if session_data.assistant %}
+                <div class="assistant-callout-banner" onclick="switchSidebarTab('assistant')" role="button" tabindex="0" title="Click to view Intelligent Privacy Assistant recommendations">
+                    <div class="assistant-callout-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="assistant-callout-content">
+                        <div class="assistant-callout-title">
+                            <span>Privacy Assistant Guidance</span>
+                            <span class="assistant-callout-pill">{{ session_data.assistant.stats.pending if session_data.assistant and session_data.assistant.stats else 0 }} Suggestions</span>
+                        </div>
+                        <p class="assistant-callout-desc">
+                            {% if session_data.assistant.stats and session_data.assistant.stats.high_priority > 0 %}
+                            {{ session_data.assistant.stats.high_priority }} high-priority item{{ 's' if session_data.assistant.stats.high_priority != 1 else '' }} recommended for redaction in {{ session_data.assistant.context|capitalize }} mode.
+                            {% else %}
+                            Automated analysis complete: view explainable recommendations.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right assistant-callout-arrow"></i>
+                </div>
+                {% endif %}
 
                 <!-- Quick Selection Action Bar & Filter -->
 
@@ -432,6 +460,136 @@
 
                 </div>
 
+            </div>
+
+            <!-- Tab Content: Intelligent Privacy Assistant -->
+            <div class="sidebar-tab-pane" id="paneAssistant" style="display: none;">
+                <div class="assistant-panel-wrapper">
+                    <!-- Assistant Header & Sharing Context -->
+                    <div class="assistant-header-card">
+                        <div class="assistant-header-top">
+                            <div class="assistant-brand">
+                                <div class="assistant-icon-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                <div>
+                                    <h4 class="assistant-panel-title">Privacy Assistant</h4>
+                                    <span class="assistant-context-pill"><i class="fa-solid fa-sliders"></i> Context: {{ (session_data.assistant.context or session_data.sharing_context or 'academic')|capitalize }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Explainable Summary -->
+                        <div class="assistant-summary-box">
+                            <p class="assistant-summary-text" id="assistantSummaryText">
+                                {{ session_data.assistant.summary if session_data.assistant else "Assistant is analyzing the document for context-aware privacy recommendations." }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Assistant Metrics / Stats Tracker Bar -->
+                    <div class="assistant-stats-bar">
+                        <div class="asst-stat-item">
+                            <span class="asst-stat-num" id="asstPendingCount">{{ session_data.assistant.stats.pending if session_data.assistant and session_data.assistant.stats else 0 }}</span>
+                            <span class="asst-stat-lbl">Review</span>
+                        </div>
+                        <div class="asst-stat-divider"></div>
+                        <div class="asst-stat-item">
+                            <span class="asst-stat-num text-sage" id="asstAcceptedCount">{{ session_data.assistant.stats.accepted if session_data.assistant and session_data.assistant.stats else 0 }}</span>
+                            <span class="asst-stat-lbl">Accepted</span>
+                        </div>
+                        <div class="asst-stat-divider"></div>
+                        <div class="asst-stat-item">
+                            <span class="asst-stat-num text-muted" id="asstDismissedCount">{{ session_data.assistant.stats.dismissed if session_data.assistant and session_data.assistant.stats else 0 }}</span>
+                            <span class="asst-stat-lbl">Dismissed</span>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Controls -->
+                    <div class="assistant-quick-actions">
+                        <button type="button" class="btn-asst-action btn-asst-accept-all" onclick="acceptAllHighPriorityRecommendations()" title="Accept and stage redactions for all High Priority items">
+                            <i class="fa-solid fa-check-double"></i> Accept High Priority
+                        </button>
+                        <button type="button" class="btn-asst-action btn-asst-guided" onclick="startGuidedReview()" title="Review each suggestion sequentially">
+                            <i class="fa-solid fa-crosshairs"></i> Review All
+                        </button>
+                        <button type="button" class="btn-asst-action btn-asst-reset" onclick="resetAllRecommendations()" title="Reset all decisions back to review state">
+                            <i class="fa-solid fa-rotate-left"></i> Reset
+                        </button>
+                    </div>
+
+                    <!-- Recommendations List -->
+                    <div class="assistant-recommendations-list" id="assistantRecsList">
+                        {% if session_data.assistant and session_data.assistant.recommendations and session_data.assistant.recommendations|length > 0 %}
+                            {% for rec in session_data.assistant.recommendations %}
+                            <div class="rec-card rec-status-{{ rec.status|lower }} rec-pri-{{ rec.priority|lower }}" 
+                                 id="rec-card-{{ rec.id }}"
+                                 data-rec-id="{{ rec.id }}"
+                                 data-finding-id="{{ rec.finding_id }}"
+                                 data-page="{{ rec.page }}"
+                                 data-priority="{{ rec.priority }}"
+                                 data-status="{{ rec.status }}">
+                                <div class="rec-card-header">
+                                    <span class="rec-priority-badge {{ rec.priority_info.css_class }}">
+                                        <i class="{{ rec.priority_info.icon }}"></i> {{ rec.priority_info.label }}
+                                    </span>
+                                    <div class="rec-header-meta">
+                                        <span class="rec-meta-chip"><i class="fa-regular fa-file"></i> P.{{ rec.page }}</span>
+                                        <span class="rec-meta-chip {{ 'chip-confirmed' if rec.confidence == 'high' else 'chip-uncertain' }}">
+                                            {{ rec.confidence_label }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="rec-entity-row">
+                                    <div class="rec-entity-name">
+                                        <strong>{{ rec.label }}</strong>
+                                        <span class="rec-category-label">{{ rec.category }}</span>
+                                    </div>
+                                    <div class="rec-value-preview">
+                                        <code>{{ rec.masked }}</code>
+                                    </div>
+                                </div>
+                                <div class="rec-body">
+                                    <div class="rec-point">
+                                        <span class="rec-point-tag"><i class="fa-solid fa-circle-info"></i> Why Sensitive:</span>
+                                        <p class="rec-point-text">{{ rec.explanation }}</p>
+                                    </div>
+                                    <div class="rec-point">
+                                        <span class="rec-point-tag text-coral"><i class="fa-solid fa-shield-halved"></i> Risk Note:</span>
+                                        <p class="rec-point-text">{{ rec.risk_description }}</p>
+                                    </div>
+                                    <div class="rec-point">
+                                        <span class="rec-point-tag text-sand"><i class="fa-solid fa-lightbulb"></i> Guidance:</span>
+                                        <p class="rec-point-text">{{ rec.recommendation }}</p>
+                                    </div>
+                                </div>
+                                <div class="rec-footer">
+                                    <div class="rec-suggested-style">
+                                        <span class="rec-style-hint"><i class="fa-solid fa-paintbrush"></i> Style: <strong>{{ rec.suggested_style|capitalize }}</strong></span>
+                                    </div>
+                                    <div class="rec-actions-group">
+                                        <button type="button" class="btn-rec-action btn-rec-locate" onclick="focusRecommendationOnCanvas('{{ rec.finding_id }}', {{ rec.page }})" title="Jump to page and highlight this item">
+                                            <i class="fa-solid fa-location-crosshairs"></i> Locate
+                                        </button>
+                                        <button type="button" class="btn-rec-action btn-rec-dismiss" onclick="dismissRecommendation('{{ rec.id }}', '{{ rec.finding_id }}')" title="Dismiss suggestion and leave finding unchanged">
+                                            <i class="fa-solid fa-xmark"></i> Dismiss
+                                        </button>
+                                        <button type="button" class="btn-rec-action btn-rec-accept" onclick="acceptRecommendation('{{ rec.id }}', '{{ rec.finding_id }}', {{ rec.page }}, '{{ rec.suggested_style }}')" title="Accept recommendation and select for redaction">
+                                            <i class="fa-solid fa-check"></i> Accept
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="rec-status-stamp" id="rec-stamp-{{ rec.id }}">
+                                    <span class="stamp-text">{{ rec.status }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="assistant-empty-state">
+                                <i class="fa-solid fa-shield-heart"></i>
+                                <h5>Clean Document</h5>
+                                <p>No risks requiring privacy redaction were detected. You may still apply manual redactions if needed.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
             <!-- Tab Content 2: Manual Redactions -->
@@ -814,7 +972,7 @@
 
 function switchSidebarTab(tabName) {
 
-    const tabs = ['threats', 'manual', 'metadata'];
+    const tabs = ['threats', 'assistant', 'manual', 'metadata'];
 
     tabs.forEach(t => {
 

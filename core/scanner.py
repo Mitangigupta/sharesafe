@@ -12,6 +12,7 @@ from core.regex_detector import SensitiveDetector
 from core.qr_detector import QRDetector
 from core.ocr_engine import ocr_engine
 from core.risk_assessor import RiskAssessor
+from core.privacy_assistant import PrivacyAssistant
 
 class DocumentScanner:
     """Multi-modal document scanner orchestrating PyMuPDF vector text extraction, Tesseract/WinRT OCR, and QR payload inspection."""
@@ -57,13 +58,24 @@ class DocumentScanner:
         # Assess overall risk taking sharing context into account
         risk_summary = RiskAssessor.assess(all_detections, context=sharing_context)
 
+        # Generate Intelligent Privacy Assistant recommendations
+        file_display_name = original_filename or os.path.basename(file_path)
+        assistant_analysis = PrivacyAssistant.generate_recommendations(
+            all_detections,
+            sharing_context=sharing_context,
+            file_name=file_display_name,
+            is_pdf=is_pdf,
+            page_count=len(pages)
+        )
+
         return {
-            'file_name': original_filename or os.path.basename(file_path),
+            'file_name': file_display_name,
             'is_pdf': is_pdf,
             'page_count': len(pages),
             'pages': pages,
             'detections': all_detections,
             'risk_summary': risk_summary,
+            'assistant': assistant_analysis,
             'ocr_status': ocr_engine.get_status(),
             'warnings': scan_warnings
         }

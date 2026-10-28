@@ -1818,3 +1818,224 @@ function purgeCurrentSession() {
 
 }
 
+
+// ============================================================================
+// Intelligent Privacy Assistant Controller
+// ============================================================================
+
+function goToPage(pageNum) {
+    if (!sessionData || !sessionData.page_count) return;
+    if (pageNum < 1 || pageNum > sessionData.page_count) return;
+    if (pageNum === currentPage) return;
+    changePage(pageNum - currentPage);
+}
+
+function acceptRecommendation(recId, findingId, page, suggestedStyle) {
+    // 1. Stage finding for redaction (does NOT immediately modify disk)
+    if (findingId) {
+        window.setDetectionSelected(findingId, true);
+        if (suggestedStyle && typeof setDetectionStyle === 'function') {
+            setDetectionStyle(findingId, suggestedStyle);
+        }
+    }
+
+    // 2. Update recommendation card UI
+    const card = document.getElementById(`rec-card-${recId}`);
+    if (card) {
+        card.classList.remove('rec-status-dismissed', 'rec-status-pending');
+        card.classList.add('rec-status-accepted');
+        card.setAttribute('data-status', 'ACCEPTED');
+        const stamp = document.getElementById(`rec-stamp-${recId}`);
+        if (stamp) stamp.innerHTML = '<span class="stamp-text">ACCEPTED</span>';
+    }
+
+    // 3. Persist decision to backend
+    if (sessionData && sessionData.session_id) {
+        fetch(`/api/assistant/decision/${sessionData.session_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recommendation_id: recId, decision: 'accept' })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.stats) {
+                updateAssistantStatsUI(data.stats);
+            }
+        })
+        .catch(err => console.error('Error persisting assistant decision:', err));
+    }
+
+    updateAssistantStatsLocally();
+}
+
+function dismissRecommendation(recId, findingId) {
+    // 1. Leave finding intact without selection
+    if (findingId) {
+        window.setDetectionSelected(findingId, false);
+    }
+
+    // 2. Update card visual state
+    const card = document.getElementById(`rec-card-${recId}`);
+    if (card) {
+        card.classList.remove('rec-status-accepted', 'rec-status-pending');
+        card.classList.add('rec-status-dismissed');
+        card.setAttribute('data-status', 'DISMISSED');
+        const stamp = document.getElementById(`rec-stamp-${recId}`);
+        if (stamp) stamp.innerHTML = '<span class="stamp-text">DISMISSED</span>';
+    }
+
+    // 3. Persist to backend
+    if (sessionData && sessionData.session_id) {
+        fetch(`/api/assistant/decision/${sessionData.session_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recommendation_id: recId, decision: 'dismiss' })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.stats) {
+                updateAssistantStatsUI(data.stats);
+            }
+        })
+        .catch(err => console.error('Error persisting assistant decision:', err));
+    }
+
+    updateAssistantStatsLocally();
+}
+
+function focusRecommendationOnCanvas(findingId, page) {
+    if (page && page !== currentPage) {
+        goToPage(page);
+    }
+
+    setTimeout(() => {
+        // Highlight bounding box on canvas
+        const box = document.getElementById(`box-${findingId}`);
+        if (box) {
+            box.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            box.classList.remove('pulse-highlight');
+            void box.offsetWidth; // trigger reflow
+            box.classList.add('pulse-highlight');
+            setTimeout(() => box.classList.remove('pulse-highlight'), 2200);
+        }
+
+        // Also scroll item into view in findings list if open
+        const detItem = document.getElementById(`det-item-${findingId}`);
+        if (detItem) {
+            detItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }, 120);
+}
+
+function acceptAllHighPriorityRecommendations() {
+    const highCards = document.querySelectorAll('#assistantRecsList .rec-card[data-priority="HIGH_PRIORITY"]');
+    if (!highCards.length) return;
+
+    highCards.forEach(card => {
+        const recId = card.getAttribute('data-rec-id');
+        const findingId = card.getAttribute('data-finding-id');
+        if (findingId) {
+            selectedIds.add(findingId);
+            syncCheckbox(findingId);
+        }
+        card.classList.remove('rec-status-dismissed', 'rec-status-pending');
+        card.classList.add('rec-status-accepted');
+        card.setAttribute('data-status', 'ACCEPTED');
+        const stamp = document.getElementById(`rec-stamp-${recId}`);
+        if (stamp) stamp.innerHTML = '<span class="stamp-text">ACCEPTED</span>';
+    });
+
+    notifySelectionChanged();
+
+    if (sessionData && sessionData.session_id) {
+        fetch(`/api/assistant/decision/${sessionData.session_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ decision: 'accept_all_high' })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.stats) {
+                updateAssistantStatsUI(data.stats);
+            }
+        })
+        .catch(err => console.error('Error persisting bulk accept:', err));
+    }
+
+    updateAssistantStatsLocally();
+}
+
+function resetAllRecommendations() {
+    const cards = document.querySelectorAll('#assistantRecsList .rec-card');
+    cards.forEach(card => {
+        const recId = card.getAttribute('data-rec-id');
+        card.classList.remove('rec-status-accepted', 'rec-status-dismissed');
+        card.classList.add('rec-status-pending');
+        card.setAttribute('data-status', 'PENDING');
+        const stamp = document.getElementById(`rec-stamp-${recId}`);
+        if (stamp) stamp.innerHTML = '<span class="stamp-text">PENDING</span>';
+    });
+
+    if (sessionData && sessionData.session_id) {
+        fetch(`/api/assistant/decision/${sessionData.session_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ decision: 'reset_all' })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.stats) {
+                updateAssistantStatsUI(data.stats);
+            }
+        })
+        .catch(err => console.error('Error resetting assistant decisions:', err));
+    }
+
+    updateAssistantStatsLocally();
+}
+
+let guidedReviewIndex = 0;
+function startGuidedReview() {
+    const pendingCards = Array.from(document.querySelectorAll('#assistantRecsList .rec-card[data-status="PENDING"]'));
+    if (!pendingCards.length) {
+        alert('All privacy recommendations have already been reviewed and decided!');
+        return;
+    }
+
+    if (guidedReviewIndex >= pendingCards.length) {
+        guidedReviewIndex = 0;
+    }
+
+    const card = pendingCards[guidedReviewIndex];
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.add('rec-card-focus-guided');
+    setTimeout(() => card.classList.remove('rec-card-focus-guided'), 2000);
+
+    const findingId = card.getAttribute('data-finding-id');
+    const page = parseInt(card.getAttribute('data-page') || '1', 10);
+    focusRecommendationOnCanvas(findingId, page);
+
+    guidedReviewIndex = (guidedReviewIndex + 1) % pendingCards.length;
+}
+
+function updateAssistantStatsLocally() {
+    const total = document.querySelectorAll('#assistantRecsList .rec-card').length;
+    const accepted = document.querySelectorAll('#assistantRecsList .rec-card[data-status="ACCEPTED"]').length;
+    const dismissed = document.querySelectorAll('#assistantRecsList .rec-card[data-status="DISMISSED"]').length;
+    const pending = Math.max(0, total - accepted - dismissed);
+
+    updateAssistantStatsUI({ total, accepted, dismissed, pending });
+}
+
+function updateAssistantStatsUI(stats) {
+    if (!stats) return;
+    const pendingEl = document.getElementById('asstPendingCount');
+    const acceptedEl = document.getElementById('asstAcceptedCount');
+    const dismissedEl = document.getElementById('asstDismissedCount');
+    const badgeEl = document.getElementById('assistantCountBadge');
+
+    if (pendingEl) pendingEl.innerText = stats.pending;
+    if (acceptedEl) acceptedEl.innerText = stats.accepted;
+    if (dismissedEl) dismissedEl.innerText = stats.dismissed;
+    if (badgeEl) badgeEl.innerText = stats.pending;
+}

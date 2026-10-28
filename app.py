@@ -136,7 +136,8 @@ def restore_session_if_needed(session_id, client_session_data=None):
                     'pages': scan_res['pages'],
                     'detections': scan_res['detections'],
                     'risk_summary': scan_res['risk_summary'],
-                    'metadata': meta_res
+                    'metadata': meta_res,
+                    'assistant': scan_res.get('assistant', {})
                 }
 
             with open(info_path, 'w', encoding='utf-8') as f:
@@ -285,6 +286,7 @@ def upload_file():
             'detections': scan_result['detections'],
             'risk_summary': scan_result['risk_summary'],
             'metadata': meta_result,
+            'assistant': scan_result.get('assistant', {}),
             'warnings': scan_result.get('warnings', [])
         }
 
@@ -329,14 +331,95 @@ def update_sharing_context(session_id):
         new_context = 'academic'
 
     from core.risk_assessor import RiskAssessor
+    from core.privacy_assistant import PrivacyAssistant
     new_risk = RiskAssessor.assess(session_data.get('detections', []), context=new_context)
+    new_assistant = PrivacyAssistant.generate_recommendations(
+        session_data.get('detections', []),
+        sharing_context=new_context,
+        file_name=session_data.get('file_name', 'Document'),
+        is_pdf=session_data.get('is_pdf', False),
+        page_count=session_data.get('page_count', 1)
+    )
     session_data['sharing_context'] = new_context
     session_data['risk_summary'] = new_risk
+    session_data['assistant'] = new_assistant
 
     with open(info_path, 'w', encoding='utf-8') as f:
         json.dump(session_data, f, indent=2)
 
-    return jsonify({'success': True, 'risk_summary': new_risk, 'sharing_context': new_context})
+    return jsonify({'success': True, 'risk_summary': new_risk, 'assistant': new_assistant, 'sharing_context': new_context})
+
+@app.route('/api/assistant/decision/<session_id>', methods=['POST'])
+def update_assistant_decision(session_id):
+    upload_dir = SessionManager.get_session_upload_dir(session_id)
+    info_path = os.path.join(upload_dir, 'session_info.json')
+
+    if not os.path.exists(info_path):
+        return jsonify({'error': 'Session expired or not found'}), 404
+
+    with open(info_path, 'r', encoding='utf-8') as f:
+        session_data = json.load(f)
+
+    data = request.get_json() or {}
+    rec_id = data.get('recommendation_id')
+    decision = data.get('decision', 'accept').lower()
+
+    from core.privacy_assistant import PrivacyAssistant
+    assistant_data = session_data.get('assistant')
+    if not assistant_data or 'recommendations' not in assistant_data:
+        assistant_data = PrivacyAssistant.generate_recommendations(
+            session_data.get('detections', []),
+            sharing_context=session_data.get('sharing_context', 'academic'),
+            file_name=session_data.get('file_name', 'Document'),
+            is_pdf=session_data.get('is_pdf', False),
+            page_count=session_data.get('page_count', 1)
+        )
+        session_data['assistant'] = assistant_data
+
+    recs = assistant_data.get('recommendations', [])
+
+    if decision == 'accept_all_high':
+        for r in recs:
+            if r.get('priority') == 'HIGH_PRIORITY':
+                r['status'] = 'ACCEPTED'
+    elif decision == 'accept_all':
+        for r in recs:
+            r['status'] = 'ACCEPTED'
+    elif decision == 'reset_all':
+        for r in recs:
+            r['status'] = 'PENDING'
+    else:
+        for r in recs:
+            if r.get('id') == rec_id:
+                if decision == 'accept':
+                    r['status'] = 'ACCEPTED'
+                elif decision == 'dismiss':
+                    r['status'] = 'DISMISSED'
+                elif decision == 'reset':
+                    r['status'] = 'PENDING'
+                break
+
+    # Recalculate stats
+    total = len(recs)
+    accepted = sum(1 for r in recs if r.get('status') == 'ACCEPTED')
+    dismissed = sum(1 for r in recs if r.get('status') == 'DISMISSED')
+    pending = total - accepted - dismissed
+
+    stats = assistant_data.get('stats', {})
+    stats['total'] = total
+    stats['accepted'] = accepted
+    stats['dismissed'] = dismissed
+    stats['pending'] = max(0, pending)
+    assistant_data['stats'] = stats
+
+    with open(info_path, 'w', encoding='utf-8') as f:
+        json.dump(session_data, f, indent=2)
+
+    return jsonify({
+        'success': True,
+        'assistant': assistant_data,
+        'stats': stats
+    })
 
 @app.route('/workbench/<session_id>')
 def workbench(session_id):
@@ -354,6 +437,18 @@ def workbench(session_id):
 
     with open(info_path, 'r', encoding='utf-8') as f:
         session_data = json.load(f)
+
+    if 'assistant' not in session_data or not session_data['assistant']:
+        from core.privacy_assistant import PrivacyAssistant
+        session_data['assistant'] = PrivacyAssistant.generate_recommendations(
+            session_data.get('detections', []),
+            sharing_context=session_data.get('sharing_context', 'academic'),
+            file_name=session_data.get('file_name', 'Document'),
+            is_pdf=session_data.get('is_pdf', False),
+            page_count=session_data.get('page_count', 1)
+        )
+        with open(info_path, 'w', encoding='utf-8') as f:
+            json.dump(session_data, f, indent=2)
 
     return render_template('workbench.html', session_data=session_data)
 
