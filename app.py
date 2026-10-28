@@ -18,6 +18,39 @@ app.config.from_object(Config)
 
 scanner = DocumentScanner()
 
+def validate_file_content(file_path: str, ext: str):
+    """Validates magic bytes / signatures to guarantee file integrity and bounds."""
+    try:
+        with open(file_path, 'rb') as f:
+            header = f.read(32)
+        if len(header) < 4:
+            return False, "File is empty or corrupted."
+
+        if ext == 'pdf':
+            if not header.startswith(b'%PDF-'):
+                return False, "Invalid PDF structure: missing %PDF- header."
+            import pymupdf
+            doc = pymupdf.open(file_path)
+            page_count = len(doc)
+            doc.close()
+            if page_count > 50:
+                return False, f"PDF exceeds maximum page limit (found {page_count} pages, limit is 50)."
+        elif ext == 'png':
+            if not header.startswith(b'\x89PNG\r\n\x1a\n'):
+                return False, "Invalid PNG file: corrupted header."
+        elif ext in ('jpg', 'jpeg'):
+            if not header.startswith(b'\xff\xd8\xff'):
+                return False, "Invalid JPEG file: corrupted header."
+        elif ext == 'webp':
+            if not (header.startswith(b'RIFF') and b'WEBP' in header[:16]):
+                return False, "Invalid WEBP file: corrupted header."
+        elif ext == 'bmp':
+            if not header.startswith(b'BM'):
+                return False, "Invalid BMP file: corrupted header."
+        return True, ""
+    except Exception as e:
+        return False, f"Failed to validate file: {str(e)}"
+
 def generate_preview_images(file_path: str, session_dir: str, is_pdf: bool):
     """Renders page preview images (page_1.png, page_2.png, ...) in session_dir."""
     if is_pdf:
@@ -218,33 +251,32 @@ def upload_file():
         target_path = os.path.join(upload_dir, safe_filename)
         file.save(target_path)
 
+        # Validate file content structure / magic bytes
+        is_valid, val_err = validate_file_content(target_path, ext)
+        if not is_valid:
+            SessionManager.purge_session(session_id)
+            return jsonify({'error': val_err}), 400
+
     sharing_context = request.form.get('sharing_context', 'academic').lower()
     if sharing_context not in ['academic', 'professional', 'private', 'public']:
         sharing_context = 'academic'
 
     # Execute Document Scan
     try:
-        scan_result = scanner.scan_file(target_path, upload_dir, sharing_context=sharing_context, original_filename=display_name)
+        scan_result = scanner.scan_file(
+            target_path, 
+            upload_dir, 
+            sharing_context=sharing_context, 
+            original_filename=display_name,
+            sample_id=sample_id
+        )
         meta_result = MetadataCleaner.inspect_file(target_path)
-
-        # Identify sample_id if applicable
-        sample_map = {
-            'aadhaar_pan': 'aadhaar_pan_sample.png',
-            'medical_invoice': 'medical_invoice.pdf',
-            'server_config': 'server_config.png'
-        }
-        detected_sample_id = sample_id
-        if not detected_sample_id:
-            for s_k, s_v in sample_map.items():
-                if s_v == display_name:
-                    detected_sample_id = s_k
-                    break
 
         # Save session metadata json
         session_info = {
             'session_id': session_id,
             'file_name': scan_result['file_name'],
-            'sample_id': detected_sample_id,
+            'sample_id': sample_id,
             'is_pdf': scan_result['is_pdf'],
             'page_count': scan_result.get('page_count', len(scan_result.get('pages', []))),
             'sharing_context': sharing_context,
@@ -252,7 +284,8 @@ def upload_file():
             'pages': scan_result['pages'],
             'detections': scan_result['detections'],
             'risk_summary': scan_result['risk_summary'],
-            'metadata': meta_result
+            'metadata': meta_result,
+            'warnings': scan_result.get('warnings', [])
         }
 
         with open(os.path.join(upload_dir, 'session_info.json'), 'w', encoding='utf-8') as f:

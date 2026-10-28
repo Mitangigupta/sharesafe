@@ -1287,6 +1287,7 @@ code, pre, kbd {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 /* Strict 36px control height standardization */
@@ -1488,28 +1489,69 @@ code, pre, kbd {
 
 /* Right Toolbar Controls */
 .style-selector-container {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.8rem;
-    color: var(--ink-secondary);
+    height: 36px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    vertical-align: middle;
 }
 
 .style-selector-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
     font-weight: 600;
+    color: var(--ink-secondary);
+    white-space: nowrap;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.style-selector-label i {
+    font-size: 0.85rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--coral-primary);
+    flex-shrink: 0;
 }
 
 .select-editorial {
     height: 36px;
+    line-height: 34px;
     background: var(--bg-canvas);
     border: 1px solid var(--border-stone);
     border-radius: var(--radius-sm);
     padding: 0 12px;
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--ink-primary);
     outline: none;
     cursor: pointer;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.select-editorial:hover {
+    border-color: var(--border-stone-strong);
+}
+
+.select-editorial:focus-visible {
+    border-color: var(--coral-primary);
+    box-shadow: 0 0 0 2px var(--coral-glow);
 }
 
 .btn-draw-toggle {
@@ -3489,7 +3531,7 @@ input:checked + .toggle-slider::before {
 }
 
 
-@media (max-width: 1240px) {
+@media (max-width: 1480px) {
     .workbench-toolbar {
         height: auto;
         min-height: 56px;
@@ -3499,15 +3541,19 @@ input:checked + .toggle-slider::before {
     }
     .toolbar-left {
         order: 1;
+        flex-shrink: 0;
     }
     .toolbar-right {
         order: 2;
+        flex-shrink: 0;
     }
     .toolbar-center {
         order: 3;
         width: 100%;
         justify-content: center;
-        padding-top: 6px;
+        padding-top: 8px;
         border-top: 1px solid var(--border-stone-subtle);
+        flex-wrap: wrap;
+        gap: 8px;
     }
 }

@@ -89,7 +89,10 @@ def identify_card_network(card_number: str) -> str:
 PAN_VALID_ENTITIES = {'P', 'C', 'H', 'F', 'A', 'T', 'B', 'L', 'J', 'G'}
 
 class SensitiveDetector:
-    """High-accuracy regex detector with algorithmic validators for personal identifiable information (PII)."""
+    """High-accuracy regex detector with algorithmic validators and context-aware classification
+    for personally identifiable information (PII). Eliminates false positives on ordinary numbers,
+    shell code, and unstructured identifiers.
+    """
 
     def __init__(self):
         self._compile_patterns()
@@ -97,7 +100,7 @@ class SensitiveDetector:
     def _compile_patterns(self):
         self.regexes = {
             'upi_vpa': re.compile(r'\b[a-zA-Z0-9.\-_]{2,64}@(oksbi|okhdfcbank|okaxis|okicici|paytm|ybl|ibl|axl|upi|sbi|hdfcbank|icici|kotak|barodampay|postbank|federal|idfcbank|indus|airtel|gpay|apl)\b', re.IGNORECASE),
-            'email': re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b', re.IGNORECASE),
+            'email': re.compile(r'\b[A-Za-z0-9](?:[A-Za-z0-9._%+-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,24}\b', re.IGNORECASE),
             'pan': re.compile(r'\b([A-Za-z]{5})[\s-]?([0-9]{4})[\s-]?([A-Za-z]{1})\b'),
             'voter_id': re.compile(r'\b([A-Za-z]{3})[\s-]?([0-9]{7})\b'),
             'driving_licence': re.compile(r'\b([A-Za-z]{2}[\s-]?[0-9]{2}[\s-]?(?:19|20[0-9]{2})[\s-]?[0-9]{7}|[A-Za-z]{2}[ -]?[0-9]{13,15})\b'),
@@ -141,7 +144,7 @@ class SensitiveDetector:
             text, re.IGNORECASE
         ))
 
-        # 0. Credit / Debit Card Detection with Luhn Checksum & Structured Fallback (Checked first to prevent 16-digit cards from being broken into 12-digit Aadhaar)
+        # 0. Credit / Debit Card Detection with Luhn Checksum & Structured Fallback
         for pat in (self.regexes['card_spaced'], self.regexes['card_compact']):
             for match in pat.finditer(text):
                 val = match.group()
@@ -161,21 +164,28 @@ class SensitiveDetector:
                             'category': 'Financial Payment',
                             'risk': 'CRITICAL',
                             'char_span': span,
-                            'details': f'{network} number verified via Luhn Mod-10 algorithm'
+                            'details': f'{network} number verified via Luhn Mod-10 algorithm',
+                            'confidence': 'high',
+                            'review_required': False
                         })
                     elif pat == self.regexes['card_spaced'] and len(clean) == 16:
-                        # 4 groups of 4 digits formatted as card
-                        seen_spans.add(span)
-                        results.append({
-                            'type': 'credit_card',
-                            'label': 'Payment Card Candidate',
-                            'value': val,
-                            'masked': f"****-****-****-{clean[-4:]}",
-                            'category': 'Financial Payment',
-                            'risk': 'HIGH',
-                            'char_span': span,
-                            'details': 'Formatted 16-digit card number candidate'
-                        })
+                        # 4 groups of 4 digits formatted as card: require financial/card context
+                        window = text[max(0, span[0]-40) : min(len(text), span[1]+40)].lower()
+                        has_card_context = bool(re.search(r'(?:card|credit|debit|visa|mastercard|amex|payment|cvv|expir)', window))
+                        if has_card_context:
+                            seen_spans.add(span)
+                            results.append({
+                                'type': 'credit_card',
+                                'label': 'Payment Card Candidate',
+                                'value': val,
+                                'masked': f"****-****-****-{clean[-4:]}",
+                                'category': 'Financial Payment',
+                                'risk': 'HIGH',
+                                'char_span': span,
+                                'details': 'Formatted 16-digit card number candidate',
+                                'confidence': 'medium',
+                                'review_required': True
+                            })
 
         # 1. Masked Aadhaar UID (e.g. XXXX XXXX 1234 or **** **** 1234)
         for match in self.regexes['aadhaar_masked'].finditer(text):
@@ -191,7 +201,9 @@ class SensitiveDetector:
                     'category': 'Identity Document',
                     'risk': 'HIGH',
                     'char_span': span,
-                    'details': 'Masked Aadhaar UIDAI card number with exposed last 4 digits'
+                    'details': 'Masked Aadhaar UIDAI card number with exposed last 4 digits',
+                    'confidence': 'high',
+                    'review_required': False
                 })
 
         # 1.1 16-Digit Virtual ID (VID)
@@ -210,10 +222,12 @@ class SensitiveDetector:
                         'category': 'Identity Document',
                         'risk': 'HIGH',
                         'char_span': span,
-                        'details': '16-digit UIDAI temporary Virtual ID (VID)'
+                        'details': '16-digit UIDAI temporary Virtual ID (VID)',
+                        'confidence': 'high',
+                        'review_required': False
                     })
 
-        # 1.2 Indian Aadhaar Detection (Spaced & Compact) with Verhoeff Validation & Candidate Fallback
+        # 1.2 Indian Aadhaar Detection (Spaced & Compact) with Strict Verhoeff Validation & Identifier Fallback
         for pat in (self.regexes['aadhaar_spaced'], self.regexes['aadhaar_compact']):
             for match in pat.finditer(text):
                 val = match.group()
@@ -223,7 +237,11 @@ class SensitiveDetector:
                     if is_overlapping(span[0], span[1]):
                         continue
 
-                    # Validate Verhoeff checksum
+                    # Filter out calendar dates and invoice years
+                    if is_calendar_date(val):
+                        continue
+
+                    # Validate Verhoeff checksum (Aadhaar cannot start with 0 or 1)
                     is_checksum_valid = validate_verhoeff(digits)
 
                     if is_checksum_valid:
@@ -236,23 +254,47 @@ class SensitiveDetector:
                             'category': 'Identity Document',
                             'risk': 'CRITICAL',
                             'char_span': span,
-                            'details': '12-digit UIDAI identity number validated via Verhoeff checksum'
+                            'details': '12-digit UIDAI identity number validated via Verhoeff checksum',
+                            'confidence': 'high',
+                            'review_required': False
                         })
-                    elif has_aadhaar_context or pat == self.regexes['aadhaar_spaced']:
-                        # Even if checksum fails due to OCR digit error, flag candidate so PII is never leaked
+                    elif has_aadhaar_context:
+                        # Cheque failed but explicit Aadhaar context exists in document -> mark as unverified candidate for review
                         seen_spans.add(span)
                         results.append({
                             'type': 'aadhaar',
-                            'label': 'Indian Aadhaar UID',
+                            'label': 'Aadhaar UID Candidate (Unverified Checksum)',
                             'value': val,
                             'masked': f"XXXX-XXXX-{digits[-4:]}",
                             'category': 'Identity Document',
-                            'risk': 'CRITICAL',
+                            'risk': 'MEDIUM',
                             'char_span': span,
-                            'details': '12-digit national identity number (detected with OCR variance)'
+                            'details': '12-digit number in Aadhaar context (checksum mismatch or OCR distortion)',
+                            'confidence': 'low',
+                            'review_required': True
                         })
+                    elif pat == self.regexes['aadhaar_spaced']:
+                        # Spaced 4-4-4 number without Aadhaar context and failed checksum:
+                        # Resembles a generic identifier but lacks sufficient evidence for a specific classification.
+                        window = text[max(0, span[0]-30) : min(len(text), span[1]+30)].lower()
+                        has_id_context = bool(re.search(r'(?:id|identif|no|num|code|ref|serial|sn|order)', window))
+                        if has_id_context:
+                            seen_spans.add(span)
+                            results.append({
+                                'type': 'identifier_candidate',
+                                'label': 'Unclassified Identifier Candidate',
+                                'value': val,
+                                'masked': f"XXXX-XXXX-{digits[-4:]}",
+                                'category': 'Identity Document',
+                                'risk': 'LOW',
+                                'char_span': span,
+                                'details': 'Formatted 12-digit numeric identifier (unconfirmed classification)',
+                                'confidence': 'low',
+                                'review_required': True
+                            })
+                        # If no ID context at all, treat as harmless formatted numbers (e.g. data matrix, coordinates)
 
-        # 2. Indian PAN Card Detection (Case-insensitive, supports OCR variations)
+        # 2. Indian PAN Card Detection (Requires 4th character entity validation)
         for match in self.regexes['pan'].finditer(text):
             val = match.group()
             clean_pan = re.sub(r'[\s-]', '', val).upper()
@@ -261,6 +303,11 @@ class SensitiveDetector:
                 if is_overlapping(span[0], span[1]):
                     continue
                 entity_char = clean_pan[3]
+                window = text[max(0, span[0]-35) : min(len(text), span[1]+35)].lower()
+                has_pan_context = bool(re.search(r'(?:pan|tax|income\s*tax|permanent\s*account|itd)', window))
+                # Enforce valid Indian Income Tax Department entity codes or nearby PAN context
+                if entity_char not in PAN_VALID_ENTITIES and not has_pan_context:
+                    continue
                 entity_desc = "Individual" if entity_char == 'P' else f"Entity ({entity_char})"
                 seen_spans.add(span)
                 results.append({
@@ -271,7 +318,9 @@ class SensitiveDetector:
                     'category': 'Financial Identity',
                     'risk': 'HIGH',
                     'char_span': span,
-                    'details': f'Permanent Account Number (Entity code: {entity_char})'
+                    'details': f'Permanent Account Number (Entity code: {entity_char})',
+                    'confidence': 'high',
+                    'review_required': False
                 })
 
         # 2.1 Indian Voter ID (EPIC)
@@ -280,17 +329,22 @@ class SensitiveDetector:
             clean_epic = re.sub(r'[\s-]', '', val).upper()
             span = (match.start(), match.end())
             if not is_overlapping(span[0], span[1]):
-                seen_spans.add(span)
-                results.append({
-                    'type': 'voter_id',
-                    'label': 'Indian Voter ID (EPIC)',
-                    'value': val,
-                    'masked': f"{clean_epic[:3]}XXXX{clean_epic[-3:]}",
-                    'category': 'Identity Document',
-                    'risk': 'HIGH',
-                    'char_span': span,
-                    'details': 'Election Commission of India Electoral Photo Identity Card'
-                })
+                window = text[max(0, span[0]-35) : min(len(text), span[1]+35)].lower()
+                has_voter_context = bool(re.search(r'(?:voter|epic|election|eci|निर्वाचन|पहचान\s*पत्र)', window))
+                if has_voter_context:
+                    seen_spans.add(span)
+                    results.append({
+                        'type': 'voter_id',
+                        'label': 'Indian Voter ID (EPIC)',
+                        'value': val,
+                        'masked': f"{clean_epic[:3]}XXXX{clean_epic[-3:]}",
+                        'category': 'Identity Document',
+                        'risk': 'HIGH',
+                        'char_span': span,
+                        'details': 'Election Commission of India Electoral Photo Identity Card',
+                        'confidence': 'high',
+                        'review_required': False
+                    })
 
         # 2.2 Indian Driving Licence
         for match in self.regexes['driving_licence'].finditer(text):
@@ -298,17 +352,22 @@ class SensitiveDetector:
             clean_dl = re.sub(r'[\s-]', '', val).upper()
             span = (match.start(), match.end())
             if not is_overlapping(span[0], span[1]) and len(clean_dl) >= 14:
-                seen_spans.add(span)
-                results.append({
-                    'type': 'driving_licence',
-                    'label': 'Indian Driving Licence',
-                    'value': val,
-                    'masked': f"{clean_dl[:4]}XXXXXXX{clean_dl[-4:]}",
-                    'category': 'Identity Document',
-                    'risk': 'HIGH',
-                    'char_span': span,
-                    'details': 'State Transport Authority Driving Licence record'
-                })
+                window = text[max(0, span[0]-35) : min(len(text), span[1]+35)].lower()
+                has_dl_context = bool(re.search(r'(?:licen|dl\b|transport|rto|driving)', window))
+                if has_dl_context:
+                    seen_spans.add(span)
+                    results.append({
+                        'type': 'driving_licence',
+                        'label': 'Indian Driving Licence',
+                        'value': val,
+                        'masked': f"{clean_dl[:4]}XXXXXXX{clean_dl[-4:]}",
+                        'category': 'Identity Document',
+                        'risk': 'HIGH',
+                        'char_span': span,
+                        'details': 'State Transport Authority Driving Licence record',
+                        'confidence': 'high',
+                        'review_required': False
+                    })
 
         # 2.3 Indian Passport Number
         for match in self.regexes['passport'].finditer(text):
@@ -326,7 +385,9 @@ class SensitiveDetector:
                         'category': 'Identity Document',
                         'risk': 'CRITICAL',
                         'char_span': span,
-                        'details': 'Indian Passport travel document identifier'
+                        'details': 'Indian Passport travel document identifier',
+                        'confidence': 'high',
+                        'review_required': False
                     })
 
         # 2.4 Date of Birth (DOB)
@@ -343,9 +404,10 @@ class SensitiveDetector:
                     'category': 'Identity Document',
                     'risk': 'MEDIUM',
                     'char_span': span,
-                    'details': 'Official demographic birth record'
+                    'details': 'Official demographic birth record',
+                    'confidence': 'high',
+                    'review_required': False
                 })
-
 
         # 3.5 UPI Virtual Payment Address (VPA)
         for match in self.regexes['upi_vpa'].finditer(text):
@@ -364,17 +426,35 @@ class SensitiveDetector:
                 'category': 'Financial Identity',
                 'risk': 'HIGH',
                 'char_span': span,
-                'details': f'Unified Payments Interface address ({val}) resolves directly to bank account identity'
+                'details': f'Unified Payments Interface address ({val}) resolves directly to bank account identity',
+                'confidence': 'high',
+                'review_required': False
             })
 
-        # 4. Email Addresses
+        # 4. Email Addresses (Strict validation of structure, TLD, and exclusions)
         for match in self.regexes['email'].finditer(text):
-            val = match.group()
-            span = (match.start(), match.end())
+            raw_val = match.group()
+            val = raw_val.rstrip('.,;:)]}>"\'')
+            if not val or '@' not in val:
+                continue
+            span = (match.start(), match.start() + len(val))
             if is_overlapping(span[0], span[1]):
                 continue
-            seen_spans.add(span)
+
             user, domain = val.split('@', 1)
+            # Validate user and domain syntax
+            if not user or not domain or '..' in val or user.startswith('.') or user.endswith('.'):
+                continue
+            if '.' not in domain or domain.startswith('.') or domain.endswith('.'):
+                continue
+            tld = domain.split('.')[-1]
+            if len(tld) < 2 or not tld.isalpha():
+                continue
+            # Exclude code constructs such as ${#str} or shell variable expansions
+            if user.startswith(('#', '$', '{', '<', '!', '"', '\'')):
+                continue
+
+            seen_spans.add(span)
             masked_user = (user[0] + '***' + user[-1]) if len(user) > 2 else user[0] + '***'
             results.append({
                 'type': 'email',
@@ -384,7 +464,9 @@ class SensitiveDetector:
                 'category': 'Contact Information',
                 'risk': 'LOW',
                 'char_span': span,
-                'details': 'Personal or corporate electronic mail address'
+                'details': 'Personal or corporate electronic mail address',
+                'confidence': 'high',
+                'review_required': False
             })
 
         # 5. US Social Security Number (SSN)
@@ -402,10 +484,12 @@ class SensitiveDetector:
                 'category': 'Identity Document',
                 'risk': 'CRITICAL',
                 'char_span': span,
-                'details': '9-digit US Social Security Number'
+                'details': '9-digit US Social Security Number',
+                'confidence': 'high',
+                'review_required': False
             })
 
-        # 6. Phone Numbers (Indian & International) - Filter out calendar dates and invoice years
+        # 6. Phone Numbers (Indian & International) - Context-aware, filters out dates, prices, units
         for match in self.regexes['indian_phone'].finditer(text):
             val = match.group()
             clean_digits = re.sub(r'\D', '', val)
@@ -413,58 +497,102 @@ class SensitiveDetector:
                 span = (match.start(), match.end())
                 if is_overlapping(span[0], span[1]) or is_calendar_date(val):
                     continue
-                seen_spans.add(span)
-                results.append({
-                    'type': 'phone',
-                    'label': 'Phone Number (IN)',
-                    'value': val,
-                    'masked': f"+91 XXXXX-{clean_digits[-4:]}",
-                    'category': 'Contact Information',
-                    'risk': 'MEDIUM',
-                    'char_span': span,
-                    'details': 'Indian mobile phone number'
-                })
+
+                # Repetitive or trivial sequence check (e.g. 9999999999, 1234567890)
+                ten_digits = clean_digits[-10:]
+                if len(set(ten_digits)) <= 2 or ten_digits in ('1234567890', '0123456789'):
+                    continue
+
+                window = text[max(0, span[0]-35) : min(len(text), span[1]+35)].lower()
+                # Check for currency or technical measurement units before/after
+                if re.search(r'(?:rs\.?|inr|usd|\$|€|₹|bytes|kb|mb|gb|px|pt|fps|mhz)\s*$', text[max(0, span[0]-10):span[0]].lower()):
+                    continue
+
+                has_phone_context = bool(re.search(r'(?:phone|tel|mobile|call|ph\b|cell|contact|fax|whatsapp|mob|helpline|संपर्क)', window))
+                has_91_prefix = val.strip().startswith('+91') or (clean_digits.startswith('91') and len(clean_digits) == 12)
+                is_formatted = bool(re.search(r'[\s-]', val.strip().lstrip('+91').strip()))
+
+                # Only confirm if +91 prefix, phone context, or standard hyphen/space formatting is present
+                if has_91_prefix or has_phone_context or is_formatted:
+                    seen_spans.add(span)
+                    results.append({
+                        'type': 'phone',
+                        'label': 'Phone Number (IN)',
+                        'value': val,
+                        'masked': f"+91 XXXXX-{ten_digits[-4:]}",
+                        'category': 'Contact Information',
+                        'risk': 'MEDIUM',
+                        'char_span': span,
+                        'details': 'Indian mobile phone number',
+                        'confidence': 'high' if (has_91_prefix or has_phone_context) else 'medium',
+                        'review_required': not (has_91_prefix or has_phone_context)
+                    })
 
         for match in self.regexes['intl_phone'].finditer(text):
             val = match.group()
             clean_digits = re.sub(r'\D', '', val)
             # Exclude dates, years, and IP addresses
             if len(clean_digits) >= 9 and not is_calendar_date(val):
-                # Don't match year-numbers like 2026-9821
                 if re.match(r'^(?:19|20)\d{2}[-\s]?\d{4}$', val.strip()):
                     continue
+                if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}', val.strip()):
+                    continue
+
                 span = (match.start(), match.end())
                 if is_overlapping(span[0], span[1]):
                     continue
-                seen_spans.add(span)
-                results.append({
-                    'type': 'phone',
-                    'label': 'Phone Number (Intl)',
-                    'value': val,
-                    'masked': f"***-***-{clean_digits[-4:]}",
-                    'category': 'Contact Information',
-                    'risk': 'MEDIUM',
-                    'char_span': span,
-                    'details': 'International standard telephone number'
-                })
 
-        # 7. IPv4 Addresses
+                window = text[max(0, span[0]-35) : min(len(text), span[1]+35)].lower()
+                has_phone_context = bool(re.search(r'(?:phone|tel|mobile|call|ph\b|cell|contact|fax|voice)', window))
+                has_plus_prefix = val.strip().startswith('+')
+                has_paren_format = bool(re.search(r'\([2-9]\d{2}\)', val))
+
+                # Require plus prefix, standard parenthesis formatting, or phone context
+                if has_plus_prefix or has_paren_format or has_phone_context:
+                    seen_spans.add(span)
+                    results.append({
+                        'type': 'phone',
+                        'label': 'Phone Number (Intl)',
+                        'value': val,
+                        'masked': f"***-***-{clean_digits[-4:]}",
+                        'category': 'Contact Information',
+                        'risk': 'MEDIUM',
+                        'char_span': span,
+                        'details': 'International standard telephone number',
+                        'confidence': 'high' if (has_plus_prefix or has_phone_context) else 'medium',
+                        'review_required': False
+                    })
+
+        # 7. IPv4 Addresses (Filters out version strings like v1.2.3.4, gcc-11.2.0.1, 0.0.0.0)
         for match in self.regexes['ipv4'].finditer(text):
             val = match.group()
             span = (match.start(), match.end())
             if is_overlapping(span[0], span[1]):
                 continue
-            seen_spans.add(span)
-            results.append({
-                'type': 'ip_address',
-                'label': 'IPv4 Address',
-                'value': val,
-                'masked': f"{val.split('.')[0]}.*.*.{val.split('.')[-1]}",
-                'category': 'Network Infrastructure',
-                'risk': 'MEDIUM',
-                'char_span': span,
-                'details': 'Network host IP address'
-            })
+            if val == '0.0.0.0':
+                continue
+            # Exclude version strings
+            prefix = text[max(0, span[0]-10):span[0]].lower()
+            if re.search(r'(?:version|ver|v\b|gcc|python|node|linux|kernel|vmlinuz|pkg)\s*[-_:]?$', prefix):
+                continue
+            parts = val.split('.')
+            if len(parts) == 4 and all(p.isdigit() and 0 <= int(p) <= 255 for p in parts):
+                # Discard multi-digit octets with leading zeroes (like 01.02.03.04)
+                if any(len(p) > 1 and p.startswith('0') for p in parts):
+                    continue
+                seen_spans.add(span)
+                results.append({
+                    'type': 'ip_address',
+                    'label': 'IPv4 Address',
+                    'value': val,
+                    'masked': f"{parts[0]}.*.*.{parts[-1]}",
+                    'category': 'Network Infrastructure',
+                    'risk': 'MEDIUM',
+                    'char_span': span,
+                    'details': 'Network host IP address',
+                    'confidence': 'high',
+                    'review_required': False
+                })
 
         # 8. API Keys, JWT Tokens, and AWS Credentials
         for match in self.regexes['aws_key'].finditer(text):
@@ -480,7 +608,9 @@ class SensitiveDetector:
                     'category': 'Cloud Credential',
                     'risk': 'CRITICAL',
                     'char_span': span,
-                    'details': 'Amazon Web Services IAM Access Key'
+                    'details': 'Amazon Web Services IAM Access Key',
+                    'confidence': 'high',
+                    'review_required': False
                 })
 
         for match in self.regexes['jwt_token'].finditer(text):
@@ -496,7 +626,9 @@ class SensitiveDetector:
                     'category': 'Authentication Token',
                     'risk': 'CRITICAL',
                     'char_span': span,
-                    'details': 'Encoded JSON Web Token carrying identity and session claims'
+                    'details': 'Encoded JSON Web Token carrying identity and session claims',
+                    'confidence': 'high',
+                    'review_required': False
                 })
 
         for match in self.regexes['secret_token'].finditer(text):
@@ -512,7 +644,9 @@ class SensitiveDetector:
                     'category': 'Security Credential',
                     'risk': 'CRITICAL',
                     'char_span': span,
-                    'details': 'Private developer/service API authentication token'
+                    'details': 'Private developer/service API authentication token',
+                    'confidence': 'high',
+                    'review_required': False
                 })
 
         return results
