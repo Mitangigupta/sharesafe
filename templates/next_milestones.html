@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Next Milestones &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
+
+{% block content %}
+<div class="info-page-wrapper">
+    <!-- Breadcrumb & Status Bar -->
+    <div class="info-breadcrumb-bar">
+        <div class="info-breadcrumb-inner">
+            <a href="/" class="breadcrumb-link"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Next Milestones</span>
+        </div>
+        <div class="breadcrumb-meta-chips">
+            <span class="meta-tag"><i class="fa-solid fa-flag-checkered"></i> Strategic Roadmap</span>
+            <span class="meta-tag"><i class="fa-solid fa-clock"></i> 8 Min Read</span>
+        </div>
+    </div>
+
+    <!-- Hero Header -->
+    <header class="info-hero-header">
+        <div class="info-hero-kicker">
+            <span class="kicker-pill"><i class="fa-solid fa-flag-checkered"></i> Strategic Engineering Roadmap</span>
+        </div>
+        <h1 class="info-hero-title">
+            ShareSafe <span class="teal-gradient-text">Development Roadmap</span> &amp; Next Milestones
+        </h1>
+        <p class="info-hero-lead">
+            A comprehensive, phased blueprint tracing ShareSafe’s evolution from application stabilization to advanced privacy verification, AI assistance calibration, browser extension feasibility, and messaging-platform pre-share protection.
+        </p>
+    </header>
+
+    <!-- Main Content Body -->
+    <div class="info-content-grid">
+        <!-- Roadmap Methodology Card -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-compass"></i></div>
+                <div>
+                    <span class="section-sub-label">DEVELOPMENT PHILOSOPHY</span>
+                    <h2 class="section-title">Evidence-Based Milestones with Verifiable Criteria</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    ShareSafe adheres to a disciplined engineering lifecycle: <strong>future capabilities are never presented as completed work, and feasibility is verified before building complex integrations.</strong> Each milestone in this roadmap is bound to concrete deliverables, explicit technical dependencies, measurable completion criteria, and realistic proposed delivery windows.
+                </p>
+                <div class="milestone-legend-bar">
+                    <span class="legend-item"><span class="status-indicator-dot dot-completed"></span> Completed / Verified</span>
+                    <span class="legend-item"><span class="status-indicator-dot dot-progress"></span> In Active Progress</span>
+                    <span class="legend-item"><span class="status-indicator-dot dot-planned"></span> Planned Engineering</span>
+                    <span class="legend-item"><span class="status-indicator-dot dot-research"></span> Feasibility Research</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Milestone 1 -->
+        <section class="info-card section-card milestone-card">
+            <div class="milestone-header-row">
+                <div class="milestone-badge-box">
+                    <span class="m-num">M1</span>
+                    <span class="m-status status-completed"><i class="fa-solid fa-check"></i> Completed / Verified</span>
+                </div>
+                <div class="milestone-dates">
+                    <span class="m-phase">Phase 1 &bull; Baseline Stabilization</span>
+                    <span class="m-target">Completed: October 2026</span>
+                </div>
+            </div>
+            <h2 class="milestone-title">Stabilize the Existing Application &amp; Redaction Pipeline</h2>
+            <p class="milestone-desc">
+                Conduct an exhaustive audit of the core document-processing workflow, resolve interface alignment regressions, eliminate QR code false positives on code blocks and data tables, integrate statutory checksum validation (Verhoeff for Aadhaar, ITD entity checks for PAN), align the toolbar Style dropdown, and verify synchronized Before/After split comparisons.
+            </p>
+            <div class="milestone-details-grid">
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-box-archive"></i> Expected Deliverables:</span>
+                    <ul class="m-list">
+                        <li>Fixed toolbar Style dropdown alignment and responsive icon spacing.</li>
+                        <li>QR false-positive suppression on monospace code and tabular grids.</li>
+                        <li>Verhoeff algorithm implementation for Aadhaar number validation.</li>
+                        <li>4th-character entity validation for Indian Permanent Account Numbers (PAN).</li>
+                        <li>Automated regression test suite (13 comprehensive tests in <code>test_regression_suite.py</code>).</li>
+                    </ul>
+                </div>
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-list-check"></i> Completion Criterion &amp; Dependencies:</span>
+                    <div class="m-criterion-box">
+                        <strong>Criterion:</strong> 100% passing test suite across all 13 regression tests with zero false alarms on synthetic PAN/Aadhaar samples.
+                    </div>
+                    <div class="m-deps-box">
+                        <strong>Dependencies:</strong> Core Flask runtime, PyMuPDF, OpenCV QR detector.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Milestone 2 -->
+        <section class="info-card section-card milestone-card">
+            <div class="milestone-header-row">
+                <div class="milestone-badge-box">
+                    <span class="m-num">M2</span>
+                    <span class="m-status status-progress"><i class="fa-solid fa-spinner fa-spin"></i> In Progress</span>
+                </div>
+                <div class="milestone-dates">
+                    <span class="m-phase">Phase 2 &bull; Privacy Validation &amp; Accuracy</span>
+                    <span class="m-target">Proposed Target: Q2 2027</span>
+                </div>
+            </div>
+            <h2 class="milestone-title">Improve Detection Accuracy &amp; Privacy Sanitization Verification</h2>
+            <p class="milestone-desc">
+                Evaluate detection precision and recall against a curated test corpus, improve multi-page coordinate mapping for complex scanned documents, verify that exported sanitized files never expose underlying vector text streams, and introduce automated forensic leakage testing tools into the CI/CD pipeline.
+            </p>
+            <div class="milestone-details-grid">
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-box-archive"></i> Expected Deliverables:</span>
+                    <ul class="m-list">
+                        <li>Curated benchmark dataset of 250 labeled synthetic test documents.</li>
+                        <li>Sub-pixel bounding box coordinate alignment for skewed and rotated scans.</li>
+                        <li>Automated post-export forensic validator checking for text stream residue.</li>
+                        <li>Dynamic image contrast normalization for degraded OCR documents.</li>
+                    </ul>
+                </div>
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-list-check"></i> Completion Criterion &amp; Dependencies:</span>
+                    <div class="m-criterion-box">
+                        <strong>Criterion:</strong> Precision &ge; 94%, Recall &ge; 90%, and 0.00% recoverable characters across 100% of tested exported files.
+                    </div>
+                    <div class="m-deps-box">
+                        <strong>Dependencies:</strong> Milestone 1 baseline; labeled benchmark corpus.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Milestone 3 -->
+        <section class="info-card section-card milestone-card">
+            <div class="milestone-header-row">
+                <div class="milestone-badge-box">
+                    <span class="m-num">M3</span>
+                    <span class="m-status status-planned"><i class="fa-solid fa-clock"></i> Planned</span>
+                </div>
+                <div class="milestone-dates">
+                    <span class="m-phase">Phase 3 &bull; AI Guidance Refinement</span>
+                    <span class="m-target">Proposed Target: Q4 2027</span>
+                </div>
+            </div>
+            <h2 class="milestone-title">Enhance AI Assistance &amp; Suspicious Content Reasoning</h2>
+            <p class="milestone-desc">
+                Evaluate assistant explanations against real-world ambiguous document scenarios, eliminate misleading warnings, enhance sharing context profiles (Academic, Enterprise, Private, Public), and research privacy-preserving local on-device small language models (SLMs) to provide interactive conversational risk guidance without sending document tokens to external cloud providers.
+            </p>
+            <div class="milestone-details-grid">
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-box-archive"></i> Expected Deliverables:</span>
+                    <ul class="m-list">
+                        <li>Expanded explanation dictionary covering international privacy regulations.</li>
+                        <li>Interactive "Guided Review" wizard walking users through pending recommendations.</li>
+                        <li>Evaluation report comparing local rule engine vs. quantized on-device SLMs (e.g. WebLLM / Llama-3-8B 4-bit local).</li>
+                        <li>Zero-telemetry privacy audit verifying that no user document tokens leak.</li>
+                    </ul>
+                </div>
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-list-check"></i> Completion Criterion &amp; Dependencies:</span>
+                    <div class="m-criterion-box">
+                        <strong>Criterion:</strong> User comprehension score &ge; 95% in qualitative trials; 0% false Critical alarms on safe web URLs or numbers.
+                    </div>
+                    <div class="m-deps-box">
+                        <strong>Dependencies:</strong> Milestone 2 detection baseline; local SLM benchmarking.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Milestone 4 -->
+        <section class="info-card section-card milestone-card">
+            <div class="milestone-header-row">
+                <div class="milestone-badge-box">
+                    <span class="m-num">M4</span>
+                    <span class="m-status status-research"><i class="fa-solid fa-flask"></i> Feasibility Research</span>
+                </div>
+                <div class="milestone-dates">
+                    <span class="m-phase">Phase 4 &bull; Browser Extension Feasibility</span>
+                    <span class="m-target">Proposed Target: Q1 2028</span>
+                </div>
+            </div>
+            <h2 class="milestone-title">Explore a Sovereign Browser Extension for Pre-Share Protection</h2>
+            <p class="milestone-desc">
+                Investigate the technical feasibility of extending ShareSafe into a Chromium and Firefox browser extension (Manifest V3) that assists users during web-based document uploads. Focus on identifying when files are selected in web forms, running lightweight local privacy audits, and alerting users <em>before</em> files are submitted to external websites.
+            </p>
+            <div class="milestone-details-grid">
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-box-archive"></i> Research Scope &amp; Deliverables:</span>
+                    <ul class="m-list">
+                        <li>Manifest V3 permission and security boundary assessment.</li>
+                        <li>Evaluation of WebAssembly (Wasm) ports of PyMuPDF or pdf.js for local client parsing.</li>
+                        <li>Content script DOM interception for <code>&lt;input type="file"&gt;</code> elements.</li>
+                        <li>Technical proof-of-concept demonstrating pre-upload notification without blocking normal browsing.</li>
+                    </ul>
+                </div>
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-list-check"></i> Completion Criterion &amp; Boundaries:</span>
+                    <div class="m-criterion-box">
+                        <strong>Criterion:</strong> Published feasibility whitepaper and working prototype confirming sub-second client-side scanning without remote server dependencies.
+                    </div>
+                    <div class="m-deps-box">
+                        <strong>Boundary:</strong> Build proof-of-concept only after confirming that client-side Wasm performance and sandbox permissions are viable.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Milestone 5 -->
+        <section class="info-card section-card milestone-card">
+            <div class="milestone-header-row">
+                <div class="milestone-badge-box">
+                    <span class="m-num">M5</span>
+                    <span class="m-status status-research"><i class="fa-solid fa-flask"></i> Feasibility Research</span>
+                </div>
+                <div class="milestone-dates">
+                    <span class="m-phase">Phase 5 &bull; Messaging Platform Integration</span>
+                    <span class="m-target">Proposed Target: Q2 2028</span>
+                </div>
+            </div>
+            <h2 class="milestone-title">Investigate Messaging-Platform &amp; OS Share-Sheet Integration</h2>
+            <p class="milestone-desc">
+                Explore architectural approaches to help users sanitize documents and screenshots shared through instant messaging platforms (such as WhatsApp Web, Telegram, and Slack). Rigorously evaluate platform terms of service, sandbox boundaries, OS-level share sheet APIs (Windows, Android, macOS), and user-initiated submission workflows.
+            </p>
+            <div class="milestone-details-grid">
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-box-archive"></i> Architectural Approaches under Review:</span>
+                    <ul class="m-list">
+                        <li><strong>Approach A (Web Extension Hook):</strong> Browser extension monitoring drag-and-drop into WhatsApp Web, offering a "Sanitize with ShareSafe" pre-upload prompt.</li>
+                        <li><strong>Approach B (OS Native Share-Sheet):</strong> Operating system integration registering ShareSafe as a native handler in the system "Share" menu.</li>
+                        <li><strong>Approach C (User-Initiated Studio Workflow):</strong> Fast-track clipboard import workflow allowing users to paste screenshots, redact them in seconds, and copy them back to chat.</li>
+                    </ul>
+                </div>
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-list-check"></i> Policy Boundaries &amp; Realistic Scope:</span>
+                    <div class="m-criterion-box">
+                        <strong>Strict Privacy Principle:</strong> ShareSafe will never attempt unauthorized background message inspection or traffic interception. All workflows must be explicitly user-initiated, transparent, and compliant with platform policies.
+                    </div>
+                    <div class="m-deps-box">
+                        <strong>Dependencies:</strong> Milestone 4 extension architecture; OS platform API access.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Milestone 6 -->
+        <section class="info-card section-card milestone-card">
+            <div class="milestone-header-row">
+                <div class="milestone-badge-box">
+                    <span class="m-num">M6</span>
+                    <span class="m-status status-planned"><i class="fa-solid fa-rocket"></i> Planned</span>
+                </div>
+                <div class="milestone-dates">
+                    <span class="m-phase">Phase 6 &bull; Production Release</span>
+                    <span class="m-target">Proposed Target: Q3 2028</span>
+                </div>
+            </div>
+            <h2 class="milestone-title">Comprehensive Security Audit, Demonstration &amp; Release</h2>
+            <p class="milestone-desc">
+                Execute formal penetration testing and adversarial security evaluations, publish full open-source developer documentation, prepare live portfolio and academic demonstration packages, and release optimized containerized (Docker) and serverless deployment bundles.
+            </p>
+            <div class="milestone-details-grid">
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-box-archive"></i> Expected Deliverables:</span>
+                    <ul class="m-list">
+                        <li>Independent security audit report covering file upload safety and buffer protection.</li>
+                        <li>Reproducible Docker deployment container for self-hosted enterprise use.</li>
+                        <li>Academic project evaluation presentation and portfolio showcase.</li>
+                        <li>Stable v1.0.0 community release with full API and architecture documentation.</li>
+                    </ul>
+                </div>
+                <div class="m-detail-col">
+                    <span class="m-col-label"><i class="fa-solid fa-list-check"></i> Completion Criterion:</span>
+                    <div class="m-criterion-box">
+                        <strong>Criterion:</strong> Zero unresolved high-severity vulnerabilities; verified 100% test coverage; peer-reviewed academic validation.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Roadmap Table -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-timeline"></i></div>
+                <div>
+                    <span class="section-sub-label">SUMMARY</span>
+                    <h2 class="section-title">Milestones Roadmap Synthesis</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Milestone</th>
+                                <th>Core Deliverable</th>
+                                <th>Status</th>
+                                <th>Target Window</th>
+                                <th>Primary Dependencies</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>M1: Stabilization</strong></td>
+                                <td>Bug fixes, Verhoeff/ITD checksums, toolbar alignment, test suite.</td>
+                                <td><span class="table-status-pill pill-completed"><i class="fa-solid fa-check"></i> Completed</span></td>
+                                <td>October 2026</td>
+                                <td>Baseline codebase</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M2: Accuracy &amp; Validation</strong></td>
+                                <td>Benchmark test set (250 docs), sub-pixel mapping, forensic verifier.</td>
+                                <td><span class="table-status-pill pill-progress"><i class="fa-solid fa-spinner fa-spin"></i> In Progress</span></td>
+                                <td>Q2 2027</td>
+                                <td>M1 baseline, benchmark dataset</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M3: AI Guidance</strong></td>
+                                <td>Context alignment, guided review wizard, local SLM research.</td>
+                                <td><span class="table-status-pill pill-planned"><i class="fa-solid fa-clock"></i> Planned</span></td>
+                                <td>Q4 2027</td>
+                                <td>M2 detection baseline</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M4: Browser Extension</strong></td>
+                                <td>Feasibility study, Manifest V3 architecture, Wasm parsing PoC.</td>
+                                <td><span class="table-status-pill pill-research"><i class="fa-solid fa-flask"></i> Feasibility</span></td>
+                                <td>Q1 2028</td>
+                                <td>Wasm runtime &amp; browser APIs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M5: Messaging Integration</strong></td>
+                                <td>WhatsApp/OS share-sheet evaluation, privacy boundary specification.</td>
+                                <td><span class="table-status-pill pill-research"><i class="fa-solid fa-flask"></i> Feasibility</span></td>
+                                <td>Q2 2028</td>
+                                <td>M4 extension research</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M6: Release Preparation</strong></td>
+                                <td>Security penetration testing, Docker deployment, academic demo.</td>
+                                <td><span class="table-status-pill pill-planned"><i class="fa-solid fa-rocket"></i> Planned</span></td>
+                                <td>Q3 2028</td>
+                                <td>M1&ndash;M5 completion</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page Footer Navigation Links -->
+    <div class="info-page-nav-bar">
+        <a href="/architecture-design" class="btn-info-nav"><i class="fa-solid fa-arrow-left"></i> Previous: Architecture Design</a>
+        <a href="/" class="btn-info-nav btn-info-nav-next">Return to Home Studio <i class="fa-solid fa-house"></i></a>
+    </div>
+</div>
+{% endblock %}

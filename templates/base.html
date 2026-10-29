@@ -36,6 +36,35 @@
                 <kbd class="kbd-shortcut">/</kbd>
             </div>
 
+            <!-- Navigation Links Menu (Five Clickable Information Pages) -->
+            <div class="nav-links-menu" id="navLinksMenu">
+                <a href="/problem-statement" class="nav-page-link {{ 'active' if active_page == 'problem-statement' else '' }}" title="Problem Statement: The threat of accidental data exposure">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Problem Statement</span>
+                </a>
+                <a href="/proposed-solution" class="nav-page-link {{ 'active' if active_page == 'proposed-solution' else '' }}" title="Proposed Solution: Document privacy protection & AI assistance">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>Proposed Solution</span>
+                </a>
+                <a href="/objectives" class="nav-page-link {{ 'active' if active_page == 'objectives' else '' }}" title="Objectives: SMART project outcomes">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <span>Objectives</span>
+                </a>
+                <a href="/architecture-design" class="nav-page-link {{ 'active' if active_page == 'architecture-design' else '' }}" title="Architecture Design: System & security engineering">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span>Architecture Design</span>
+                </a>
+                <a href="/next-milestones" class="nav-page-link {{ 'active' if active_page == 'next-milestones' else '' }}" title="Next Milestones: Strategic project roadmap">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    <span>Next Milestones</span>
+                </a>
+            </div>
+
+            <!-- Mobile Navigation Toggle -->
+            <button type="button" class="nav-mobile-toggle" id="navMobileToggle" onclick="toggleMobileNav()" aria-label="Toggle navigation links" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
             <div class="nav-actions">
                 <div class="nav-status-pill" title="Processing occurs in ephemeral RAM; no data is stored or transmitted.">
                     <span class="status-pulse-dot {{ 'status-live' if ocr_status and ocr_status.available else 'status-ready' }}"></span>

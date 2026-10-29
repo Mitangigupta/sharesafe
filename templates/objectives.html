@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}Project Objectives &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
+
+{% block content %}
+<div class="info-page-wrapper">
+    <!-- Breadcrumb & Status Bar -->
+    <div class="info-breadcrumb-bar">
+        <div class="info-breadcrumb-inner">
+            <a href="/" class="breadcrumb-link"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Objectives</span>
+        </div>
+        <div class="breadcrumb-meta-chips">
+            <span class="meta-tag"><i class="fa-solid fa-bullseye"></i> SMART Framework</span>
+            <span class="meta-tag"><i class="fa-solid fa-clock"></i> 7 Min Read</span>
+        </div>
+    </div>
+
+    <!-- Hero Header -->
+    <header class="info-hero-header">
+        <div class="info-hero-kicker">
+            <span class="kicker-pill"><i class="fa-solid fa-bullseye"></i> Project Commitments &amp; Success Criteria</span>
+        </div>
+        <h1 class="info-hero-title">
+            ShareSafe <span class="teal-gradient-text">SMART Objectives</span> &amp; Evaluation Framework
+        </h1>
+        <p class="info-hero-lead">
+            A rigorous formulation of project outcomes rather than mere feature checklists. Each objective defines verifiable success criteria, concrete benchmarks, and verification methodologies evaluated against representative test datasets.
+        </p>
+    </header>
+
+    <!-- Main Content Body -->
+    <div class="info-content-grid">
+        <!-- Section: Objectives vs Features Distinction -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-code-compare"></i></div>
+                <div>
+                    <span class="section-sub-label">METHODOLOGICAL CLARITY</span>
+                    <h2 class="section-title">Distinguishing Project Objectives from System Features</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    A foundational engineering error in software projects is confusing <em>capabilities built</em> with <em>outcomes achieved</em>. ShareSafe rigorously distinguishes between these two concepts:
+                </p>
+                <div class="comparison-dual-grid">
+                    <div class="comp-card card-concept">
+                        <div class="comp-header">
+                            <i class="fa-solid fa-screwdriver-wrench text-teal"></i>
+                            <h4>System Features (The Mechanisms)</h4>
+                        </div>
+                        <p>
+                            Features are the functional software capabilities, tools, and algorithms engineered into the application. Examples in ShareSafe include: the Tesseract/Windows OCR parser, the Verhoeff checksum algorithm, the Before/After split reveal slider, and the QR payload inspector. <em>Features describe what the software does.</em>
+                        </p>
+                    </div>
+                    <div class="comp-card card-concept">
+                        <div class="comp-header">
+                            <i class="fa-solid fa-bullseye text-teal"></i>
+                            <h4>Project Objectives (The Desired Outcomes)</h4>
+                        </div>
+                        <p>
+                            Objectives are the measurable, verifiable real-world outcomes and performance benchmarks that the features are built to achieve. Examples include: reducing detection false-positive rates below 3%, achieving 100% zero-leakage in exported PDF byte streams, and guaranteeing explainable privacy advice. <em>Objectives define whether the software succeeded.</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Objective 1: Improve Sensitive-Information Detection -->
+        <section class="info-card section-card objective-card">
+            <div class="objective-header-row">
+                <div class="obj-badge-pill">OBJECTIVE 01</div>
+                <span class="obj-proposal-tag"><i class="fa-solid fa-clipboard-check"></i> Proposed Benchmark &bull; Subject to Evaluation</span>
+            </div>
+            <h2 class="objective-main-title">
+                Improve Sensitive-Information Detection Precision and Algorithmic Reliability
+            </h2>
+            <div class="objective-statement-box">
+                <span class="statement-label">OBJECTIVE STATEMENT:</span>
+                <p class="statement-text">
+                    Develop, calibrate, and validate a deterministic, context-aware detection pipeline capable of identifying supported categories of personal identifiers, financial data, contact numbers, and infrastructure credentials across image and PDF documents, achieving a minimum of 94% precision and 90% recall while suppressing false-positive rates on ordinary non-sensitive numeric sequences below 3%.
+                </p>
+            </div>
+
+            <!-- SMART Breakdown Grid -->
+            <div class="smart-breakdown-grid">
+                <div class="smart-item">
+                    <div class="smart-letter">S</div>
+                    <div class="smart-text">
+                        <strong>Specific:</strong> Target 8 core categories (Aadhaar, PAN, SSN, Credit Cards, Phones, Emails, IPv4, API Keys) across digital and scanned PDF/image documents with statutory checksum verification.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">M</div>
+                    <div class="smart-text">
+                        <strong>Measurable:</strong> Precision &ge; 94.0%, Recall &ge; 90.0%, F1-Score &ge; 92.0%, and False Positive Rate on harmless numbers &lt; 3.0% evaluated against a curated benchmark corpus.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">A</div>
+                    <div class="smart-text">
+                        <strong>Actionable:</strong> Implemented via mathematical checksums (Verhoeff for Aadhaar, ITD entity checks for PAN, Luhn for cards) and contextual token boundary inspection in <code>core/regex_detector.py</code>.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">R</div>
+                    <div class="smart-text">
+                        <strong>Relevant:</strong> Eliminates user visual alarm fatigue caused by irrelevant threat alerts, making pre-share document scanning dependable and practical.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">T</div>
+                    <div class="smart-text">
+                        <strong>Time-Bound:</strong> Proposed Milestone 2 Target: <strong>June 30, 2027</strong> *(Proposal requiring project committee approval)*.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification & Metrics Table -->
+            <div class="objective-meta-table-box">
+                <div class="obj-meta-row">
+                    <span class="meta-row-title"><i class="fa-solid fa-chart-line"></i> Evaluation Metrics:</span>
+                    <span class="meta-row-val">Precision = <code>TP / (TP + FP)</code> &bull; Recall = <code>TP / (TP + FN)</code> &bull; False Positive Rate = <code>FP / (FP + TN)</code></span>
+                </div>
+                <div class="obj-meta-row">
+                    <span class="meta-row-title"><i class="fa-solid fa-flask"></i> Verification Method:</span>
+                    <span class="meta-row-val">Automated test harness evaluating 250 labeled synthetic test documents containing known PII, edge-case numbers, invoices, code snippets, and benign text.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Objective 2: Improve Privacy Protection & Sanitisation Reliability -->
+        <section class="info-card section-card objective-card">
+            <div class="objective-header-row">
+                <div class="obj-badge-pill">OBJECTIVE 02</div>
+                <span class="obj-proposal-tag"><i class="fa-solid fa-clipboard-check"></i> Proposed Benchmark &bull; Subject to Evaluation</span>
+            </div>
+            <h2 class="objective-main-title">
+                Guarantee Forensic Sanitization Integrity and Zero Data Leakage in Exported Files
+            </h2>
+            <div class="objective-statement-box">
+                <span class="statement-label">OBJECTIVE STATEMENT:</span>
+                <p class="statement-text">
+                    Ensure that 100% of user-selected and confirmed sensitive elements are irreversibly destroyed in exported documents—eradicating underlying vector glyphs, unrendered PDF text streams, and latent device metadata—such that no redacted information can be recovered through copy-paste, OCR reconstruction, or adversarial forensic extraction tools.
+                </p>
+            </div>
+
+            <!-- SMART Breakdown Grid -->
+            <div class="smart-breakdown-grid">
+                <div class="smart-item">
+                    <div class="smart-letter">S</div>
+                    <div class="smart-text">
+                        <strong>Specific:</strong> Completely eliminate the "pseudo-redaction" vulnerability by burning solid blackout and visual masks into image rasters and clipping underlying text streams in exported PDFs.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">M</div>
+                    <div class="smart-text">
+                        <strong>Measurable:</strong> Exactly 0.00% recoverable sensitive characters in exported file byte streams, and 0 latent EXIF/PDF metadata tags remaining after sanitization.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">A</div>
+                    <div class="smart-text">
+                        <strong>Actionable:</strong> Implemented via PyMuPDF <code>page.apply_redactions()</code>, OpenCV pixel burn-in, Pillow metadata dictionary stripping, and SHA-256 certificate generation in <code>core/redactor.py</code>.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">R</div>
+                    <div class="smart-text">
+                        <strong>Relevant:</strong> Protects users against reverse-engineering or forensic retrieval of redacted information after documents are publicly shared or distributed.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">T</div>
+                    <div class="smart-text">
+                        <strong>Time-Bound:</strong> Proposed Milestone 2 Target: <strong>September 30, 2027</strong> *(Proposal requiring project committee approval)*.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification & Metrics Table -->
+            <div class="objective-meta-table-box">
+                <div class="obj-meta-row">
+                    <span class="meta-row-title"><i class="fa-solid fa-chart-line"></i> Evaluation Metrics:</span>
+                    <span class="meta-row-val">Data Leakage Rate = <code>0.00%</code> &bull; Metadata Remainder Count = <code>0 tags</code> &bull; Vector Glyph Residue = <code>0 items</code></span>
+                </div>
+                <div class="obj-meta-row">
+                    <span class="meta-row-title"><i class="fa-solid fa-flask"></i> Verification Method:</span>
+                    <span class="meta-row-val">Adversarial forensic suite running automated <code>pdftotext</code> text dumps, Poppler string extraction, <code>exiftool</code> inspection, and pixel-inversion scans on exported documents.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Objective 3: Improve Reliability of AI-Assisted Security Guidance -->
+        <section class="info-card section-card objective-card">
+            <div class="objective-header-row">
+                <div class="obj-badge-pill">OBJECTIVE 03</div>
+                <span class="obj-proposal-tag"><i class="fa-solid fa-clipboard-check"></i> Proposed Benchmark &bull; Subject to Evaluation</span>
+            </div>
+            <h2 class="objective-main-title">
+                Improve the Reliability, Explainability, and Context-Awareness of AI Guidance
+            </h2>
+            <div class="objective-statement-box">
+                <span class="statement-label">OBJECTIVE STATEMENT:</span>
+                <p class="statement-text">
+                    Calibrate the Intelligent Privacy Assistant to deliver 100% transparent, context-aware privacy recommendations across all supported sharing contexts, achieving zero uncalibrated alarmist warnings on harmless items (e.g. ordinary QR codes, dates, order numbers) and maintaining a minimum 95% user comprehension score in qualitative security evaluations.
+                </p>
+            </div>
+
+            <!-- SMART Breakdown Grid -->
+            <div class="smart-breakdown-grid">
+                <div class="smart-item">
+                    <div class="smart-letter">S</div>
+                    <div class="smart-text">
+                        <strong>Specific:</strong> Provide clear natural-language explanations of why each item is sensitive, delineate statutory risk, recommend appropriate actions (<code>REDACT</code>, <code>REVIEW</code>, <code>LEAVE</code>), and separate confirmed from uncertain findings.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">M</div>
+                    <div class="smart-text">
+                        <strong>Measurable:</strong> 0.0% Critical threat inflation on safe URLs or numbers, &ge; 95% contextual agreement rate with expert human privacy auditors, and &ge; 95% user comprehension score.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">A</div>
+                    <div class="smart-text">
+                        <strong>Actionable:</strong> Implemented via rule matrices and contextual weighting in <code>core/privacy_assistant.py</code>, dynamically linking recommendations to canvas selection and sharing context.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">R</div>
+                    <div class="smart-text">
+                        <strong>Relevant:</strong> Bridges the gap between raw pattern detection and human understanding, empowering non-technical users to make confident privacy choices without panic.
+                    </div>
+                </div>
+                <div class="smart-item">
+                    <div class="smart-letter">T</div>
+                    <div class="smart-text">
+                        <strong>Time-Bound:</strong> Proposed Milestone 3 Target: <strong>December 15, 2027</strong> *(Proposal requiring project committee approval)*.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification & Metrics Table -->
+            <div class="objective-meta-table-box">
+                <div class="obj-meta-row">
+                    <span class="meta-row-title"><i class="fa-solid fa-chart-line"></i> Evaluation Metrics:</span>
+                    <span class="meta-row-val">False Alarm Ratio on Safe Items = <code>0.00%</code> &bull; Contextual Agreement Index &ge; <code>95.0%</code> &bull; User Comprehension Score &ge; <code>95.0%</code></span>
+                </div>
+                <div class="obj-meta-row">
+                    <span class="meta-row-title"><i class="fa-solid fa-flask"></i> Verification Method:</span>
+                    <span class="meta-row-val">Dual-blind evaluation across 150 test documents containing ambiguous numbers, benign web QR codes, sensitive payment intents, and genuine statutory identity documents.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Matrix Table -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-table-list"></i></div>
+                <div>
+                    <span class="section-sub-label">SYNTHESIS</span>
+                    <h2 class="section-title">SMART Objectives Verification Matrix</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Objective</th>
+                                <th>Primary Metric</th>
+                                <th>Proposed Benchmark</th>
+                                <th>Target Date (Proposed)</th>
+                                <th>Verification Protocol</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Detection Accuracy</strong></td>
+                                <td>Precision / Recall / FPR</td>
+                                <td>&ge; 94% Precision, &ge; 90% Recall, &lt; 3% FPR</td>
+                                <td>June 30, 2027</td>
+                                <td>250 Labeled Synthetic Documents Harness</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Sanitization Integrity</strong></td>
+                                <td>Data Leakage Rate</td>
+                                <td>0.00% Leakage, 0 Latent Metadata Tags</td>
+                                <td>September 30, 2027</td>
+                                <td>Adversarial Forensic String &amp; Pixel Scraping</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. AI Assistant Reliability</strong></td>
+                                <td>Context Alignment &amp; False Alarms</td>
+                                <td>0% Safe False Alarms, &ge; 95% Context Agreement</td>
+                                <td>December 15, 2027</td>
+                                <td>Dual-Blind Expert Review (150 Test Cases)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-footnote">
+                    * Note: All numerical benchmark targets and deadlines above represent structured engineering proposals subject to formal academic and supervisory committee review.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page Footer Navigation Links -->
+    <div class="info-page-nav-bar">
+        <a href="/proposed-solution" class="btn-info-nav"><i class="fa-solid fa-arrow-left"></i> Previous: Proposed Solution</a>
+        <a href="/architecture-design" class="btn-info-nav btn-info-nav-next">Next: Architecture Design <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+</div>
+{% endblock %}

@@ -437,3 +437,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+
+// Mobile Navigation Drawer Toggle
+function toggleMobileNav() {
+    const menu = document.getElementById('navLinksMenu');
+    const toggle = document.getElementById('navMobileToggle');
+    if (!menu) return;
+    const isOpen = menu.classList.toggle('mobile-open');
+    if (toggle) {
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        toggle.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+    }
+}

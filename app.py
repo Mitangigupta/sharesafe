@@ -201,7 +201,32 @@ def index():
             'badge': 'Cloud & Credentials'
         }
     ]
-    return render_template('index.html', ocr_status=ocr_status, samples=samples)
+    return render_template('index.html', ocr_status=ocr_status, samples=samples, active_page='home')
+
+@app.route('/problem-statement')
+def problem_statement():
+    ocr_status = ocr_engine.get_status()
+    return render_template('problem_statement.html', active_page='problem-statement', ocr_status=ocr_status)
+
+@app.route('/proposed-solution')
+def proposed_solution():
+    ocr_status = ocr_engine.get_status()
+    return render_template('proposed_solution.html', active_page='proposed-solution', ocr_status=ocr_status)
+
+@app.route('/objectives')
+def objectives():
+    ocr_status = ocr_engine.get_status()
+    return render_template('objectives.html', active_page='objectives', ocr_status=ocr_status)
+
+@app.route('/architecture-design')
+def architecture_design():
+    ocr_status = ocr_engine.get_status()
+    return render_template('architecture_design.html', active_page='architecture-design', ocr_status=ocr_status)
+
+@app.route('/next-milestones')
+def next_milestones():
+    ocr_status = ocr_engine.get_status()
+    return render_template('next_milestones.html', active_page='next-milestones', ocr_status=ocr_status)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():

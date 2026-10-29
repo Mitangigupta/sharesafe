@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Problem Statement &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
+
+{% block content %}
+<div class="info-page-wrapper">
+    <!-- Breadcrumb & Status Bar -->
+    <div class="info-breadcrumb-bar">
+        <div class="info-breadcrumb-inner">
+            <a href="/" class="breadcrumb-link"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Problem Statement</span>
+        </div>
+        <div class="breadcrumb-meta-chips">
+            <span class="meta-tag"><i class="fa-solid fa-shield-halved"></i> Threat Landscape</span>
+            <span class="meta-tag"><i class="fa-solid fa-clock"></i> 8 Min Read</span>
+        </div>
+    </div>
+
+    <!-- Hero Header -->
+    <header class="info-hero-header">
+        <div class="info-hero-kicker">
+            <span class="kicker-pill"><i class="fa-solid fa-triangle-exclamation"></i> Threat Analysis &amp; Problem Formulation</span>
+        </div>
+        <h1 class="info-hero-title">
+            The Silent Threat of <span class="teal-gradient-text">Accidental Data Exposure</span> in Everyday Digital Sharing
+        </h1>
+        <p class="info-hero-lead">
+            Modern collaboration relies on the rapid, frictionless exchange of documents, screenshots, presentations, and images. Yet, behind this convenience lies a critical systemic vulnerability: files routinely carry latent credentials, identity numbers, scannable payloads, and unstripped metadata that senders never intended to reveal.
+        </p>
+    </header>
+
+    <!-- Main Content Body -->
+    <div class="info-content-grid">
+        <!-- Section 1: The Ubiquity of Digital File Sharing -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-share-nodes"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION 01</span>
+                    <h2 class="section-title">The Ubiquity and Illusion of "Ordinary" Digital Files</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    In academic environments, professional workplaces, customer support channels, and daily messaging, individuals exchange digital files under the subconscious assumption that a document reveals only the specific text or graphic they set out to communicate. A student submitting an assignment, an engineer sharing a terminal screenshot for debugging, a patient transmitting a medical invoice for insurance reimbursement, or a citizen emailing an identity proof rarely scrutinizes the peripheral margins, embedded layers, or raw file properties.
+                </p>
+                <p>
+                    However, digital files are not static paper sheets. They are complex, multi-layered data structures. A screenshot of a web browser often captures active authentication session headers or open bookmarks; an exported PDF billing receipt preserves machine-readable account numbers in underlying text streams even if obscured on-screen; a camera photo of an ID document contains uncompressed high-resolution EXIF camera parameters and GPS coordinates; and a system screenshot embeds internal private IPv4 gateways and cloud API tokens.
+                </p>
+                <div class="highlight-callout-teal">
+                    <i class="fa-solid fa-quote-left quote-icon"></i>
+                    <p>
+                        "The fundamental flaw in modern digital collaboration is an asymmetry of perception: humans view documents semantically through rendered visual pixels, whereas automated scrapers, malicious actors, and search indexers inspect raw byte streams, vector glyphs, and latent metadata."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Concrete Threat Vectors & Vulnerabilities -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-fingerprint"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION 02</span>
+                    <h2 class="section-title">High-Risk Information Categories Frequently Exposed</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    ShareSafe’s empirical audit of document-sharing habits identifies six distinct categories of sensitive information routinely compromised through routine uploads:
+                </p>
+                
+                <div class="vectors-grid">
+                    <!-- Vector 1 -->
+                    <div class="vector-box">
+                        <div class="vector-icon-badge badge-coral"><i class="fa-solid fa-id-card"></i></div>
+                        <h3 class="vector-title">Government Identification Records</h3>
+                        <p class="vector-desc">
+                            National identity numbers including Indian Aadhaar (12-digit UIDs), Permanent Account Numbers (PAN), US Social Security Numbers (SSNs), Passports, Voter IDs, and Driver’s Licenses.
+                        </p>
+                        <div class="vector-example">
+                            <span class="example-label">Typical Exposure:</span>
+                            <code>Aadhaar: 2345 6789 0123 &bull; PAN: ABCDE1234F</code>
+                        </div>
+                    </div>
+
+                    <!-- Vector 2 -->
+                    <div class="vector-box">
+                        <div class="vector-icon-badge badge-amber"><i class="fa-solid fa-credit-card"></i></div>
+                        <h3 class="vector-title">Financial &amp; Payment Credentials</h3>
+                        <p class="vector-desc">
+                            16-digit credit/debit card Primary Account Numbers (PANs), card expiry dates, CVVs, bank account numbers, IFSC codes, and Unified Payments Interface (UPI) Virtual Payment Addresses.
+                        </p>
+                        <div class="vector-example">
+                            <span class="example-label">Typical Exposure:</span>
+                            <code>Card: 4532 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 8910 &bull; UPI: user@okaxis</code>
+                        </div>
+                    </div>
+
+                    <!-- Vector 3 -->
+                    <div class="vector-box">
+                        <div class="vector-icon-badge badge-teal"><i class="fa-solid fa-address-book"></i></div>
+                        <h3 class="vector-title">Personal Contact &amp; Demographic Data</h3>
+                        <p class="vector-desc">
+                            Direct telephone numbers with international dialing prefixes, personal and corporate email addresses, residential street addresses, and official dates of birth.
+                        </p>
+                        <div class="vector-example">
+                            <span class="example-label">Typical Exposure:</span>
+                            <code>+91 98765 43210 &bull; student.reg@university.edu.in</code>
+                        </div>
+                    </div>
+
+                    <!-- Vector 4 -->
+                    <div class="vector-box">
+                        <div class="vector-icon-badge badge-purple"><i class="fa-solid fa-key"></i></div>
+                        <h3 class="vector-title">Developer &amp; Infrastructure Secrets</h3>
+                        <p class="vector-desc">
+                            Cloud access keys (AWS AKIA..., Google AI/GCP keys), JSON Web Tokens (JWTs), private SSH RSA keys, database connection strings, and internal private RFC 1918 IPv4 addresses.
+                        </p>
+                        <div class="vector-example">
+                            <span class="example-label">Typical Exposure:</span>
+                            <code>AKIAIOSFODNN7EXAMPLE &bull; 192.168.1.104:8080</code>
+                        </div>
+                    </div>
+
+                    <!-- Vector 5 -->
+                    <div class="vector-box">
+                        <div class="vector-icon-badge badge-blue"><i class="fa-solid fa-qrcode"></i></div>
+                        <h3 class="vector-title">Scannable Digital QR Payloads</h3>
+                        <p class="vector-desc">
+                            Embedded digital barcodes carrying payment routing strings (BharatQR, UPI intents), Wi-Fi WPA2 pre-shared passphrases, electronic business cards (vCards), and sensitive authentication tokens.
+                        </p>
+                        <div class="vector-example">
+                            <span class="example-label">Typical Exposure:</span>
+                            <code>WIFI:S:LabNet;T:WPA;P:Secret2026;; &bull; upi://pay?pa=...</code>
+                        </div>
+                    </div>
+
+                    <!-- Vector 6 -->
+                    <div class="vector-box">
+                        <div class="vector-icon-badge badge-sage"><i class="fa-solid fa-camera-rotate"></i></div>
+                        <h3 class="vector-title">Latent Forensic &amp; Device Metadata</h3>
+                        <p class="vector-desc">
+                            Exchangeable Image File Format (EXIF) tags, GPS latitude/longitude geo-stamps, camera serial numbers, author identity, software compilation markers, and revision history streams.
+                        </p>
+                        <div class="vector-example">
+                            <span class="example-label">Typical Exposure:</span>
+                            <code>GPS: 28.6139° N, 77.2090° E &bull; Author: Desktop-Admin</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: The Irreversibility & Cascade of Unchecked Sharing -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION 03</span>
+                    <h2 class="section-title">The Danger of Sharing Without Pre-Verification</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    Digital distribution channels are fundamentally asymmetrical: <em>transmitting a file requires milliseconds, but revoking an exposed document is mathematically and practically impossible.</em> Once an unverified file is shared over email, uploaded to an educational LMS portal, posted in a Slack workspace, committed to a public Git repository, or transmitted via instant messaging (e.g. WhatsApp, Telegram):
+                </p>
+                <ul class="styled-bullet-list">
+                    <li>
+                        <strong>Automated Web Crawlers &amp; Scrapers:</strong> Publicly accessible documents are scraped within minutes by automated bots searching for email harvesting lists, API keys, and credential tokens.
+                    </li>
+                    <li>
+                        <strong>Uncontrolled Second-Order Redistribution:</strong> Recipients frequently forward files, quote screenshots in public bug trackers, or mirror documents across unencrypted cloud backups without the originator's consent.
+                    </li>
+                    <li>
+                        <strong>Permanent Machine Indexing:</strong> Search engines cache document contents in web archives. Even if the original file link is severed, the indexed snippet and cached PDF vector stream remain accessible indefinitely.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section 4: Inconvenience and Fallibility of Manual Privacy Checks -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-ban"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION 04</span>
+                    <h2 class="section-title">The Fallibility of Manual Checks &amp; The "Pseudo-Redaction" Trap</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    Relying on manual human review before document transmission has proven repeatedly inadequate across research studies and security incident reviews:
+                </p>
+                <div class="comparison-dual-grid">
+                    <div class="comp-card card-flaw">
+                        <div class="comp-header">
+                            <i class="fa-solid fa-circle-xmark text-coral"></i>
+                            <h4>Human Oversight &amp; Cognitive Fatigue</h4>
+                        </div>
+                        <p>
+                            A multi-page document containing hundreds of lines of text overwhelms human visual scanning. A reviewer may notice a bold heading while overlooking an Aadhaar number in a tiny footnote, a client email address in an invoice footer, or an embedded QR code in a corner seal.
+                        </p>
+                    </div>
+                    <div class="comp-card card-flaw">
+                        <div class="comp-header">
+                            <i class="fa-solid fa-file-excel text-coral"></i>
+                            <h4>The Dangerous "Pseudo-Redaction" Trap</h4>
+                        </div>
+                        <p>
+                            Many users attempt redaction by placing black shapes over text in Microsoft Word, PowerPoint, or basic image markup tools. In digital PDFs, this merely adds a visual polygon on a top rendering layer: <em>the underlying text stream remains fully selectable, copy-pasteable, and searchable by anyone inspecting the document.</em>
+                        </p>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem;">
+                    Furthermore, manual editing tools offer zero capability to parse machine-readable QR payloads, inspect embedded EXIF camera coordinates, or validate checksums to confirm whether a numeric string represents a genuine statutory identifier or an arbitrary order number.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 5: Real-World Consequences -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-scale-unbalanced"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION 05</span>
+                    <h2 class="section-title">Severe Legal, Financial, and Reputational Consequences</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    The downstream impacts of accidental digital disclosure are severe, long-lasting, and often irreversible:
+                </p>
+                <div class="consequences-grid">
+                    <div class="consequence-item">
+                        <div class="consequence-num">01</div>
+                        <h4>Identity Theft &amp; Synthetic Fraud</h4>
+                        <p>
+                            Leaked Aadhaar, PAN, and SSN records enable adversaries to open fraudulent bank accounts, apply for unauthorized micro-loans, execute SIM-swap attacks, and construct convincing synthetic identity profiles.
+                        </p>
+                    </div>
+                    <div class="consequence-item">
+                        <div class="consequence-num">02</div>
+                        <h4>Direct Financial Loss &amp; Extortion</h4>
+                        <p>
+                            Exposed payment cards, billing invoices, and UPI addresses facilitate targeted credit fraud, unauthorized recurring charges, and invoice manipulation attacks against small businesses and consumers.
+                        </p>
+                    </div>
+                    <div class="consequence-item">
+                        <div class="consequence-num">03</div>
+                        <h4>Statutory &amp; Regulatory Penalties</h4>
+                        <p>
+                            Under data protection regimes such as the <strong>Digital Personal Data Protection (DPDP) Act 2023</strong> in India, <strong>GDPR</strong> in the European Union, and <strong>HIPAA</strong> in healthcare, unauthorized disclosure of personally identifiable information carries substantial financial penalties and legal liability.
+                        </p>
+                    </div>
+                    <div class="consequence-item">
+                        <div class="consequence-num">04</div>
+                        <h4>Infrastructure Takeover &amp; Breach</h4>
+                        <p>
+                            Leaked cloud API credentials (AWS tokens, private keys) allow malicious actors to compromise entire cloud compute clusters, deploy unauthorized cryptominers, exfiltrate private databases, and incur tens of thousands of dollars in cloud computing costs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Evaluating Suspicious Messages & Content -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION 06</span>
+                    <h2 class="section-title">The Recipient's Dilemma: Evaluating Suspicious Content</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    Security vulnerability is a two-way street. While senders struggle with outbound accidental disclosure, recipients face an equally acute problem: <em>evaluating whether shared content, unexpected screenshots, or unsolicited documents are safe and authentic.</em>
+                </p>
+                <p>
+                    Modern phishing lures and social engineering attacks no longer rely on obviously broken text. Attackers create convincing invoices, impersonate educational departments or human resources, and embed malicious URLs inside scannable QR codes ("quishing"). Ordinary users lack the specialized forensic tools required to inspect encoded payloads, verify sender identity markers, or evaluate whether a document is an authentic communication or a credential harvesting trap.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 7: The Need for an Integrated Dual-Pillar Solution -->
+        <section class="info-card section-card section-summary-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION 07 &bull; CONCLUSION</span>
+                    <h2 class="section-title">Why a Dual-Pillar Solution is Essential</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    Solving these challenges requires moving beyond fragmented, disconnected tools. Standalone OCR software only extracts text; basic image editors only draw superficial black boxes; and cloud-based AI tools require users to upload their most sensitive documents to external remote servers, defeating the very premise of privacy.
+                </p>
+                <div class="dual-pillar-box">
+                    <div class="pillar-col">
+                        <div class="pillar-badge"><i class="fa-solid fa-file-shield"></i> Pillar One</div>
+                        <h4>Pre-Share Document Privacy &amp; Sanitization</h4>
+                        <p>
+                            Automated on-device detection of sensitive entities, algorithmic checksum validation, scannable QR forensic payload decoding, and irreversible raster-level redaction that permanently purges underlying text layers and metadata.
+                        </p>
+                    </div>
+                    <div class="pillar-divider-line"></div>
+                    <div class="pillar-col">
+                        <div class="pillar-badge"><i class="fa-solid fa-brain"></i> Pillar Two</div>
+                        <h4>Intelligent Privacy &amp; Security Assistance</h4>
+                        <p>
+                            Accessible, explainable security guidance that demystifies why detected items are sensitive, calculates risk contextually without false alarms, and empowers users to make informed redaction decisions before sharing.
+                        </p>
+                    </div>
+                </div>
+                <p style="margin-top: 1.25rem;">
+                    <strong>ShareSafe</strong> was engineered specifically to unite these two complementary pillars into an integrated, zero-telemetry, 100% on-device sovereign studio.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page Footer Navigation Links -->
+    <div class="info-page-nav-bar">
+        <a href="/" class="btn-info-nav"><i class="fa-solid fa-arrow-left"></i> Home</a>
+        <a href="/proposed-solution" class="btn-info-nav btn-info-nav-next">Next: Proposed Solution <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+</div>
+{% endblock %}

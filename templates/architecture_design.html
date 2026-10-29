@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Architecture Design &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
+
+{% block content %}
+<div class="info-page-wrapper">
+    <!-- Breadcrumb & Status Bar -->
+    <div class="info-breadcrumb-bar">
+        <div class="info-breadcrumb-inner">
+            <a href="/" class="breadcrumb-link"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Architecture Design</span>
+        </div>
+        <div class="breadcrumb-meta-chips">
+            <span class="meta-tag"><i class="fa-solid fa-network-wired"></i> Technical Blueprint</span>
+            <span class="meta-tag"><i class="fa-solid fa-clock"></i> 12 Min Read</span>
+        </div>
+    </div>
+
+    <!-- Hero Header -->
+    <header class="info-hero-header">
+        <div class="info-hero-kicker">
+            <span class="kicker-pill"><i class="fa-solid fa-network-wired"></i> Engineering Specification &amp; System Topography</span>
+        </div>
+        <h1 class="info-hero-title">
+            ShareSafe <span class="teal-gradient-text">System Architecture</span> and Security Engineering
+        </h1>
+        <p class="info-hero-lead">
+            An in-depth technical analysis of ShareSafe’s decoupled frontend interface, serverless-ready Flask backend, local dual-engine document pipeline, and on-device Intelligent Privacy Assistant engine.
+        </p>
+    </header>
+
+    <!-- Main Content Body -->
+    <div class="info-content-grid">
+        <!-- Section A: System Overview -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-cubes"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION A</span>
+                    <h2 class="section-title">System Overview &amp; Topography</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    ShareSafe is built upon a <strong>privacy-first, decoupled micro-architecture</strong> designed for high performance, deterministic execution, and zero persistent data leakage. Unlike conventional SaaS redaction utilities that transmit documents to remote cloud compute clusters, ShareSafe performs all file parsing, OCR rendering, regex entity detection, risk scoring, and raster burn-in either directly on the user's local operating system or inside an ephemeral serverless container.
+                </p>
+                <div class="topography-cards-grid">
+                    <div class="topography-card">
+                        <div class="topo-icon"><i class="fa-solid fa-desktop"></i></div>
+                        <h4>Client Layer (Frontend)</h4>
+                        <p>Jinja2 server-rendered templates with reactive vanilla JavaScript controllers (<code>canvas_editor.js</code>, <code>app.js</code>), HTML5 Canvas overlay, synchronized Before/After split comparison, and responsive CSS.</p>
+                    </div>
+                    <div class="topography-card">
+                        <div class="topo-icon"><i class="fa-solid fa-server"></i></div>
+                        <h4>Application Layer (Backend)</h4>
+                        <p>Flask (Python 3.13) RESTful microservice managing session isolation, magic-byte header validation, dual-mode text extraction, algorithmic checksum verification, and export generation.</p>
+                    </div>
+                    <div class="topography-card">
+                        <div class="topo-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                        <h4>Processing &amp; Intelligence Core</h4>
+                        <p>Modular Python engine: PyMuPDF for native vector parsing, OpenCV for QR computer vision decoding, Windows/Tesseract OCR, and the local rule-based <code>PrivacyAssistant</code>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section H: Architecture Diagram (Placed early for structural clarity) -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-diagram-project"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION B &bull; VISUAL TOPOGRAPHY</span>
+                    <h2 class="section-title">System Data Flow &amp; Decoupled Architecture Diagram</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    The diagram below illustrates the actual data flow through ShareSafe. Notice that the <strong>Document Privacy Protection Workflow</strong> (left pipeline) and the <strong>Intelligent Privacy Assistant Engine</strong> (right pipeline) operate as distinct, decoupled modules:
+                </p>
+                
+                <div class="diagram-render-container">
+                    <div class="mermaid-diagram-box">
+<pre class="mermaid">
+flowchart TD
+    subgraph Client ["Client Browser Layer"]
+        UI_Upload["Upload Cockpit (index.html)"]
+        UI_Workbench["Interactive Studio (workbench.html)"]
+        CanvasEditor["Canvas Controller (canvas_editor.js)"]
+        SplitSlider["Before/After Split Comparison"]
+    end
+
+    subgraph Server ["Flask Application Layer (app.py)"]
+        Router["Session Router & Ingestion Engine"]
+        SessionMgr["Ephemeral SessionManager"]
+        DecisionAPI["/api/assistant/decision API"]
+        RedactAPI["/api/redact API"]
+    end
+
+    subgraph PrivacyPipeline ["Pillar A: Document Privacy Pipeline"]
+        Validator["Magic-Byte Header Validator"]
+        NativeExtractor["PyMuPDF Native Text Parser"]
+        OCREngine["OCR Engine (WinOCR / Tesseract)"]
+        RegexEngine["Contextual Regex & Checksum Engine (Verhoeff, ITD, Luhn)"]
+        QRScanner["OpenCV QR Detector & Forensic Decoder"]
+        RiskScore["RiskAssessor Composite Scoring Engine"]
+        Redactor["Forensic Redactor (Burn-in, Stream Clip, EXIF Strip)"]
+    end
+
+    subgraph AssistantPipeline ["Pillar B: Intelligent Privacy Assistant"]
+        AssistantCore["PrivacyAssistant Engine (core/privacy_assistant.py)"]
+        RuleMatrix["Deterministic Expert Decision Matrix"]
+        ContextAdapter["Sharing Context Selector (Academic, Enterprise, etc.)"]
+        RecGenerator["Structured Recommendations & Summary Builder"]
+    end
+
+    UI_Upload -->|File Upload POST| Router
+    Router --> Validator
+    Validator --> SessionMgr
+    SessionMgr --> NativeExtractor
+    SessionMgr --> OCREngine
+    NativeExtractor --> RegexEngine
+    OCREngine --> RegexEngine
+    SessionMgr --> QRScanner
+    RegexEngine --> RiskScore
+    QRScanner --> RiskScore
+    
+    RiskScore -->|Raw Detections| AssistantCore
+    ContextAdapter --> AssistantCore
+    AssistantCore --> RuleMatrix
+    RuleMatrix --> RecGenerator
+    
+    RiskScore -->|Session Data JSON| UI_Workbench
+    RecGenerator -->|Assistant Data JSON| UI_Workbench
+    
+    UI_Workbench --> CanvasEditor
+    CanvasEditor --> SplitSlider
+    
+    CanvasEditor -->|Accept / Dismiss Action| DecisionAPI
+    DecisionAPI --> SessionMgr
+    
+    CanvasEditor -->|Commit Redactions POST| RedactAPI
+    RedactAPI --> Redactor
+    Redactor -->|Sanitized PDF / Image + SHA-256 Audit Seal| UI_Workbench
+</pre>
+                    </div>
+                </div>
+                <p class="diagram-caption">
+                    <i class="fa-solid fa-circle-info"></i> Figure 1: Architectural Data Flow Diagram. Note that Pillar A (Mechanical Redaction) and Pillar B (Cognitive Privacy Assistance) communicate via structured in-memory JSON interfaces with zero cloud transmission.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section B & C: Frontend & Backend Architecture -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-code"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION C</span>
+                    <h2 class="section-title">Frontend and Backend Architecture</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <div class="architecture-split-grid">
+                    <!-- Frontend Details -->
+                    <div class="arch-col">
+                        <div class="arch-col-badge"><i class="fa-brands fa-js"></i> Frontend Architecture</div>
+                        <p>
+                            ShareSafe employs an ultra-fast, zero-framework vanilla JavaScript client architecture optimized for low memory overhead and maximum rendering precision:
+                        </p>
+                        <ul class="arch-bullets">
+                            <li>
+                                <strong>Jinja2 Server Rendering:</strong> <code>base.html</code> establishes a shared structural shell with sticky navigation and accessible modal dialogs; <code>index.html</code> delivers the upload dropzone; <code>workbench.html</code> houses the multi-pane studio.
+                            </li>
+                            <li>
+                                <strong>Dual-Layer Canvas Controller (<code>canvas_editor.js</code>):</strong> Implements an HTML5 canvas overlay on top of high-resolution document previews, mapping document native coordinates to scaled DOM coordinates.
+                            </li>
+                            <li>
+                                <strong>Synchronized Before/After Comparison:</strong> A high-performance clip-path divider slider synchronizes original and sanitized image layers with zero repaint lag.
+                            </li>
+                            <li>
+                                <strong>Interactive Selection Sync:</strong> Checkboxes, canvas bounding boxes, assistant cards, and toolbar style controls synchronize state reactively via a client-side <code>selectedIds</code> Set.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Backend Details -->
+                    <div class="arch-col">
+                        <div class="arch-col-badge"><i class="fa-brands fa-python"></i> Backend Architecture</div>
+                        <p>
+                            The server-side component is built as a modular Python 3.13 Flask application with clear separation of concerns across the <code>core/</code> package:
+                        </p>
+                        <ul class="arch-bullets">
+                            <li>
+                                <strong>Modular Domain Design:</strong> Separate dedicated modules for detection (<code>regex_detector.py</code>), computer vision (<code>qr_detector.py</code>), OCR abstraction (<code>ocr_engine.py</code>), risk calculation (<code>risk_assessor.py</code>), assistant guidance (<code>privacy_assistant.py</code>), and file sanitization (<code>redactor.py</code>).
+                            </li>
+                            <li>
+                                <strong>Stateless Ephemeral Session Manager:</strong> Uses UUIDv4 session identifiers. Sessions are isolated in transient file system sandboxes (<code>uploads/&lt;session_id&gt;</code>) with automatic purge endpoints.
+                            </li>
+                            <li>
+                                <strong>Zero-Roundtrip Base64 Payloads:</strong> In serverless deployments (such as Vercel), preview images and sanitized outputs are delivered via embedded Base64 data URIs to guarantee zero broken image links.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section D: Document Processing Pipeline -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-bars-progress"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION D</span>
+                    <h2 class="section-title">The Document Processing Pipeline</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    The document processing lifecycle proceeds through six sequentially guarded stages:
+                </p>
+                <div class="pipeline-flow-cards">
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 1</div>
+                        <h5>Header Validation &amp; Rendering</h5>
+                        <p>Magic byte verification; multi-page PDF rendering at 150 DPI into PNG preview frames; page dimension extraction.</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 2</div>
+                        <h5>Glyph &amp; Text Stream Extraction</h5>
+                        <p>PyMuPDF native character extraction with exact bounding boxes; fallback OCR for image-only scans via Windows/Tesseract.</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 3</div>
+                        <h5>Entity Detection &amp; Algorithmic Filtering</h5>
+                        <p>Contextual regex scanning, Verhoeff checksum calculation for Aadhaar, ITD validation for PAN, Luhn for cards, false-positive suppression.</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 4</div>
+                        <h5>Computer Vision QR Forensics</h5>
+                        <p>OpenCV image scanning, payload decoding, semantic parsing of payment URIs, Wi-Fi parameters, and URLs.</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 5</div>
+                        <h5>Assistant Analysis &amp; Scoring</h5>
+                        <p>Composite risk score calculation; <code>PrivacyAssistant</code> generates explainable recommendations and narrative summaries.</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-step-num">Stage 6</div>
+                        <h5>Irreversible Burn-in &amp; Export</h5>
+                        <p>Raster pixel overwrite, vector text stream clipping, EXIF/PDF metadata eradication, and cryptographic SHA-256 certificate generation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section E: AI Assistance Architecture -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-microchip"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION E</span>
+                    <h2 class="section-title">The AI Assistance Architecture (Local Expert Engine)</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    A critical architectural requirement of ShareSafe is that the AI Assistance feature operates under <strong>strict privacy sovereignty</strong>. The current implementation in <code>core/privacy_assistant.py</code> is a specialized, local deterministic expert reasoning engine:
+                </p>
+
+                <div class="asst-arch-details-grid">
+                    <div class="asst-arch-box">
+                        <div class="asst-arch-header">
+                            <i class="fa-solid fa-brain text-teal"></i>
+                            <h4>Engine Model &amp; Execution Environment</h4>
+                        </div>
+                        <p>
+                            Implemented entirely in native Python as an algorithmic expert system. It does not invoke external third-party cloud APIs (such as OpenAI, Anthropic, or Google Gemini), avoiding external network latency, recurring API costs, and third-party data disclosure risks.
+                        </p>
+                    </div>
+
+                    <div class="asst-arch-box">
+                        <div class="asst-arch-header">
+                            <i class="fa-solid fa-inbox text-teal"></i>
+                            <h4>Inputs Accepted &amp; Preprocessing</h4>
+                        </div>
+                        <p>
+                            Receives structured findings from the scanner pipeline: entity type (e.g. <code>aadhaar</code>, <code>pan</code>, <code>phone</code>, <code>qr_code</code>), confidence level, statutory checksum status, bounding boxes, masked text previews, and the active sharing context.
+                        </p>
+                    </div>
+
+                    <div class="asst-arch-box">
+                        <div class="asst-arch-header">
+                            <i class="fa-solid fa-arrows-turn-to-dots text-teal"></i>
+                            <h4>Rule Evaluation &amp; Recommendation Logic</h4>
+                        </div>
+                        <p>
+                            Evaluates findings against a weighted decision matrix. Formulates three priority tiers: <code>HIGH_PRIORITY</code> (statutory records, payment credentials), <code>REVIEW</code> (uncertain OCR matches, contact details in private contexts), and <code>INFORMATIONAL</code> (standard URLs, harmless codes).
+                        </p>
+                    </div>
+
+                    <div class="asst-arch-box">
+                        <div class="asst-arch-header">
+                            <i class="fa-solid fa-lock text-teal"></i>
+                            <h4>Credential &amp; Data Protection</h4>
+                        </div>
+                        <p>
+                            Because no external AI services are invoked, zero API keys are stored, handled, or exposed. Document data remains strictly within host memory, ensuring zero cloud telemetry and zero third-party model training on user data.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sub-section-divider"></div>
+
+                <div class="safeguards-box">
+                    <div class="safeguards-header">
+                        <i class="fa-solid fa-shield-cat text-teal"></i>
+                        <h4>Error Handling &amp; Privacy Safeguards in AI Guidance</h4>
+                    </div>
+                    <ul class="safeguards-list">
+                        <li>
+                            <strong>Statutory Verification Decoupling:</strong> When an OCR scan detects a numeric sequence resembling a government ID but fails the Verhoeff checksum, the assistant downgrades priority to <em>Review Recommended</em> and alerts the user of potential OCR variance.
+                        </li>
+                        <li>
+                            <strong>Safe Payload Discrimination:</strong> Standard public web links inside QR codes are explicitly designated as <code>INFORMATIONAL</code>, preventing automated false alarms on corporate marketing links.
+                        </li>
+                        <li>
+                            <strong>Non-Destructive Staging:</strong> Accepting an assistant suggestion simply toggles the finding's checkbox for preview sanitization. Original files are never modified without explicit user download export.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section F & I: APIs, Integrations & Tech Stack -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-puzzle-piece"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION F &amp; I</span>
+                    <h2 class="section-title">APIs, Integrations &amp; Technology Stack Inventory</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    ShareSafe's technology stack is purposefully lightweight, dependable, and self-contained:
+                </p>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Layer</th>
+                                <th>Component / Library</th>
+                                <th>Version / Source</th>
+                                <th>Technical Purpose &amp; Justification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Backend Framework</strong></td>
+                                <td>Flask</td>
+                                <td>3.x (WSGI)</td>
+                                <td>Lightweight microservice routing, session management, and template rendering.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PDF &amp; Vector Engine</strong></td>
+                                <td>PyMuPDF (<code>fitz</code>)</td>
+                                <td>1.25.x</td>
+                                <td>Native PDF vector extraction, page rasterization at 150 DPI, and vector stream redaction.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Computer Vision</strong></td>
+                                <td>OpenCV (<code>cv2</code>)</td>
+                                <td>4.11.x</td>
+                                <td>QR code localization, barcode detection, and image manipulation for visual redactions.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Image Processing</strong></td>
+                                <td>Pillow (PIL)</td>
+                                <td>11.x</td>
+                                <td>Color space normalization, EXIF metadata extraction/purging, and format conversions.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Numerical &amp; Array Ops</strong></td>
+                                <td>NumPy</td>
+                                <td>2.x</td>
+                                <td>High-speed pixel buffer transformations for blur, pixelate, and blackout styles.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Certificate Generation</strong></td>
+                                <td>ReportLab</td>
+                                <td>4.3.x</td>
+                                <td>Vector PDF generation for cryptographically verifiable SHA-256 Audit Certificates.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>OCR Engine (Local)</strong></td>
+                                <td>Tesseract / Windows OCR</td>
+                                <td>5.x / Native API</td>
+                                <td>Local optical character recognition for scanned images; 100% on-device execution.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Guidance Core</strong></td>
+                                <td>PrivacyAssistant</td>
+                                <td>Internal Python Core</td>
+                                <td>Deterministic, context-aware rule engine; 0 external cloud AI API dependencies.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section G: Security and Privacy Considerations -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-lock"></i></div>
+                <div>
+                    <span class="section-sub-label">SECTION G</span>
+                    <h2 class="section-title">Security &amp; Privacy Engineering Safeguards</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <div class="security-safeguards-grid">
+                    <div class="sec-item">
+                        <div class="sec-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                        <h4>File Validation &amp; Buffer Safety</h4>
+                        <p>Raw magic-byte header inspection prevents extension spoofing. File processing is constrained by a 50-page ceiling and 32 MB size thresholds to prevent decompression bombs.</p>
+                    </div>
+                    <div class="sec-item">
+                        <div class="sec-icon"><i class="fa-solid fa-trash-can"></i></div>
+                        <h4>Ephemeral RAM Sandboxing</h4>
+                        <p>Uploaded documents reside in transient, isolated session folders. A dedicated purge endpoint and background cleanup daemon securely purge expired artifacts.</p>
+                    </div>
+                    <div class="sec-item">
+                        <div class="sec-icon"><i class="fa-solid fa-eye-slash"></i></div>
+                        <h4>Zero Cloud Telemetry</h4>
+                        <p>No user files, extracted text, or detected credentials are ever logged, cached remotely, or transmitted across external networks. All computations run in-memory.</p>
+                    </div>
+                    <div class="sec-item">
+                        <div class="sec-icon"><i class="fa-solid fa-stamp"></i></div>
+                        <h4>Irreversible Burn-in</h4>
+                        <p>Redactions overwrite underlying raster pixels and purge PDF font glyph streams, preventing forensic copy-paste recovery or reverse-engineering.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page Footer Navigation Links -->
+    <div class="info-page-nav-bar">
+        <a href="/objectives" class="btn-info-nav"><i class="fa-solid fa-arrow-left"></i> Previous: Objectives</a>
+        <a href="/next-milestones" class="btn-info-nav btn-info-nav-next">Next: Next Milestones <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+</div>
+
+<!-- Mermaid JS for Dynamic Architecture Rendering -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof mermaid !== 'undefined') {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    darkMode: true,
+                    background: '#0B132B',
+                    primaryColor: '#162032',
+                    primaryTextColor: '#E6EDF3',
+                    primaryBorderColor: '#2DD4BF',
+                    lineColor: '#56B6C2',
+                    secondaryColor: '#1C2128',
+                    tertiaryColor: '#0F172A'
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

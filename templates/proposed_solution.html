@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}Proposed Solution &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
+
+{% block content %}
+<div class="info-page-wrapper">
+    <!-- Breadcrumb & Status Bar -->
+    <div class="info-breadcrumb-bar">
+        <div class="info-breadcrumb-inner">
+            <a href="/" class="breadcrumb-link"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Proposed Solution</span>
+        </div>
+        <div class="breadcrumb-meta-chips">
+            <span class="meta-tag"><i class="fa-solid fa-microchip"></i> System Architecture</span>
+            <span class="meta-tag"><i class="fa-solid fa-clock"></i> 10 Min Read</span>
+        </div>
+    </div>
+
+    <!-- Hero Header -->
+    <header class="info-hero-header">
+        <div class="info-hero-kicker">
+            <span class="kicker-pill"><i class="fa-solid fa-microchip"></i> Dual-Pillar Privacy Architecture</span>
+        </div>
+        <h1 class="info-hero-title">
+            ShareSafe: <span class="teal-gradient-text">Sovereign Document Sanitization</span> and Context-Aware AI Guidance
+        </h1>
+        <p class="info-hero-lead">
+            An end-to-end, on-device platform uniting deterministic entity detection, irreversible multi-style redaction, scannable QR payload forensics, and transparent privacy assistance. All execution occurs in ephemeral RAM with zero cloud telemetry.
+        </p>
+    </header>
+
+    <!-- Main Content Body -->
+    <div class="info-content-grid">
+        <!-- Architectural Overview Diagram Card -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-sitemap"></i></div>
+                <div>
+                    <span class="section-sub-label">SOLUTION OVERVIEW</span>
+                    <h2 class="section-title">The ShareSafe Two-Pillar Defense Model</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    ShareSafe operates on a fundamental architectural principle: <strong>privacy tools must never compromise privacy during processing.</strong> By executing 100% locally on the user's host environment or in an ephemeral serverless container without external cloud API dependencies, ShareSafe eliminates third-party data transmission risks while delivering enterprise-grade document redaction.
+                </p>
+                <div class="solution-pillars-summary-grid">
+                    <div class="pillar-summary-box pillar-blue">
+                        <div class="pillar-header">
+                            <i class="fa-solid fa-file-shield"></i>
+                            <h3>Pillar A: Document Privacy Protection</h3>
+                        </div>
+                        <p>
+                            Focuses on the <strong>mechanical, automated, and irreversible sanitization</strong> of outbound documents. Extracts text streams, validates checksums, locates bounding boxes, scrubs metadata, and permanently eradicates sensitive data before files leave your possession.
+                        </p>
+                        <div class="pillar-tech-chips">
+                            <span>PyMuPDF Native</span>
+                            <span>Windows / Tesseract OCR</span>
+                            <span>Verhoeff / ITD Checks</span>
+                            <span>OpenCV QR Decoder</span>
+                        </div>
+                    </div>
+                    <div class="pillar-summary-box pillar-teal">
+                        <div class="pillar-header">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <h3>Pillar B: Intelligent Privacy Assistant</h3>
+                        </div>
+                        <p>
+                            Focuses on the <strong>cognitive and contextual interpretation</strong> of privacy risks. Explains why detected items are sensitive, evaluates disclosure severity based on sharing context, provides actionable recommendations, and guides users through review.
+                        </p>
+                        <div class="pillar-tech-chips">
+                            <span>Deterministic Rule Engine</span>
+                            <span>Sharing Context Adaptation</span>
+                            <span>Explainability Matrix</span>
+                            <span>Zero External API Calls</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART A: Document Privacy Protection -->
+        <section class="info-card section-card" id="part-a">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-layer-group"></i></div>
+                <div>
+                    <span class="section-sub-label">PART A &bull; IMPLEMENTED WORKFLOW</span>
+                    <h2 class="section-title">Document Privacy Protection Pipeline</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    ShareSafe implements a rigorous, nine-stage document privacy lifecycle engineered to ensure that every sensitive byte is detected, confirmed, interactively reviewed, and permanently purged:
+                </p>
+
+                <!-- Workflow Timeline -->
+                <div class="workflow-steps-list">
+                    <!-- Step 1 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">01</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Secure Ingestion &amp; Magic-Byte Verification</h4>
+                            <p>
+                                When an image (PNG, JPG, WEBP, BMP) or PDF document is selected or dropped onto the workbench, the backend inspects the raw file magic bytes (e.g. <code>%PDF-</code>, <code>\x89PNG</code>, <code>\xFF\xD8\xFF</code>) rather than trusting client-provided file extensions. Uploaded payloads are bounded by a strict 50-page processing safeguard and stored in isolated, ephemeral per-session storage directories.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">02</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Dual-Engine Text &amp; Symbol Extraction</h4>
+                            <p>
+                                ShareSafe incorporates a hybrid extraction architecture tailored to document structure:
+                            </p>
+                            <ul class="step-sub-bullets">
+                                <li><strong>Digital PDFs:</strong> PyMuPDF (<code>fitz</code>) extracts vector glyphs, fonts, and exact bounding box coordinates directly from page content streams with zero loss of fidelity.</li>
+                                <li><strong>Scanned Documents &amp; Images:</strong> An adaptive OCR pipeline (leveraging Windows Native OCR PowerShell hooks or Tesseract OCR) extracts text lines and word-level coordinate polygons.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">03</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Context-Aware Algorithmic Entity Detection</h4>
+                            <p>
+                                Rather than relying on fragile naive regex patterns that trigger false alarms on ordinary numbers, ShareSafe integrates context-aware detectors with statutory mathematical checksum algorithms:
+                            </p>
+                            <div class="detector-pills-row">
+                                <span class="det-pill"><strong>Aadhaar:</strong> Verhoeff Checksum Dihedral Group <i>D</i><sub>5</sub></span>
+                                <span class="det-pill"><strong>PAN:</strong> 4th-Char ITD Entity Check (P, C, H, F, A, T, B, L, J, G)</span>
+                                <span class="det-pill"><strong>Payment Cards:</strong> Luhn Mod-10 Checksum &amp; BIN Validation</span>
+                                <span class="det-pill"><strong>Contact Info:</strong> RFC 5322 Email &amp; E.164 Phone Validation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">04</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>QR Code Payload Forensic Inspection</h4>
+                            <p>
+                                Embedded QR codes represent a dangerous blind spot in document security because human eyes cannot read them. ShareSafe uses OpenCV computer vision detectors to locate QR codes, decode their raw byte streams, and classify payload contents (e.g. UPI payments, Wi-Fi keys, vCards, or standard URLs). This ensures safe URLs are not falsely penalized while payment routing codes are appropriately flagged.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">05</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Calibrated Executive Risk Scoring</h4>
+                            <p>
+                                The <code>RiskAssessor</code> module calculates a composite threat score (0–100) and assigns an executive severity status (Critical, High, Medium, Low). Scores are dynamically adjusted based on the user's chosen sharing context (Academic, Enterprise, Private, Public), deduplicated to prevent score inflation, and bounded by mathematically sound threat ceilings.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">06</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Interactive Workbench &amp; Custom Manual Drawing</h4>
+                            <p>
+                                Detected entities are rendered on an interactive canvas overlay with bounding boxes matching document coordinates. Users can toggle individual findings, select categories in bulk, or activate the <strong>Draw Manual Box</strong> tool in the toolbar to drag custom redaction polygons over handwritten signatures, medical stamps, or proprietary logos.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 7 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">07</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Multi-Style Redaction Rendering</h4>
+                            <p>
+                                Users can customize the visual redaction style to match the document's aesthetic and regulatory requirements:
+                            </p>
+                            <div class="styles-preview-grid">
+                                <div class="style-item">
+                                    <span class="style-badge badge-blackout">Blackout</span>
+                                    <p>Total solid black burn-in. Maximum regulatory compliance; zero pixel reconstruction possible.</p>
+                                </div>
+                                <div class="style-item">
+                                    <span class="style-badge badge-blur">Gaussian Blur</span>
+                                    <p>High-sigma blur destroying high-frequency glyph details while maintaining document flow.</p>
+                                </div>
+                                <div class="style-item">
+                                    <span class="style-badge badge-pixelate">Pixelate</span>
+                                    <p>Subsampled pixelation mosaic obscuring sensitive digits in screenshots and technical documents.</p>
+                                </div>
+                                <div class="style-item">
+                                    <span class="style-badge badge-synth">Synthetic</span>
+                                    <p>Replaces sensitive numbers with clean masked markers (e.g. <code>•••• •••• 0123</code>).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 8 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">08</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Before / After Interactive Split Comparison</h4>
+                            <p>
+                                To give users absolute confidence before exporting, the workbench provides a synchronized <strong>Before / After Split Reveal Slider</strong> and side-by-side comparison mode. Users can drag the vertical divider across any page to visually verify that sensitive content is obscured while surrounding non-sensitive text remains intact.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 9 -->
+                    <div class="workflow-step-card">
+                        <div class="step-num-col">
+                            <span class="step-circle">09</span>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step-content-col">
+                            <h4>Irreversible Sanitization, Metadata Stripping &amp; Audit Certificate</h4>
+                            <p>
+                                During final export, the redactor performs true irreversible burn-in: rasterizing redacted regions to destroy underlying text layers, stripping all EXIF and PDF document metadata dictionaries, and generating a cryptographically signed SHA-256 Audit Certificate verifying that the sanitized document has been purged of sensitive markers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART B: AI Assistance -->
+        <section class="info-card section-card" id="part-b">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div>
+                    <span class="section-sub-label">PART B &bull; IMPLEMENTED CAPABILITY</span>
+                    <h2 class="section-title">The Intelligent Privacy Assistant</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p>
+                    While the redaction pipeline provides the mechanical tools to alter files, users frequently struggle with the decision-making process: <em>Is this telephone number sensitive in a public assignment? Should this QR code be blacked out? Is this 12-digit number an Aadhaar card or just an invoice code?</em>
+                </p>
+                <p>
+                    The <strong>Intelligent Privacy Assistant</strong> (implemented in <code>core/privacy_assistant.py</code>) acts as an on-device expert advisor that analyzes detected entities, assesses contextual risk, and generates human-readable, transparent guidance.
+                </p>
+
+                <div class="assistant-features-grid">
+                    <!-- Feature 1 -->
+                    <div class="asst-feat-card">
+                        <div class="asst-feat-icon"><i class="fa-solid fa-circle-question"></i></div>
+                        <h4>Why Each Item is Sensitive</h4>
+                        <p>
+                            Explains the statutory or personal significance of detected data in simple, non-jargon language (e.g. explains that Aadhaar exposes government identity credentials that could enable synthetic identity theft).
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="asst-feat-icon-card">
+                        <div class="asst-feat-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h4>Potential Risk in Plain Language</h4>
+                        <p>
+                            Describes what an adversary could do with the exposed item in the specific sharing context (e.g. unsolicited spam, credential harvesting, or infrastructure reconnaissance).
+                        </p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="asst-feat-card">
+                        <div class="asst-feat-icon"><i class="fa-solid fa-list-check"></i></div>
+                        <h4>Actionable Recommendations</h4>
+                        <p>
+                            Categorizes each item into one of three definitive actions: <code>REDACT</code> (immediate removal advised), <code>REVIEW</code> (manual human inspection recommended), or <code>LEAVE</code> (safe to keep unredacted).
+                        </p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="asst-feat-card">
+                        <div class="asst-feat-icon"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                        <h4>Priority &amp; Confidence Calibration</h4>
+                        <p>
+                            Explicitly separates confirmed statutory matches from uncertain OCR readings. Items with unverified checksums or OCR variances are flagged as <em>Uncertain / OCR Review</em> rather than presenting false alarms.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="sub-section-divider"></div>
+
+                <h3 class="inner-sub-heading"><i class="fa-solid fa-scale-balanced"></i> Comparing Document Privacy and AI Assistance</h3>
+                <p>
+                    It is crucial to understand that Document Privacy and AI Assistance serve distinct yet highly complementary roles in ShareSafe:
+                </p>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Functional Dimension</th>
+                                <th>Document Privacy Protection (Pillar A)</th>
+                                <th>Intelligent Privacy Assistant (Pillar B)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Primary Objective</strong></td>
+                                <td>Mechanical detection, obscuration, and irreversible sanitization of file bytes.</td>
+                                <td>Cognitive guidance, risk explainability, and informed user decision support.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Direction of Focus</strong></td>
+                                <td>Outbound documents prepared for sharing or distribution.</td>
+                                <td>Understanding exposure risks and evaluating ambiguous content.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Input Types</strong></td>
+                                <td>Raw image pixels, PDF page streams, and embedded metadata bytes.</td>
+                                <td>Extracted entity types, confidence metrics, coordinates, and sharing context.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Primary Output</strong></td>
+                                <td>Sanitized PDF/image file, stripped metadata, and SHA-256 certificate.</td>
+                                <td>Structured recommendation cards, priority badges, and narrative summaries.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Execution Nature</strong></td>
+                                <td>Algorithmic computer vision, OCR, vector clipping, and raster burn-in.</td>
+                                <td>Deterministic expert rules, contextual weighting, and explainability matrices.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Retention</strong></td>
+                                <td>Zero retention; processed in ephemeral per-session RAM.</td>
+                                <td>Zero retention; executes 100% locally with zero cloud API calls.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="sub-section-divider"></div>
+
+                <!-- Realistic Boundaries & Safeguards -->
+                <div class="safeguards-box">
+                    <div class="safeguards-header">
+                        <i class="fa-solid fa-triangle-exclamation text-amber"></i>
+                        <h4>Technical Boundaries &amp; Non-Exaggerated Claims</h4>
+                    </div>
+                    <ul class="safeguards-list">
+                        <li>
+                            <strong>No Infallible AI Guarantees:</strong> ShareSafe does not claim that AI can guarantee scam detection or ascertain an author's deceptive intent with 100% mathematical certainty. The assistant is designed as an advisory decision-support system, not an autonomous censor.
+                        </li>
+                        <li>
+                            <strong>Strict Local Processing:</strong> The current implementation uses a local deterministic rule engine in Python. It does not transmit document text, extracted PII, or images to external cloud LLM providers (e.g. OpenAI or Google Gemini), ensuring that sensitive data never leaves your device.
+                        </li>
+                        <li>
+                            <strong>Document Integrity:</strong> Accepting an assistant recommendation stages the finding for redaction preview on the canvas. It does not alter or overwrite the user's original source file on disk.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page Footer Navigation Links -->
+    <div class="info-page-nav-bar">
+        <a href="/problem-statement" class="btn-info-nav"><i class="fa-solid fa-arrow-left"></i> Previous: Problem Statement</a>
+        <a href="/objectives" class="btn-info-nav btn-info-nav-next">Next: Objectives <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+</div>
+{% endblock %}
