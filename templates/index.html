@@ -65,30 +65,25 @@
                     
                     <!-- State A: Idle / Empty State -->
                     <div class="dropzone-idle" id="dropzoneIdle">
-                        <div class="upload-shield-symbol" aria-hidden="true">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 3L4 6V12C4 17.5 7.4 22.1 12 23C16.6 22.1 20 17.5 20 12V6L12 3Z" stroke="var(--ink-primary)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 8V16M12 8L9 11M12 8L15 11" stroke="var(--coral-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                        <div class="upload-circle-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
                         <h3 class="upload-headline">Drop your document or image here</h3>
-                        <p class="upload-subline">Inspect slides, PDFs, identity credentials, or system configurations</p>
+                        <p class="upload-subline">Supports PDF, PNG, JPG, WEBP, BMP &bull; Up to 30 MB &bull; 100% In-Memory RAM</p>
                         
                         <div class="upload-actions-row">
-                            <button type="button" class="btn-editorial-primary" onclick="triggerFilePicker()">
-                                <i class="fa-solid fa-arrow-up-from-bracket"></i> Choose File to Audit
+                            <button type="button" class="btn-editorial-primary btn-upload-primary" onclick="triggerFilePicker()">
+                                <i class="fa-solid fa-folder-open"></i> Choose File to Audit
                             </button>
                         </div>
 
-                        <div class="upload-specs-pill">
-                            <span class="spec-tag"><i class="fa-regular fa-file"></i> PDF, PNG, JPG, WEBP, BMP</span>
-                            <span class="spec-tag"><i class="fa-solid fa-weight-hanging"></i> Max 30 MB</span>
-                            <span class="spec-tag spec-secure"><i class="fa-solid fa-shield-halved"></i> Ephemeral In-Memory</span>
+                        <div class="upload-privacy-note">
+                            <i class="fa-solid fa-shield-halved text-teal"></i> Executing in ephemeral RAM &bull; Zero cloud telemetry
                         </div>
 
                         <!-- 1-Click Quick Demo Launcher directly on Upload Card for live presentation ease -->
                         <div class="dropzone-quick-demos">
-                            <span class="quick-demo-label"><i class="fa-solid fa-bolt text-coral"></i> Or launch a 1-click synthetic demo:</span>
+                            <span class="quick-demo-label"><i class="fa-solid fa-bolt text-teal"></i> Instant Demo Samples:</span>
                             <div class="quick-demo-buttons">
                                 <button type="button" class="btn-quick-sample" onclick="loadSample('aadhaar_pan')" title="Load Aadhaar & PAN sample">
                                     <i class="fa-solid fa-id-card"></i> Identity Card
@@ -182,7 +177,7 @@
             <div class="feature-card">
                 <div class="feature-card-header">
                     <span class="feature-eyebrow">CHECKSUM VERIFICATION</span>
-                    <div class="feature-icon-wrap"><i class="fa-solid fa-microchip"></i></div>
+                    <div class="feature-icon-wrap icon-teal"><i class="fa-solid fa-microchip"></i></div>
                 </div>
                 <h3 class="feature-title">Verhoeff &amp; Luhn</h3>
                 <p class="feature-desc">Mathematical checksum validation for Aadhaar UID and payment cards to prevent false-positive alert fatigue.</p>
@@ -192,7 +187,7 @@
             <div class="feature-card">
                 <div class="feature-card-header">
                     <span class="feature-eyebrow">VECTOR FLATTENING</span>
-                    <div class="feature-icon-wrap"><i class="fa-solid fa-layer-group"></i></div>
+                    <div class="feature-icon-wrap icon-blue"><i class="fa-solid fa-layer-group"></i></div>
                 </div>
                 <h3 class="feature-title">Anti-Recovery</h3>
                 <p class="feature-desc">Irreversible high-DPI rasterization that permanently destroys underlying PDF text streams and hidden layers.</p>
@@ -202,7 +197,7 @@
             <div class="feature-card">
                 <div class="feature-card-header">
                     <span class="feature-eyebrow">LATENT FORENSICS</span>
-                    <div class="feature-icon-wrap"><i class="fa-solid fa-fingerprint"></i></div>
+                    <div class="feature-icon-wrap icon-amber"><i class="fa-solid fa-fingerprint"></i></div>
                 </div>
                 <h3 class="feature-title">EXIF &amp; GPS Stripping</h3>
                 <p class="feature-desc">Deep inspection and automated scrubbing of hardware serials, geolocation coordinates, and author tags.</p>
@@ -212,7 +207,7 @@
             <div class="feature-card">
                 <div class="feature-card-header">
                     <span class="feature-eyebrow">PAYLOAD FORENSICS</span>
-                    <div class="feature-icon-wrap"><i class="fa-solid fa-qrcode"></i></div>
+                    <div class="feature-icon-wrap icon-coral"><i class="fa-solid fa-qrcode"></i></div>
                 </div>
                 <h3 class="feature-title">QR Payload X-Ray</h3>
                 <p class="feature-desc">Decodes and audits embedded UPI, WiFi, and web routing strings that bypass visual inspection.</p>
