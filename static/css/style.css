@@ -319,39 +319,24 @@ code, pre, kbd {
 }
 
 .nav-container {
-
-    max-width: 1280px;
-
+    max-width: 1440px;
     margin: 0 auto;
-
-    padding: 0 24px;
-
+    padding: 0 20px;
     width: 100%;
-
     display: flex;
-
-    justify-content: space-between;
-
     align-items: center;
-
-    gap: 20px;
-
+    gap: 12px;
 }
 
 /* ShareSafe Wordmark & Monogram */
 
 .nav-brand {
-
     display: flex;
-
     align-items: center;
-
-    gap: 12px;
-
+    gap: 10px;
     text-decoration: none;
-
     user-select: none;
-
+    flex-shrink: 0;
 }
 
 .brand-monogram {
@@ -427,12 +412,10 @@ code, pre, kbd {
 /* Minimalist Search & Command Bar */
 
 .nav-search-box {
-
-    flex: 1;
-
-    max-width: 440px;
-
-    height: 38px;
+    flex: 0 1 240px;
+    max-width: 240px;
+    min-width: 120px;
+    height: 36px;
 
     background: var(--bg-surface);
 
@@ -511,26 +494,22 @@ code, pre, kbd {
 /* Nav Actions Cluster */
 
 .nav-actions {
-
     display: flex;
-
     align-items: center;
-
-    gap: 10px;
-
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 /* Local Processing Status Indicator */
 
 .nav-status-pill {
-
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
     height: 36px;
+    flex-shrink: 0;
+    white-space: nowrap;
 
     background: var(--bg-surface);
 
@@ -581,14 +560,13 @@ code, pre, kbd {
 /* Engine Config Secondary Button */
 
 .btn-engine-config {
-
     display: flex;
-
     align-items: center;
-
-    gap: 8px;
-
+    gap: 6px;
     height: 36px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    cursor: pointer;
 
     background: var(--bg-surface);
 
@@ -7192,16 +7170,17 @@ input:checked + .toggle-slider::before {
 .nav-links-menu {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     margin: 0 8px;
+    flex-shrink: 1;
 }
 
 .nav-page-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 11px;
-    font-size: 0.8125rem;
+    gap: 5px;
+    padding: 5px 8px;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--ink-secondary);
     text-decoration: none;
@@ -8744,19 +8723,19 @@ input:checked + .toggle-slider::before {
 }
 
 /* Responsive Overrides */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .nav-search-box {
-        max-width: 280px;
+        max-width: 180px;
     }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1260px) {
     .nav-search-box {
         display: none;
     }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1140px) {
     .nav-links-menu {
         display: none;
         position: absolute;
@@ -8829,5 +8808,11 @@ input:checked + .toggle-slider::before {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    .nav-status-pill {
+        display: none;
     }
 }
