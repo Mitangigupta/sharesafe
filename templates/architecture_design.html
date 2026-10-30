@@ -330,56 +330,65 @@
             </div>
             <div class="card-body-text">
                 <p style="margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--ink-secondary);">
-                    The following visual architecture traces information flow through ShareSafe's verified components — from browser upload, dual-mode OCR and context-aware AI risk analysis, to permanent raster burn-in and metadata stripping:
+                    The following high-resolution data flow diagram traces information through ShareSafe's verified components — from browser upload, dual-mode OCR and context-aware AI risk analysis, to permanent raster burn-in and metadata stripping:
                 </p>
 
-                <div class="diagram-render-container" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center; overflow-x: auto;">
-                    <div class="mermaid" style="width: 100%; min-width: 680px; text-align: center;">
+                <div class="diagram-render-container">
+                    <div class="diagram-render-toolbar">
+                        <div class="diagram-toolbar-title">
+                            <i class="fa-solid fa-route" style="color: var(--coral-primary);"></i>
+                            End-to-End Pipeline &bull; Sequential Data Flow Architecture
+                        </div>
+                        <div class="diagram-toolbar-hint">
+                            <i class="fa-solid fa-arrows-left-right"></i> Horizontal scroll supported on smaller viewports
+                        </div>
+                    </div>
+
+                    <div class="mermaid">
 flowchart TD
-    subgraph Client ["Client Layer (Frontend)"]
-        UI["Jinja2 Templates &amp; Responsive UI<br/>(Warm Cream, Rose &amp; Teal Palette)"]
-        Canvas["HTML5 Canvas Annotation Engine<br/>(canvas_editor.js &amp; app.js)"]
-        Split["Before / After Split Comparison"]
+    subgraph P1 ["PHASE 1: CLIENT INGESTION &amp; SESSION ISOLATION"]
+        Client["🖥️ <b>Client Presentation Layer</b><br/>Browser File Ingestion &bull; Drag &amp; Drop &bull; Split Viewer<br/><i>(HTML5 Canvas &bull; Jinja2 Templates &bull; app.js)</i>"]
+        Server["⚙️ <b>Application Router &amp; Session Manager</b><br/>MIME Magic-Byte Validation &bull; Ephemeral Isolation<br/><i>(Flask 3 &bull; Python 3.13 &bull; core/cleanup.py)</i>"]
     end
 
-    subgraph Server ["Application Layer (Backend)"]
-        Flask["Flask 3 Web Framework (Python 3.13)"]
-        SessionMgr["Ephemeral Session Manager (Session Isolation)"]
-        Router["Session Routing &amp; File Ingestion Engine"]
+    subgraph P2 ["PHASE 2: DUAL-ENGINE SCANNING &amp; AI RISK MATRIX"]
+        OCR["🔍 <b>Forensic Extraction &amp; OCR Engine</b><br/>Native PDF Text Vector Parser &bull; Dual-Backend OCR<br/><i>(PyMuPDF &bull; Windows Media OCR &bull; Tesseract pytesseract)</i>"]
+        Detector["🛡️ <b>Checksum RegEx &amp; QR Forensics</b><br/>Contextual Patterns &bull; Algorithmic Validations<br/><i>(Verhoeff Aadhaar &bull; Luhn Cards &bull; ITD PAN &bull; cv2.QRCodeDetector)</i>"]
+        Assistant["🤖 <b>PrivacyAssistant Decision Core</b><br/>Deterministic Local AI Threat &amp; Risk Matrix<br/><i>(core/privacy_assistant.py &bull; Academic, Work, Private, Public)</i>"]
     end
 
-    subgraph Core ["Processing &amp; Intelligence Core"]
-        subgraph DetectionEngines ["OCR &amp; Detection Mechanisms"]
-            PDFParse["PyMuPDF Native Vector Text Parser"]
-            OCREngine["Dual-Mode OCR Engine<br/>(Windows Media OCR &amp; Tesseract pytesseract)"]
-            RegexEngine["SensitiveDetector Contextual Regex<br/>(Verhoeff for Aadhaar, Luhn for Cards, ITD for PAN)"]
-            QREngine["OpenCV QR Forensics Decoder (cv2.QRCodeDetector)"]
-        end
-
-        subgraph AIAssistanceEngine ["AI Assistance"]
-            Assistant["PrivacyAssistant Decision Matrix (core/privacy_assistant.py)<br/>Context-Aware Risk Evaluation (Academic, Professional, Private, Public)"]
-        end
-
-        subgraph SanitisationPipeline ["File Processing &amp; Sanitisation"]
-            RasterRedact["Destructive Raster Redactor (OpenCV &amp; Pillow)<br/>Permanent Burn-in: Blur, Hide, Remove, Keep"]
-            VectorPurge["PyMuPDF Content Stream Purge"]
-            MetaClean["MetadataCleaner (EXIF, GPS, Camera History)"]
-            CertGen["ReportLab Audit Certificate Generator"]
-        end
+    subgraph P3 ["PHASE 3: INTERACTIVE STUDIO &amp; DESTRUCTIVE REDACTION"]
+        Canvas["✏️ <b>Visual Redaction Studio</b><br/>Interactive Multi-Page Coordinate Mapping<br/><i>(Blur &bull; Hide &bull; Remove &bull; Keep Selection)</i>"]
+        Raster["🔥 <b>Destructive Raster Burn-In</b><br/>Permanent Pixel-Level Overwrite<br/><i>(OpenCV &bull; Pillow &bull; True Irreversible Flattening)</i>"]
+        Purge["🧹 <b>Vector Purge &amp; Metadata Cleaner</b><br/>Underlying PDF Text Stream Scrubbed &amp; EXIF Purged<br/><i>(fitz Stream Strip &bull; core/metadata_cleaner.py)</i>"]
     end
 
-    UI -->|1. File Upload POST| Router
-    Router --> SessionMgr
-    SessionMgr --> PDFParse
-    SessionMgr --> OCREngine
-    PDFParse &amp; OCREngine --> RegexEngine
-    RegexEngine &amp; QREngine -->|2. Detections &amp; Payloads| Assistant
-    Assistant -->|3. Risk Advice &amp; Recommendations| Canvas
-    Canvas -->|4. User Redaction Actions| RasterRedact
-    RasterRedact --> VectorPurge
-    VectorPurge --> MetaClean
-    MetaClean --> CertGen
-    CertGen -->|5. Safer Sanitised File Download| UI
+    subgraph P4 ["PHASE 4: CRYPTOGRAPHIC AUDIT &amp; DELIVERY"]
+        Cert["📜 <b>Cryptographic Audit Certificate</b><br/>Tamper-Evident SHA-256 Hash Pair Ledger<br/><i>(ReportLab PDF Generator &bull; Timestamped Audit)</i>"]
+        Download["📦 <b>Safer Sanitised File Delivery</b><br/>Zero Cloud Footprint &bull; Sovereign Export<br/><i>(Safer Document &amp; Certificate Download)</i>"]
+    end
+
+    Client ==>|1. Multipart Upload POST| Server
+    Server ==>|2. Ephemeral Document Stream| OCR
+    OCR -->|3. Extracted Text Blocks &amp; Coordinates| Detector
+    Detector -->|4. Validated Detections &amp; QR Payloads| Assistant
+    Assistant ==>|5. Contextual Risk Advice &amp; Recommendations| Canvas
+    Canvas ==>|6. User Redaction Coordinates| Raster
+    Raster -->|7. Non-Recoverable Flattened Pixels| Purge
+    Purge -->|8. Scrubbed Cleaned Document Stream| Cert
+    Cert ==>|9. Cryptographically Verified Artifacts| Download
+    Download -.->|10. Verified Safe Document Returned to Client| Client
+
+    classDef phaseBox fill:#FFFFFF,stroke:#647C70,stroke-width:2px,color:#252522,font-size:14px;
+    classDef clientBox fill:#FAF7F2,stroke:#647C70,stroke-width:2px,color:#252522;
+    classDef engineBox fill:#F4F8F5,stroke:#4E685B,stroke-width:2px,color:#252522;
+    classDef redactBox fill:#FAF3F2,stroke:#C06C64,stroke-width:2px,color:#252522;
+    classDef exportBox fill:#F7F5F0,stroke:#373733,stroke-width:2px,color:#252522;
+
+    class Client,Server clientBox;
+    class OCR,Detector,Assistant engineBox;
+    class Canvas,Raster,Purge redactBox;
+    class Cert,Download exportBox;
                     </div>
                 </div>
             </div>
@@ -496,12 +505,25 @@ flowchart TD
                 themeVariables: {
                     darkMode: false,
                     background: '#FFFFFF',
-                    primaryColor: '#F3EFE9',
+                    fontFamily: 'DM Sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                    fontSize: '15px',
+                    primaryColor: '#FAF7F2',
                     primaryTextColor: '#252522',
-                    primaryBorderColor: '#EAE5DD',
+                    primaryBorderColor: '#647C70',
                     lineColor: '#647C70',
-                    secondaryColor: '#F9ECEB',
-                    tertiaryColor: '#FCFBFA'
+                    secondaryColor: '#F9F5F0',
+                    tertiaryColor: '#FCFBFA',
+                    edgeLabelBackground: '#FFFFFF',
+                    clusterBkg: '#FAFAF8',
+                    clusterBorder: '#D8D2C7'
+                },
+                flowchart: {
+                    useMaxWidth: false,
+                    htmlLabels: true,
+                    curve: 'basis',
+                    rankSpacing: 65,
+                    nodeSpacing: 45,
+                    padding: 22
                 }
             });
         }
