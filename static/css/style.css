@@ -9970,3 +9970,95 @@ input:checked + .toggle-slider::before {
         text-align: center;
     }
 }
+
+
+/* Architecture View Switcher & Data Flow Pipeline Additions */
+.arch-view-switcher {
+    display: inline-flex;
+    background: var(--bg-stone);
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-stone);
+    gap: 4px;
+    margin-bottom: 1.25rem;
+}
+
+.arch-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 7px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-secondary);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.arch-tab-btn:hover {
+    color: var(--ink-primary);
+}
+
+.arch-tab-btn.active {
+    background: #FFFFFF;
+    color: var(--ink-primary);
+    box-shadow: 0 2px 6px rgba(37, 37, 34, 0.08);
+}
+
+/* High-Level Data Flow Pipeline Tracker */
+.arch-pipeline-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    gap: 8px;
+}
+
+.pipeline-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--ink-primary);
+    white-space: nowrap;
+}
+
+.pipeline-step .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--sage-soft);
+    color: var(--sage-primary);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.pipeline-arrow {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+}
+
+.arch-mermaid-container {
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    width: 100%;
+}
