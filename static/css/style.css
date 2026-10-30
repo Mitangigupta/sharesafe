@@ -9578,3 +9578,395 @@ input:checked + .toggle-slider::before {
         gap: 16px;
     }
 }
+
+
+/* ==========================================================================
+   ShareSafe 5-Layer Software Architecture & Data Flow Diagram
+   ========================================================================== */
+
+.arch-stage-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.5rem 0 2rem;
+}
+
+/* Layer Base Container */
+.arch-layer {
+    background: #FFFFFF;
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.6rem;
+    box-shadow: 0 2px 8px -2px rgba(37, 37, 34, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Layer Tints & Accents (Preserving ShareSafe Palette) */
+.arch-layer-ui {
+    background: #FCFAF7;
+    border-color: #EFE8DE;
+}
+.arch-layer-ui:hover {
+    border-color: #E2D7C8;
+}
+
+.arch-layer-app {
+    background: #F8F9FA;
+    border-color: #E2E8F0;
+}
+.arch-layer-app:hover {
+    border-color: #CBD5E1;
+}
+
+.arch-layer-detect {
+    background: #F3F7F5;
+    border-color: var(--sage-border);
+}
+.arch-layer-detect:hover {
+    border-color: var(--sage-primary);
+}
+
+.arch-layer-intel {
+    background: #FAF4F3;
+    border-color: var(--coral-border);
+}
+.arch-layer-intel:hover {
+    border-color: var(--coral-primary);
+}
+
+.arch-layer-output {
+    background: #F1F6F3;
+    border-color: #BFD6CB;
+}
+.arch-layer-output:hover {
+    border-color: #4E7A68;
+}
+
+/* Layer Header */
+.arch-layer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.arch-layer-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.arch-layer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+}
+
+.pill-cream {
+    background: #F3ECE2;
+    color: #8C6A48;
+    border: 1px solid #E5D9C8;
+}
+
+.pill-slate {
+    background: #EDF2F7;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+}
+
+.pill-teal {
+    background: var(--sage-soft);
+    color: var(--sage-primary);
+    border: 1px solid var(--sage-border);
+}
+
+.pill-rose {
+    background: var(--coral-soft);
+    color: var(--coral-primary);
+    border: 1px solid var(--coral-border);
+}
+
+.pill-deep-teal {
+    background: #E2ECE7;
+    color: #2F594A;
+    border: 1px solid #BFD6CB;
+}
+
+.arch-layer-name {
+    font-family: var(--font-sans);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink-primary);
+    margin: 0;
+}
+
+.arch-layer-scope {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Components Grid */
+.arch-components-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+/* Component Card */
+.arch-comp-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 1px 4px rgba(37, 37, 34, 0.03);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.22s ease;
+    cursor: default;
+    position: relative;
+}
+
+.arch-comp-card:hover,
+.arch-comp-card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px -3px rgba(37, 37, 34, 0.1);
+    border-color: var(--border-stone-strong);
+    outline: none;
+}
+
+.arch-layer-ui .arch-comp-card:hover {
+    border-color: #D6C2A9;
+}
+.arch-layer-app .arch-comp-card:hover {
+    border-color: #94A3B8;
+}
+.arch-layer-detect .arch-comp-card:hover {
+    border-color: var(--sage-primary);
+}
+.arch-layer-intel .arch-comp-card:hover {
+    border-color: var(--coral-primary);
+}
+.arch-layer-output .arch-comp-card:hover {
+    border-color: #4E7A68;
+}
+
+.arch-comp-highlight {
+    border-color: var(--coral-border);
+    background: linear-gradient(180deg, #FFFFFF 0%, #FDF8F7 100%);
+}
+
+.arch-comp-header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Icon Boxes */
+.arch-comp-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.icon-cream {
+    background: #F5EFE6;
+    color: #8C6A48;
+}
+.icon-slate {
+    background: #EDF2F7;
+    color: #475569;
+}
+.icon-teal {
+    background: var(--sage-soft);
+    color: var(--sage-primary);
+}
+.icon-rose {
+    background: var(--coral-soft);
+    color: var(--coral-primary);
+}
+.icon-deep-teal {
+    background: #E2ECE7;
+    color: #2F594A;
+}
+
+.arch-comp-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+}
+
+.arch-comp-title {
+    font-family: var(--font-sans);
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ink-primary);
+    margin: 0;
+    line-height: 1.35;
+}
+
+.arch-comp-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    background: var(--bg-stone-subtle);
+    padding: 2px 7px;
+    border-radius: 4px;
+    width: fit-content;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.arch-ai-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--coral-soft);
+    color: var(--coral-primary);
+    border: 1px solid var(--coral-border);
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.arch-comp-desc {
+    font-size: 0.85rem;
+    color: var(--ink-secondary);
+    line-height: 1.5;
+    margin: 2px 0 0;
+    transition: color 0.2s ease;
+}
+
+.arch-comp-card:hover .arch-comp-desc {
+    color: var(--ink-primary);
+}
+
+/* Directional Flow Connectors */
+.arch-connector-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 8px 0;
+}
+
+.arch-connector-line {
+    width: 2px;
+    height: 14px;
+    background: var(--border-stone-strong);
+}
+
+.arch-connector-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    border: 1px solid var(--border-stone-strong);
+    border-radius: var(--radius-pill);
+    padding: 5px 16px;
+    font-size: 0.82rem;
+    color: var(--ink-primary);
+    box-shadow: 0 2px 6px rgba(37, 37, 34, 0.05);
+    z-index: 2;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.arch-connector-badge:hover {
+    border-color: var(--ink-muted);
+    transform: scale(1.02);
+}
+
+.arch-connector-badge i {
+    color: var(--sage-primary);
+    font-size: 0.85rem;
+}
+
+/* Return / Delivery Closed Loop */
+.arch-return-loop {
+    background: linear-gradient(135deg, #FAF8F5 0%, #F3F7F5 100%);
+    border: 1px solid var(--sage-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.6rem;
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px -2px rgba(100, 124, 112, 0.1);
+}
+
+.arch-return-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--sage-soft);
+    color: var(--sage-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.arch-return-text {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--ink-secondary);
+}
+
+.arch-return-text strong {
+    color: var(--ink-primary);
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+    .arch-layer {
+        padding: 1.25rem 1rem;
+    }
+
+    .arch-components-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .arch-layer-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .arch-connector-badge {
+        font-size: 0.76rem;
+        padding: 4px 12px;
+        text-align: center;
+    }
+
+    .arch-return-loop {
+        flex-direction: column;
+        text-align: center;
+    }
+}
