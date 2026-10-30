@@ -34,91 +34,84 @@ class TestInfoPages(unittest.TestCase):
         # Verify active navigation highlight
         self.assertIn('href="/problem-statement" class="nav-page-link active"', html)
         # Verify core problem statement content
-        self.assertIn('The Silent Threat of', html)
-        self.assertIn('Government Identification Records', html)
-        self.assertIn('Financial &amp; Payment Credentials', html)
-        self.assertIn('Pseudo-Redaction', html)
-        self.assertIn('DPDP', html)
+        self.assertIn('Accidental Exposure of Sensitive Information During', html)
+        self.assertIn('Digital File Sharing', html)
+        self.assertIn("In today's digital world, people frequently share documents, screenshots and images without realizing that these files may contain sensitive personal information.", html)
+        self.assertIn('The core problem is the absence of a simple, user-friendly solution that detects potentially sensitive information and helps individuals protect their privacy before sharing digital files.', html)
         # Verify return link
         self.assertIn('href="/"', html)
 
     def test_03_proposed_solution_page(self):
-        """Proposed Solution page loads successfully with Document Privacy and AI Assistant."""
+        """Proposed Solution page loads successfully with the 4 core actions."""
         res = self.client.get('/proposed-solution')
         self.assertEqual(res.status_code, 200)
         html = res.get_data(as_text=True)
         # Verify active navigation highlight
         self.assertIn('href="/proposed-solution" class="nav-page-link active"', html)
-        # Verify Part A & Part B
-        self.assertIn('Document Privacy Protection Pipeline', html)
-        self.assertIn('The Intelligent Privacy Assistant', html)
-        self.assertIn('Verhoeff Checksum', html)
-        self.assertIn('PyMuPDF', html)
-        self.assertIn('Before / After Interactive Split Comparison', html)
-        self.assertIn('Why Each Item is Sensitive', html)
+        # Verify core proposed solution content
+        self.assertIn('ShareSafe is a web-based privacy protection application that allows users to upload documents and images before sharing them with others.', html)
+        self.assertIn('Blur', html)
+        self.assertIn('Blur sensitive information while retaining the surrounding content.', html)
+        self.assertIn('Hide', html)
+        self.assertIn('Conceal selected information from view.', html)
+        self.assertIn('Remove', html)
+        self.assertIn('Permanently redact sensitive information from the file.', html)
+        self.assertIn('Keep', html)
+        self.assertIn('Retain the information if the user considers it safe to share.', html)
+        self.assertIn('After making the necessary changes, users can generate and download a safer version of their original file.', html)
+        self.assertIn('ShareSafe aims to make privacy protection a conscious step before every file is shared.', html)
 
     def test_04_objectives_page(self):
-        """Objectives page loads successfully with exactly 3 SMART objectives."""
+        """Objectives page loads successfully with exactly the three specified objectives."""
         res = self.client.get('/objectives')
         self.assertEqual(res.status_code, 200)
         html = res.get_data(as_text=True)
         # Verify active navigation highlight
         self.assertIn('href="/objectives" class="nav-page-link active"', html)
         # Verify Objectives vs Features distinction
-        self.assertIn('Distinguishing Project Objectives from System Features', html)
-        # Verify all 3 SMART objectives
-        self.assertIn('OBJECTIVE 01', html)
-        self.assertIn('Improve Sensitive-Information Detection Precision', html)
-        self.assertIn('OBJECTIVE 02', html)
-        self.assertIn('Guarantee Forensic Sanitization Integrity and Zero Data Leakage', html)
-        self.assertIn('OBJECTIVE 03', html)
-        self.assertIn('Improve the Reliability, Explainability, and Context-Awareness of AI Guidance', html)
-        # Verify SMART breakdown letters
-        self.assertIn('<div class="smart-letter">S</div>', html)
-        self.assertIn('<div class="smart-letter">M</div>', html)
-        self.assertIn('<div class="smart-letter">A</div>', html)
-        self.assertIn('<div class="smart-letter">R</div>', html)
-        self.assertIn('<div class="smart-letter">T</div>', html)
+        self.assertIn('Do not confuse objectives with features', html)
+        # Verify all 3 specified objectives
+        self.assertIn('Minimise Accidental Information Exposure', html)
+        self.assertIn('To reduce the possibility of unintended disclosure of personal and confidential information during digital file sharing', html)
+        self.assertIn('Promote Privacy Awareness and Informed Decision-Making', html)
+        self.assertIn("To improve users' understanding of digital privacy by helping them recognise the potential consequences", html)
+        self.assertIn('Encourage Context-Aware and Responsible File Sharing', html)
+        self.assertIn('To establish a more responsible approach to sharing digital information by ensuring that privacy decisions consider the purpose, recipient and intended audience of a file.', html)
 
     def test_05_architecture_design_page(self):
-        """Architecture Design page loads with system blueprints, Mermaid diagram, and tech stack."""
+        """Architecture Design page loads with verified technologies and Mermaid diagram."""
         res = self.client.get('/architecture-design')
         self.assertEqual(res.status_code, 200)
         html = res.get_data(as_text=True)
         # Verify active navigation highlight
         self.assertIn('href="/architecture-design" class="nav-page-link active"', html)
         # Verify architectural sections
-        self.assertIn('System Overview &amp; Topography', html)
-        self.assertIn('Frontend and Backend Architecture', html)
-        self.assertIn('The Document Processing Pipeline', html)
-        self.assertIn('The AI Assistance Architecture (Local Expert Engine)', html)
-        self.assertIn('APIs, Integrations &amp; Technology Stack Inventory', html)
-        self.assertIn('Security &amp; Privacy Engineering Safeguards', html)
+        self.assertIn('Frontend', html)
+        self.assertIn('Backend', html)
+        self.assertIn('APIs and integrations', html)
+        self.assertIn('AI Assistance', html)
+        self.assertIn('OCR and detection mechanisms', html)
+        self.assertIn('File processing and sanitisation', html)
+        self.assertIn('Data flow and security architecture', html)
         # Verify Mermaid diagram container
         self.assertIn('class="mermaid"', html)
-        self.assertIn('Pillar A: Document Privacy Pipeline', html)
-        self.assertIn('Pillar B: Intelligent Privacy Assistant', html)
 
     def test_06_next_milestones_page(self):
-        """Next Milestones page loads with all 6 milestones and roadmap synthesis."""
+        """Next Milestones page loads with all 5 milestones and long-term vision."""
         res = self.client.get('/next-milestones')
         self.assertEqual(res.status_code, 200)
         html = res.get_data(as_text=True)
         # Verify active navigation highlight
         self.assertIn('href="/next-milestones" class="nav-page-link active"', html)
-        # Verify all 6 milestones
-        self.assertIn('M1', html)
-        self.assertIn('Stabilize the Existing Application', html)
-        self.assertIn('M2', html)
-        self.assertIn('Improve Detection Accuracy &amp; Privacy Sanitization Verification', html)
-        self.assertIn('M3', html)
-        self.assertIn('Enhance AI Assistance &amp; Suspicious Content Reasoning', html)
-        self.assertIn('M4', html)
-        self.assertIn('Explore a Sovereign Browser Extension for Pre-Share Protection', html)
-        self.assertIn('M5', html)
-        self.assertIn('Investigate Messaging-Platform &amp; OS Share-Sheet Integration', html)
-        self.assertIn('M6', html)
-        self.assertIn('Comprehensive Security Audit, Demonstration &amp; Release', html)
+        # Verify all 5 milestones
+        self.assertIn('Browser Extension Development', html)
+        self.assertIn('Integration with Supported Platforms', html)
+        self.assertIn('Automated Privacy Screening', html)
+        self.assertIn('Improved Context-Aware Recommendations', html)
+        self.assertIn('Testing, Optimisation and Expansion', html)
+        # Verify Long-Term Vision
+        self.assertIn('Long-Term Vision', html)
+        self.assertIn('Transform ShareSafe from a standalone web application into an integrated privacy protection tool', html)
 
     def test_07_refresh_and_direct_navigation(self):
         """Each information page is directly accessible via URL and refreshes cleanly."""
