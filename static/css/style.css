@@ -10171,11 +10171,28 @@ input:checked + .toggle-slider::before {
 }
 
 /* Active Stage Highlight Pulse Animation */
+.arch-layer-band.active-band-highlight {
+    border-color: #D45D55 !important;
+    box-shadow: 0 0 0 3px rgba(212, 93, 85, 0.22), 0 12px 28px -6px rgba(37, 37, 34, 0.12) !important;
+    transform: translateY(-2px);
+}
+
 .mermaid .node.active-stage rect,
-.mermaid .node.active-stage polygon {
+.mermaid .node.active-stage polygon,
+.mermaid g.node.active-stage rect,
+.mermaid g[id*="Client"].active-stage rect,
+.mermaid g[id*="Server"].active-stage rect,
+.mermaid g[id*="OCR"].active-stage rect,
+.mermaid g[id*="Detector"].active-stage rect,
+.mermaid g[id*="Assistant"].active-stage rect,
+.mermaid g[id*="Canvas"].active-stage rect,
+.mermaid g[id*="Raster"].active-stage rect,
+.mermaid g[id*="Purge"].active-stage rect,
+.mermaid g[id*="Cert"].active-stage rect,
+.mermaid g[id*="Download"].active-stage rect {
     stroke: #D45D55 !important; /* Vibrant Warm Coral */
-    stroke-width: 2.5px !important;
-    filter: drop-shadow(0 0 14px rgba(212, 93, 85, 0.45)) drop-shadow(0 4px 10px rgba(37, 37, 34, 0.15)) !important;
+    stroke-width: 2.8px !important;
+    filter: drop-shadow(0 0 12px rgba(212, 93, 85, 0.55)) drop-shadow(0 4px 10px rgba(37, 37, 34, 0.15)) !important;
     animation: activeStagePulse 2s ease-in-out infinite !important;
 }
 

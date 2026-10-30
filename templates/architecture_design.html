@@ -373,60 +373,49 @@
 
                     <div class="mermaid">
 flowchart TD
-    subgraph P1 ["PHASE 1: CLIENT INGESTION &amp; SESSION ISOLATION"]
-        Client["<b>Client Presentation Layer</b><br/><span class='cyber-desc'>Browser File Ingestion &bull; Drag &amp; Drop &bull; Split Viewer</span><br/><span class='cyber-tech'>HTML5 Canvas &bull; Jinja2 Templates &bull; app.js</span>"]
-        Server["<b>Application Router &amp; Session Manager</b><br/><span class='cyber-desc'>MIME Magic-Byte Validation &bull; Ephemeral Isolation</span><br/><span class='cyber-tech'>Flask 3 &bull; Python 3.13 &bull; core/cleanup.py</span>"]
+    subgraph P1 ["PHASE 1: CLIENT INGESTION AND SESSION ISOLATION"]
+        Client["<b>Client Presentation Layer</b><br/>Browser File Ingestion • Drag & Drop • Split Viewer<br/><i>(HTML5 Canvas • Jinja2 Templates • app.js)</i>"]
+        Server["<b>Application Router & Session Manager</b><br/>MIME Magic-Byte Validation • Ephemeral Isolation<br/><i>(Flask 3 • Python 3.13 • core/cleanup.py)</i>"]
     end
 
-    subgraph P2 ["PHASE 2: DUAL-ENGINE SCANNING &amp; AI RISK MATRIX"]
-        OCR["<b>Forensic Extraction &amp; OCR Engine</b><br/><span class='cyber-desc'>Native PDF Text Vector Parser &bull; Dual-Backend OCR</span><br/><span class='cyber-tech'>PyMuPDF &bull; Windows Media OCR &bull; Tesseract pytesseract</span>"]
-        Detector["<b>Checksum RegEx &amp; QR Forensics</b><br/><span class='cyber-desc'>Contextual Patterns &bull; Algorithmic Validations</span><br/><span class='cyber-tech'>Verhoeff Aadhaar &bull; Luhn Cards &bull; ITD PAN &bull; cv2.QRCodeDetector</span>"]
-        Assistant["<b>PrivacyAssistant Decision Core</b><br/><span class='cyber-desc'>Deterministic Local AI Threat &amp; Risk Matrix</span><br/><span class='cyber-tech'>core/privacy_assistant.py &bull; Academic, Work, Private, Public</span>"]
+    subgraph P2 ["PHASE 2: DUAL-ENGINE SCANNING AND AI RISK MATRIX"]
+        OCR["<b>Forensic Extraction & OCR Engine</b><br/>Native PDF Text Vector Parser • Dual-Backend OCR<br/><i>(PyMuPDF • Windows Media OCR • Tesseract pytesseract)</i>"]
+        Detector["<b>Checksum RegEx & QR Forensics</b><br/>Contextual Patterns • Algorithmic Validations<br/><i>(Verhoeff Aadhaar • Luhn Cards • ITD PAN • cv2.QRCodeDetector)</i>"]
+        Assistant["<b>PrivacyAssistant Decision Core</b><br/>Deterministic Local AI Threat & Risk Matrix<br/><i>(core/privacy_assistant.py • Academic, Work, Private, Public)</i>"]
     end
 
-    subgraph P3 ["PHASE 3: INTERACTIVE STUDIO &amp; DESTRUCTIVE REDACTION"]
-        Canvas["<b>Visual Redaction Studio</b><br/><span class='cyber-desc'>Interactive Multi-Page Coordinate Mapping</span><br/><span class='cyber-tech'>Blur &bull; Hide &bull; Remove &bull; Keep Selection</span>"]
-        Raster["<b>Destructive Raster Burn-In</b><br/><span class='cyber-desc'>Permanent Pixel-Level Overwrite</span><br/><span class='cyber-tech'>OpenCV &bull; Pillow &bull; True Irreversible Flattening</span>"]
-        Purge["<b>Vector Purge &amp; Metadata Cleaner</b><br/><span class='cyber-desc'>Underlying PDF Text Stream Scrubbed &amp; EXIF Purged</span><br/><span class='cyber-tech'>fitz Stream Strip &bull; core/metadata_cleaner.py</span>"]
+    subgraph P3 ["PHASE 3: INTERACTIVE STUDIO AND DESTRUCTIVE REDACTION"]
+        Canvas["<b>Visual Redaction Studio</b><br/>Interactive Multi-Page Coordinate Mapping<br/><i>(Blur • Hide • Remove • Keep Selection)</i>"]
+        Raster["<b>Destructive Raster Burn-In</b><br/>Permanent Pixel-Level Overwrite<br/><i>(OpenCV • Pillow • True Irreversible Flattening)</i>"]
+        Purge["<b>Vector Purge & Metadata Cleaner</b><br/>Underlying PDF Text Stream Scrubbed & EXIF Purged<br/><i>(fitz Stream Strip • core/metadata_cleaner.py)</i>"]
     end
 
-    subgraph P4 ["PHASE 4: CRYPTOGRAPHIC AUDIT &amp; DELIVERY"]
-        Cert["<b>Cryptographic Audit Certificate</b><br/><span class='cyber-desc'>Tamper-Evident SHA-256 Hash Pair Ledger</span><br/><span class='cyber-tech'>ReportLab PDF Generator &bull; Timestamped Audit</span>"]
-        Download["<b>Safer Sanitised File Delivery</b><br/><span class='cyber-desc'>Zero Cloud Footprint &bull; Sovereign Export</span><br/><span class='cyber-tech'>Safer Document &amp; Certificate Download</span>"]
+    subgraph P4 ["PHASE 4: CRYPTOGRAPHIC AUDIT AND DELIVERY"]
+        Cert["<b>Cryptographic Audit Certificate</b><br/>Tamper-Evident SHA-256 Hash Pair Ledger<br/><i>(ReportLab PDF Generator • Timestamped Audit)</i>"]
+        Download["<b>Safer Sanitised File Delivery</b><br/>Zero Cloud Footprint • Sovereign Export<br/><i>(Safer Document & Certificate Download)</i>"]
     end
 
-    Client ==>|1. Multipart Upload POST| Server
-    Server ==>|2. Ephemeral Document Stream| OCR
-    OCR -->|3. Extracted Text Blocks &amp; Coordinates| Detector
-    Detector -->|4. Validated Detections &amp; QR Payloads| Assistant
-    Assistant ==>|5. Contextual Risk Advice &amp; Recommendations| Canvas
-    Canvas ==>|6. User Redaction Coordinates| Raster
+    Client -->|1. Multipart Upload POST| Server
+    Server -->|2. Ephemeral Document Stream| OCR
+    OCR -->|3. Extracted Text Blocks & Coordinates| Detector
+    Detector -->|4. Validated Detections & QR Payloads| Assistant
+    Assistant -->|5. Contextual Risk Advice & Recommendations| Canvas
+    Canvas -->|6. User Redaction Coordinates| Raster
     Raster -->|7. Non-Recoverable Flattened Pixels| Purge
     Purge -->|8. Scrubbed Cleaned Document Stream| Cert
-    Cert ==>|9. Cryptographically Verified Artifacts| Download
-    Download -.->|10. Verified Safe Document Returned to Client| Client
+    Cert -->|9. Cryptographically Verified Artifacts| Download
+    Download -->|10. Verified Safe Document Returned to Client| Client
 
-    classDef phaseP1 fill:#FAF6F0,stroke:#D9822B,stroke-width:1.5px,color:#252522;
-    classDef phaseP2 fill:#F2F7F4,stroke:#4E7D6B,stroke-width:1.5px,color:#252522;
-    classDef phaseP3 fill:#FDF5F4,stroke:#D45D55,stroke-width:1.5px,color:#252522;
-    classDef phaseP4 fill:#F7F8F7,stroke:#3E5C4E,stroke-width:1.5px,color:#252522;
+    style P1 fill:#FAF6F0,stroke:#D9822B,stroke-width:1.5px
+    style P2 fill:#F2F7F4,stroke:#4E7D6B,stroke-width:1.5px
+    style P3 fill:#FDF5F4,stroke:#D45D55,stroke-width:1.5px
+    style P4 fill:#F7F8F7,stroke:#3E5C4E,stroke-width:1.5px
 
-    classDef nodeP1 fill:#FFFFFF,stroke:#E8CFA9,stroke-width:1.25px,color:#252522;
-    classDef nodeP2 fill:#FFFFFF,stroke:#B8D9CC,stroke-width:1.25px,color:#252522;
-    classDef nodeP3 fill:#FFFFFF,stroke:#F4BFBC,stroke-width:1.25px,color:#252522;
-    classDef nodeP4 fill:#FFFFFF,stroke:#C2D9CD,stroke-width:1.25px,color:#252522;
+    classDef nodeDefault fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.25px,color:#252522;
     classDef nodeHighlight fill:#FFF4F3,stroke:#D45D55,stroke-width:2.2px,color:#252522;
 
-    class P1 phaseP1;
-    class P2 phaseP2;
-    class P3 phaseP3;
-    class P4 phaseP4;
-
-    class Client,Server nodeP1;
-    class OCR,Detector nodeP2;
+    class Client,Server,OCR,Detector,Canvas,Raster,Purge,Cert,Download nodeDefault;
     class Assistant nodeHighlight;
-    class Canvas,Raster,Purge nodeP3;
-    class Cert,Download nodeP4;
                     </div>
                 </div>
             </div>
@@ -537,47 +526,60 @@ flowchart TD
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         if (typeof mermaid !== 'undefined') {
-            mermaid.initialize({
-                startOnLoad: true,
-                theme: 'base',
-                themeVariables: {
-                    darkMode: false,
-                    background: '#FFFFFF',
-                    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                    fontSize: '14px',
-                    primaryColor: '#FFFFFF',
-                    primaryTextColor: '#252522',
-                    primaryBorderColor: '#DCD6CD',
-                    lineColor: '#647C70',
-                    secondaryColor: '#FAF7F2',
-                    tertiaryColor: '#FDF5F4',
-                    edgeLabelBackground: '#FFFFFF',
-                    clusterBkg: '#FAF7F2',
-                    clusterBorder: '#DCD6CD'
-                },
-                flowchart: {
-                    useMaxWidth: false,
-                    htmlLabels: true,
-                    curve: 'basis',
-                    rankSpacing: 68,
-                    nodeSpacing: 46,
-                    padding: 22
-                }
-            });
+            try {
+                mermaid.initialize({
+                    startOnLoad: false,
+                    theme: 'base',
+                    themeVariables: {
+                        darkMode: false,
+                        background: '#FFFFFF',
+                        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        fontSize: '14px',
+                        primaryColor: '#FFFFFF',
+                        primaryTextColor: '#252522',
+                        primaryBorderColor: '#DCD6CD',
+                        lineColor: '#647C70',
+                        secondaryColor: '#FAF7F2',
+                        tertiaryColor: '#FDF5F4',
+                        edgeLabelBackground: '#FFFFFF',
+                        clusterBkg: '#FAF7F2',
+                        clusterBorder: '#DCD6CD'
+                    },
+                    flowchart: {
+                        useMaxWidth: false,
+                        htmlLabels: true,
+                        curve: 'basis',
+                        rankSpacing: 68,
+                        nodeSpacing: 46,
+                        padding: 22
+                    }
+                });
+                mermaid.run().then(function() {
+                    setTimeout(function() { updateStepUI(0); }, 300);
+                }).catch(function(err) {
+                    console.warn("Mermaid run caught:", err);
+                    updateStepUI(0);
+                });
+            } catch (e) {
+                console.error("Mermaid init error:", e);
+                updateStepUI(0);
+            }
+        } else {
+            updateStepUI(0);
         }
 
         // Architecture Presentation Walkthrough Controller
         const presentationSteps = [
-            { id: 'Client', phase: 'Phase 1', title: 'Client Presentation Layer', desc: 'Browser Upload & Split View: Local document selection with synchronized split inspection.' },
-            { id: 'Server', phase: 'Phase 1', title: 'Application & Ephemeral Session', desc: 'MIME Verification & Isolation: Flask verifies magic-bytes and initializes isolated temporary storage.' },
-            { id: 'OCR', phase: 'Phase 2', title: 'Forensic Extraction & OCR', desc: 'Dual-Mode OCR & Parser: PyMuPDF extracts vector streams; Windows Media & Tesseract OCR scan pixels.' },
-            { id: 'Detector', phase: 'Phase 2', title: 'Checksum RegEx & QR Forensics', desc: 'Algorithmic Validation: Verhoeff (Aadhaar), Luhn (Cards), ITD (PAN) & QR forensics prevent false positives.' },
-            { id: 'Assistant', phase: 'Phase 2', title: 'PrivacyAssistant AI Decision Core', desc: 'Context-Aware Threat Evaluation: Deterministic matrix classifies risks (Academic, Work, Public) into action tiers.' },
-            { id: 'Canvas', phase: 'Phase 3', title: 'Visual Redaction Studio', desc: 'Interactive Coordinate Mapping: User assigns Blur, Hide, Remove, or Keep selections on canvas.' },
-            { id: 'Raster', phase: 'Phase 3', title: 'Destructive Raster Burn-In', desc: 'Permanent Pixel Overwrite: OpenCV and Pillow irreversibly flatten target regions to prevent digital recovery.' },
-            { id: 'Purge', phase: 'Phase 3', title: 'Vector Purge & Metadata Wiping', desc: 'Anti-Forensic Sanitisation: PyMuPDF deletes underlying text streams; core/metadata_cleaner strips all EXIF/GPS tags.' },
-            { id: 'Cert', phase: 'Phase 4', title: 'Cryptographic Audit Certificate', desc: 'Integrity Verification: ReportLab issues verifiable PDF certificate containing SHA-256 hash pair.' },
-            { id: 'Download', phase: 'Phase 4', title: 'Sovereign Document Delivery', desc: 'Safer File Export: Sanitised file and tamper-evident certificate are downloaded with zero cloud footprint.' }
+            { id: 'Client', layerIndex: 0, title: 'Client Presentation Layer', desc: 'Browser Upload & Split View: Local document selection with synchronized split inspection.' },
+            { id: 'Server', layerIndex: 1, title: 'Application & Ephemeral Session', desc: 'MIME Verification & Isolation: Flask verifies magic-bytes and initializes isolated temporary storage.' },
+            { id: 'OCR', layerIndex: 2, title: 'Forensic Extraction & OCR', desc: 'Dual-Mode OCR & Parser: PyMuPDF extracts vector streams; Windows Media & Tesseract OCR scan pixels.' },
+            { id: 'Detector', layerIndex: 2, title: 'Checksum RegEx & QR Forensics', desc: 'Algorithmic Validation: Verhoeff (Aadhaar), Luhn (Cards), ITD (PAN) & QR forensics prevent false positives.' },
+            { id: 'Assistant', layerIndex: 3, title: 'PrivacyAssistant AI Decision Core', desc: 'Context-Aware Threat Evaluation: Deterministic matrix classifies risks (Academic, Work, Public) into action tiers.' },
+            { id: 'Canvas', layerIndex: 0, title: 'Visual Redaction Studio', desc: 'Interactive Coordinate Mapping: User assigns Blur, Hide, Remove, or Keep selections on canvas.' },
+            { id: 'Raster', layerIndex: 4, title: 'Destructive Raster Burn-In', desc: 'Permanent Pixel Overwrite: OpenCV and Pillow irreversibly flatten target regions to prevent digital recovery.' },
+            { id: 'Purge', layerIndex: 4, title: 'Vector Purge & Metadata Wiping', desc: 'Anti-Forensic Sanitisation: PyMuPDF deletes underlying text streams; core/metadata_cleaner strips all EXIF/GPS tags.' },
+            { id: 'Cert', layerIndex: 4, title: 'Cryptographic Audit Certificate', desc: 'Integrity Verification: ReportLab issues verifiable PDF certificate containing SHA-256 hash pair.' },
+            { id: 'Download', layerIndex: 0, title: 'Sovereign Document Delivery', desc: 'Safer File Export: Sanitised file and tamper-evident certificate are downloaded with zero cloud footprint.' }
         ];
 
         let currentStepIndex = 0;
@@ -598,11 +600,11 @@ flowchart TD
             const step = presentationSteps[index];
 
             if (presStepCounter) {
-                presStepCounter.textContent = `Step ${index + 1} of ${presentationSteps.length}`;
+                presStepCounter.textContent = 'Step ' + (index + 1) + ' of ' + presentationSteps.length;
             }
 
             if (presStepTitle) {
-                presStepTitle.textContent = `Step ${index + 1} • ${step.title}: ${step.desc}`;
+                presStepTitle.textContent = 'Step ' + (index + 1) + ' • ' + step.title + ': ' + step.desc;
             }
 
             if (btnPrevStep) {
@@ -612,21 +614,30 @@ flowchart TD
                 btnNextStep.disabled = (index === presentationSteps.length - 1);
             }
 
-            // Highlight node in Mermaid diagram
-            const allNodes = document.querySelectorAll('.mermaid .node');
-            allNodes.forEach(node => {
+            // 1. Highlight node in Mermaid diagram
+            const allNodes = document.querySelectorAll('.mermaid .node, .mermaid g[class*="node"]');
+            allNodes.forEach(function(node) {
                 node.classList.remove('active-stage');
             });
 
-            // Locate node by step.id
-            const targetNode = Array.from(allNodes).find(node => {
+            const targetNode = Array.from(allNodes).find(function(node) {
                 const idAttr = node.getAttribute('id') || '';
-                return idAttr.includes(step.id);
+                const text = node.textContent || '';
+                return idAttr.toLowerCase().includes(step.id.toLowerCase()) || text.includes(step.id);
             });
 
             if (targetNode) {
                 targetNode.classList.add('active-stage');
             }
+
+            // 2. Also highlight corresponding band in 5-Layer Software Architecture stage
+            const allBands = document.querySelectorAll('.arch-layer-band');
+            allBands.forEach(function(band, bIdx) {
+                band.classList.remove('active-band-highlight');
+                if (bIdx === step.layerIndex) {
+                    band.classList.add('active-band-highlight');
+                }
+            });
         }
 
         function playPresentation() {
@@ -636,7 +647,7 @@ flowchart TD
             if (btnPlayText) btnPlayText.textContent = 'Pause';
             if (btnPlayPause) btnPlayPause.classList.add('playing');
 
-            playInterval = setInterval(() => {
+            playInterval = setInterval(function() {
                 if (currentStepIndex < presentationSteps.length - 1) {
                     updateStepUI(currentStepIndex + 1);
                 } else {
@@ -647,8 +658,10 @@ flowchart TD
 
         function pausePresentation() {
             isAutoPlaying = false;
-            clearInterval(playInterval);
-            playInterval = null;
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+            }
             if (playIcon) playIcon.className = 'fa-solid fa-play';
             if (btnPlayText) btnPlayText.textContent = 'Play Presentation';
             if (btnPlayPause) btnPlayPause.classList.remove('playing');
@@ -694,10 +707,8 @@ flowchart TD
             });
         }
 
-        // Initialize at Step 1 after Mermaid renders
-        setTimeout(() => {
-            updateStepUI(0);
-        }, 700);
+        // Initialize at Step 1
+        updateStepUI(0);
     });
 </script>
 {% endblock %}
