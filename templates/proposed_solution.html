@@ -3,7 +3,7 @@
 {% block title %}Proposed Solution &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
 
 {% block content %}
-<div class="info-page-wrapper">
+<div class="info-page-wrapper pres-animate-in">
     <!-- Breadcrumb & Status Bar -->
     <div class="info-breadcrumb-bar">
         <div class="info-breadcrumb-inner">
@@ -12,7 +12,8 @@
             <span class="breadcrumb-current">Proposed Solution</span>
         </div>
         <div class="breadcrumb-meta-chips">
-            <span class="meta-tag"><i class="fa-solid fa-shield-halved"></i> Solution Overview</span>
+            <span class="meta-tag"><i class="fa-solid fa-shield-halved"></i> Solution Presentation</span>
+            <span class="meta-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> Visual Redaction Studio</span>
         </div>
     </div>
 
@@ -28,72 +29,195 @@
 
     <!-- Main Content Body -->
     <div class="info-content-grid">
-        <section class="info-card section-card">
+        <section class="info-card section-card pres-card">
             <div class="card-body-text" style="font-size: 1.05rem; line-height: 1.8; color: var(--ink-primary);">
-                <p style="margin-bottom: 1.25rem;">
+                <p style="margin-bottom: 1.5rem;">
                     ShareSafe is a web-based privacy protection application that allows users to upload documents and images before sharing them with others.
                 </p>
-                <p style="margin-bottom: 1.75rem;">
-                    The application scans the uploaded files to identify potentially sensitive information, highlights the detected content and informs users about the associated privacy risks.
-                </p>
 
-                <p style="margin-bottom: 1.25rem; font-weight: 600; color: var(--ink-primary);">
-                    It then gives users the option to take appropriate action, such as:
-                </p>
-
-                <div class="vectors-grid" style="margin-bottom: 2rem;">
-                    <!-- Action: Blur -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1.1rem;">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </div>
-                        <h3 class="vector-title" style="margin: 0 0 6px; font-size: 1.05rem; color: var(--ink-primary);">Blur</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.95rem; color: var(--ink-secondary); line-height: 1.5;">
-                            Blur sensitive information while retaining the surrounding content.
-                        </p>
+                <!-- Process Flow Illustration: How ShareSafe Protects a Document -->
+                <div class="process-flow-track">
+                    <div class="process-step-node">
+                        <div class="step-number-bubble">1</div>
+                        <div class="step-label"><i class="fa-solid fa-arrow-up-from-bracket" style="color: var(--coral-primary); margin-right: 4px;"></i> Upload &amp; Scan</div>
+                        <div class="step-sub">Pre-share upload of PDFs, screenshots &amp; images for local audit.</div>
                     </div>
 
-                    <!-- Action: Hide -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1.1rem;">
-                            <i class="fa-solid fa-eye-slash"></i>
-                        </div>
-                        <h3 class="vector-title" style="margin: 0 0 6px; font-size: 1.05rem; color: var(--ink-primary);">Hide</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.95rem; color: var(--ink-secondary); line-height: 1.5;">
-                            Conceal selected information from view.
-                        </p>
+                    <div class="process-step-node">
+                        <div class="step-number-bubble">2</div>
+                        <div class="step-label"><i class="fa-solid fa-magnifying-glass-chart" style="color: var(--amber-primary); margin-right: 4px;"></i> Detect &amp; Inform</div>
+                        <div class="step-sub">Identifies sensitive entities &amp; highlights privacy threat levels.</div>
                     </div>
 
-                    <!-- Action: Remove -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1.1rem;">
-                            <i class="fa-solid fa-eraser"></i>
-                        </div>
-                        <h3 class="vector-title" style="margin: 0 0 6px; font-size: 1.05rem; color: var(--ink-primary);">Remove</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.95rem; color: var(--ink-secondary); line-height: 1.5;">
-                            Permanently redact sensitive information from the file.
-                        </p>
-                    </div>
-
-                    <!-- Action: Keep -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1.1rem;">
-                            <i class="fa-solid fa-shield-check"></i>
-                        </div>
-                        <h3 class="vector-title" style="margin: 0 0 6px; font-size: 1.05rem; color: var(--ink-primary);">Keep</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.95rem; color: var(--ink-secondary); line-height: 1.5;">
-                            Retain the information if the user considers it safe to share.
-                        </p>
+                    <div class="process-step-node">
+                        <div class="step-number-bubble">3</div>
+                        <div class="step-label"><i class="fa-solid fa-file-circle-check" style="color: var(--sage-primary); margin-right: 4px;"></i> Action &amp; Export</div>
+                        <div class="step-sub">Apply Blur, Hide, Remove or Keep and download safer file.</div>
                     </div>
                 </div>
 
-                <p style="margin-bottom: 1.5rem;">
+                <p style="margin-top: 1.75rem; margin-bottom: 1.5rem;">
+                    The application scans the uploaded files to identify potentially sensitive information, highlights the detected content and informs users about the associated privacy risks.
+                </p>
+
+                <!-- Before vs After Interactive Document Comparison -->
+                <div class="before-after-stage-grid">
+                    <!-- Before Document Card -->
+                    <div class="stage-preview-card before">
+                        <div class="stage-badge-header">
+                            <span class="stage-pill coral">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Before: Unprotected File
+                            </span>
+                            <span style="font-size: 0.75rem; color: var(--coral-primary); font-weight: 600;">High Risk</span>
+                        </div>
+                        <div class="stage-sheet-mock">
+                            <div style="font-size: 0.75rem; color: var(--ink-muted); margin-bottom: 8px; border-bottom: 1px dashed var(--border-stone); padding-bottom: 4px;">
+                                RECORD_ORIGINAL_TRANSACTION.PDF
+                            </div>
+                            <div style="margin-bottom: 6px;">Patient: Johnathan Doe</div>
+                            <div style="margin-bottom: 6px; padding: 2px 6px; border: 1px solid var(--coral-border); background: var(--coral-soft); border-radius: 4px; display: inline-block;">
+                                Phone: <strong>+91 98765 43210</strong>
+                            </div>
+                            <div style="margin-bottom: 6px; padding: 2px 6px; border: 1px solid var(--coral-border); background: var(--coral-soft); border-radius: 4px; display: inline-block;">
+                                Aadhaar: <strong>2345 6789 0123</strong>
+                            </div>
+                            <div style="margin-bottom: 6px; padding: 2px 6px; border: 1px solid var(--coral-border); background: var(--coral-soft); border-radius: 4px; display: inline-block;">
+                                Email: <strong>j.doe@confidential.org</strong>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.72rem; color: var(--coral-primary);">
+                                <i class="fa-solid fa-circle-xmark"></i> 3 sensitive entities exposed in open view
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- After Document Card -->
+                    <div class="stage-preview-card after">
+                        <div class="stage-badge-header">
+                            <span class="stage-pill sage">
+                                <i class="fa-solid fa-shield-halved"></i> After: Protected Safer File
+                            </span>
+                            <span style="font-size: 0.75rem; color: var(--sage-primary); font-weight: 600;">Zero Leakage</span>
+                        </div>
+                        <div class="stage-sheet-mock">
+                            <div style="font-size: 0.75rem; color: var(--ink-muted); margin-bottom: 8px; border-bottom: 1px dashed var(--border-stone); padding-bottom: 4px;">
+                                SAFE_SANITISED_EXPORT.PDF
+                            </div>
+                            <div style="margin-bottom: 6px;">
+                                Patient: <span class="redact-swatch-keep">Johnathan Doe ✓</span>
+                            </div>
+                            <div style="margin-bottom: 6px;">
+                                Phone: <span class="redact-swatch-blur">+91 98765 43210</span>
+                            </div>
+                            <div style="margin-bottom: 6px;">
+                                Aadhaar: <span class="redact-swatch-remove">████████████</span>
+                            </div>
+                            <div style="margin-bottom: 6px;">
+                                Email: <span class="redact-swatch-hide">[Concealed]</span>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.72rem; color: var(--sage-primary);">
+                                <i class="fa-solid fa-circle-check"></i> Irreversibly sanitised, metadata stripped
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1.5rem; margin-bottom: 1.25rem; font-weight: 600; color: var(--ink-primary);">
+                    It then gives users the option to take appropriate action, such as:
+                </p>
+
+                <!-- Attractive Action Cards Showcase -->
+                <div class="action-cards-grid">
+                    <!-- Blur Card -->
+                    <div class="action-showcase-card">
+                        <div class="action-card-top">
+                            <div class="action-icon-pill" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+                            <h3 class="action-title">
+                                Blur
+                                <span style="font-size: 0.72rem; font-weight: 500; color: var(--sage-primary); background: var(--sage-soft); padding: 2px 8px; border-radius: var(--radius-pill);">Context Preserved</span>
+                            </h3>
+                            <p class="action-desc">
+                                Blur sensitive information while retaining the surrounding content.
+                            </p>
+                        </div>
+                        <div class="action-preview-box">
+                            <span>Visual Effect:</span>
+                            <span class="redact-swatch-blur">+91 98765 43210</span>
+                        </div>
+                    </div>
+
+                    <!-- Hide Card -->
+                    <div class="action-showcase-card">
+                        <div class="action-card-top">
+                            <div class="action-icon-pill" style="background: var(--amber-soft); color: var(--amber-primary);">
+                                <i class="fa-solid fa-eye-slash"></i>
+                            </div>
+                            <h3 class="action-title">
+                                Hide
+                                <span style="font-size: 0.72rem; font-weight: 500; color: var(--amber-primary); background: var(--amber-soft); padding: 2px 8px; border-radius: var(--radius-pill);">Masked Surface</span>
+                            </h3>
+                            <p class="action-desc">
+                                Conceal selected information from view.
+                            </p>
+                        </div>
+                        <div class="action-preview-box">
+                            <span>Visual Effect:</span>
+                            <span class="redact-swatch-hide">••••••••••</span>
+                        </div>
+                    </div>
+
+                    <!-- Remove Card -->
+                    <div class="action-showcase-card">
+                        <div class="action-card-top">
+                            <div class="action-icon-pill" style="background: var(--coral-soft); color: var(--coral-primary);">
+                                <i class="fa-solid fa-eraser"></i>
+                            </div>
+                            <h3 class="action-title">
+                                Remove
+                                <span style="font-size: 0.72rem; font-weight: 500; color: var(--coral-primary); background: var(--coral-soft); padding: 2px 8px; border-radius: var(--radius-pill);">Permanent Burn-in</span>
+                            </h3>
+                            <p class="action-desc">
+                                Permanently redact sensitive information from the file.
+                            </p>
+                        </div>
+                        <div class="action-preview-box">
+                            <span>Visual Effect:</span>
+                            <span class="redact-swatch-remove">██████████</span>
+                        </div>
+                    </div>
+
+                    <!-- Keep Card -->
+                    <div class="action-showcase-card">
+                        <div class="action-card-top">
+                            <div class="action-icon-pill" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                <i class="fa-solid fa-shield-check"></i>
+                            </div>
+                            <h3 class="action-title">
+                                Keep
+                                <span style="font-size: 0.72rem; font-weight: 500; color: var(--sage-primary); background: var(--sage-soft); padding: 2px 8px; border-radius: var(--radius-pill);">User Verified</span>
+                            </h3>
+                            <p class="action-desc">
+                                Retain the information if the user considers it safe to share.
+                            </p>
+                        </div>
+                        <div class="action-preview-box">
+                            <span>Visual Effect:</span>
+                            <span class="redact-swatch-keep">Safe Data ✓</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1.75rem; margin-bottom: 1.5rem;">
                     After making the necessary changes, users can generate and download a safer version of their original file.
                 </p>
 
-                <div class="highlight-callout-teal" style="margin-top: 1.5rem;">
-                    <i class="fa-solid fa-shield-halved quote-icon"></i>
-                    <p style="font-style: normal; font-weight: 500; font-size: 1.02rem; line-height: 1.7;">
+                <!-- Core Mission Banner -->
+                <div class="highlight-callout-teal" style="margin-top: 1.5rem; display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--sage-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <p style="font-style: normal; font-weight: 500; font-size: 1.05rem; line-height: 1.7; color: var(--ink-primary); margin: 0;">
                         ShareSafe aims to make privacy protection a conscious step before every file is shared.
                     </p>
                 </div>

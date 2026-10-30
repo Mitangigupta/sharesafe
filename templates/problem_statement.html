@@ -3,7 +3,7 @@
 {% block title %}Problem Statement &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
 
 {% block content %}
-<div class="info-page-wrapper">
+<div class="info-page-wrapper pres-animate-in">
     <!-- Breadcrumb & Status Bar -->
     <div class="info-breadcrumb-bar">
         <div class="info-breadcrumb-inner">
@@ -12,7 +12,8 @@
             <span class="breadcrumb-current">Problem Statement</span>
         </div>
         <div class="breadcrumb-meta-chips">
-            <span class="meta-tag"><i class="fa-solid fa-triangle-exclamation"></i> Privacy Challenge</span>
+            <span class="meta-tag"><i class="fa-solid fa-triangle-exclamation"></i> Security Risk Presentation</span>
+            <span class="meta-tag"><i class="fa-solid fa-eye"></i> Visual Threat Model</span>
         </div>
     </div>
 
@@ -28,17 +29,169 @@
 
     <!-- Main Content Body -->
     <div class="info-content-grid">
-        <section class="info-card section-card">
+        <!-- Overview & Lead Card -->
+        <section class="info-card section-card pres-card">
             <div class="card-body-text" style="font-size: 1.05rem; line-height: 1.8; color: var(--ink-primary);">
                 <p style="margin-bottom: 1.5rem;">
                     In today's digital world, people frequently share documents, screenshots and images without realizing that these files may contain sensitive personal information. Details such as phone numbers, email addresses, identification numbers, home addresses and hidden document metadata can unintentionally be exposed.
                 </p>
-                <p style="margin-bottom: 1.5rem;">
+
+                <!-- Visual Illustration: Digital Document with Leaking Vulnerabilities -->
+                <div class="doc-leak-visual-container">
+                    <div class="mock-doc-sheet">
+                        <div class="mock-doc-header">
+                            <div class="mock-doc-brand">
+                                <i class="fa-solid fa-file-invoice"></i>
+                                <span>SAMPLE_DOCUMENT_INVOICE.PDF</span>
+                            </div>
+                            <span class="mock-doc-status-pill">
+                                <i class="fa-solid fa-radiation"></i> Unintended Exposure in Stream
+                            </span>
+                        </div>
+
+                        <div class="mock-doc-body">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <div class="mock-doc-line short"></div>
+                                <div class="mock-doc-line" style="width: 20%;"></div>
+                            </div>
+
+                            <!-- Leaked Phone Number & Email -->
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                                <span style="font-size: 0.82rem; color: var(--ink-muted);">Client Contact:</span>
+                                <span class="vuln-hotspot danger" title="Exposed Telephone Record">
+                                    <i class="fa-solid fa-phone"></i> +91 98765 43210
+                                    <span class="vuln-tag">Phone Number</span>
+                                </span>
+                                <span class="vuln-hotspot danger" title="Exposed Direct Email">
+                                    <i class="fa-solid fa-envelope"></i> rohan.sharma@healthnet.org
+                                    <span class="vuln-tag">Email Address</span>
+                                </span>
+                            </div>
+
+                            <!-- Leaked ID Number & Address -->
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0;">
+                                <span style="font-size: 0.82rem; color: var(--ink-muted);">Identity Proof:</span>
+                                <span class="vuln-hotspot warning" title="Exposed Statutory ID">
+                                    <i class="fa-solid fa-id-card"></i> Aadhaar / UID: 2345 6789 0123
+                                    <span class="vuln-tag">Identification Number</span>
+                                </span>
+                                <span class="vuln-hotspot warning" title="Exposed Home Address">
+                                    <i class="fa-solid fa-location-dot"></i> Flat 402, Green Avenue, Delhi
+                                    <span class="vuln-tag">Home Address</span>
+                                </span>
+                            </div>
+
+                            <div class="mock-doc-line"></div>
+                            <div class="mock-doc-line med"></div>
+
+                            <!-- Leaked Hidden Metadata -->
+                            <div style="margin-top: 8px; padding-top: 10px; border-top: 1px dashed var(--border-stone); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                                <span style="font-size: 0.76rem; color: var(--ink-muted);">Embedded File Properties:</span>
+                                <span class="vuln-hotspot meta" title="Exposed EXIF Camera & Geo Tags">
+                                    <i class="fa-solid fa-camera"></i> EXIF: GPS Lat 28.6139° N, Device iPhone 14 Pro
+                                    <span class="vuln-tag">Hidden Document Metadata</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Highlighted Examples Showcase Cards -->
+                <div class="examples-grid-strip">
+                    <div class="example-feature-card">
+                        <div class="example-feature-icon" style="background: var(--coral-soft); color: var(--coral-primary);">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <div class="example-feature-title">Phone Numbers</div>
+                            <div class="example-feature-sub">Direct mobile lines</div>
+                        </div>
+                    </div>
+
+                    <div class="example-feature-card">
+                        <div class="example-feature-icon" style="background: var(--coral-soft); color: var(--coral-primary);">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div>
+                            <div class="example-feature-title">Email Addresses</div>
+                            <div class="example-feature-sub">Work &amp; personal accounts</div>
+                        </div>
+                    </div>
+
+                    <div class="example-feature-card">
+                        <div class="example-feature-icon" style="background: var(--amber-soft); color: var(--amber-primary);">
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                        <div>
+                            <div class="example-feature-title">Identification Numbers</div>
+                            <div class="example-feature-sub">Aadhaar, PAN, SSN, IDs</div>
+                        </div>
+                    </div>
+
+                    <div class="example-feature-card">
+                        <div class="example-feature-icon" style="background: var(--amber-soft); color: var(--amber-primary);">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <div class="example-feature-title">Home Addresses</div>
+                            <div class="example-feature-sub">Geographic residences</div>
+                        </div>
+                    </div>
+
+                    <div class="example-feature-card">
+                        <div class="example-feature-icon" style="background: var(--sage-soft); color: var(--sage-primary);">
+                            <i class="fa-solid fa-file-code"></i>
+                        </div>
+                        <div>
+                            <div class="example-feature-title">Hidden Metadata</div>
+                            <div class="example-feature-sub">EXIF, GPS &amp; author data</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1.5rem; margin-bottom: 1.25rem;">
                     Such information, once shared, may lead to privacy breaches, identity theft or misuse of personal data. However, users often lack an easy and accessible way to identify these risks before sharing their files.
                 </p>
-                <div class="highlight-callout-teal" style="margin-top: 1.75rem;">
-                    <i class="fa-solid fa-circle-exclamation quote-icon"></i>
-                    <p style="font-style: normal; font-weight: 500; font-size: 1.02rem; line-height: 1.7;">
+
+                <!-- Consequences Storytelling Infographic -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 1.75rem;">
+                    <div style="padding: 14px; background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 8px; background: var(--coral-soft); color: var(--coral-primary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; font-size: 0.9rem; color: var(--ink-primary);">Privacy Breaches</strong>
+                            <span style="font-size: 0.78rem; color: var(--ink-muted);">Uncontrolled data leakage</span>
+                        </div>
+                    </div>
+
+                    <div style="padding: 14px; background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 8px; background: var(--amber-soft); color: var(--amber-primary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-user-ninja"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; font-size: 0.9rem; color: var(--ink-primary);">Identity Theft</strong>
+                            <span style="font-size: 0.78rem; color: var(--ink-muted);">Credential misuse &amp; fraud</span>
+                        </div>
+                    </div>
+
+                    <div style="padding: 14px; background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 8px; background: var(--sage-soft); color: var(--sage-primary); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; font-size: 0.9rem; color: var(--ink-primary);">Misuse of Personal Data</strong>
+                            <span style="font-size: 0.78rem; color: var(--ink-muted);">Permanent public exposure</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Standout Core Problem Banner -->
+                <div class="core-problem-centerpiece">
+                    <div class="core-problem-badge">
+                        <i class="fa-solid fa-circle-exclamation"></i> The Core Problem Formulation
+                    </div>
+                    <p class="core-problem-text">
                         The core problem is the absence of a simple, user-friendly solution that detects potentially sensitive information and helps individuals protect their privacy before sharing digital files.
                     </p>
                 </div>

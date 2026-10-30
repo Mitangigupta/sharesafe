@@ -3,7 +3,7 @@
 {% block title %}Next Milestones &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
 
 {% block content %}
-<div class="info-page-wrapper">
+<div class="info-page-wrapper pres-animate-in">
     <!-- Breadcrumb & Status Bar -->
     <div class="info-breadcrumb-bar">
         <div class="info-breadcrumb-inner">
@@ -12,7 +12,8 @@
             <span class="breadcrumb-current">Next Milestones</span>
         </div>
         <div class="breadcrumb-meta-chips">
-            <span class="meta-tag"><i class="fa-solid fa-flag-checkered"></i> Roadmap</span>
+            <span class="meta-tag"><i class="fa-solid fa-flag-checkered"></i> Strategic Roadmap</span>
+            <span class="meta-tag"><i class="fa-solid fa-route"></i> Phased Timeline</span>
         </div>
     </div>
 
@@ -22,96 +23,129 @@
             <span class="kicker-pill"><i class="fa-solid fa-flag-checkered"></i> Next Milestones</span>
         </div>
         <h1 class="info-hero-title">
-            ShareSafe <span class="teal-gradient-text">Next Milestones</span> &amp; Roadmap
+            ShareSafe <span class="teal-gradient-text">Next Milestones</span> &amp; Strategic Roadmap
         </h1>
+        <p class="info-hero-lead">
+            A connected visual engineering roadmap tracing ShareSafe's evolution from a standalone workbench into a ubiquitous, pre-share privacy protection shield.
+        </p>
     </header>
 
     <!-- Main Content Body -->
     <div class="info-content-grid">
-        <!-- Milestone 1 -->
-        <section class="info-card section-card milestone-card">
-            <div class="milestone-header-row" style="margin-bottom: 8px;">
-                <div class="milestone-badge-box">
-                    <span class="m-num">1</span>
+        <!-- Connected Visual Roadmap Timeline Track -->
+        <div class="timeline-track-container">
+            <div class="timeline-spine"></div>
+
+            <!-- Milestone 1 -->
+            <div class="timeline-item-row node-active">
+                <div class="timeline-node-circle">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--coral-primary); text-transform: uppercase;">Node</span>
+                    <span>1</span>
+                </div>
+                <div class="timeline-card-content pres-card">
+                    <div class="milestone-num-label">
+                        <i class="fa-solid fa-puzzle-piece"></i> Milestone 1 &bull; Client Ecosystem
+                    </div>
+                    <h2 class="milestone-title-text">
+                        Browser Extension Development
+                    </h2>
+                    <p class="milestone-desc-text">
+                        Develop a downloadable browser extension that brings ShareSafe's privacy-checking capabilities directly into the browsing experience, reducing the need for users to manually upload files to the website.
+                    </p>
                 </div>
             </div>
-            <h2 class="milestone-title" style="margin: 0 0 10px; font-size: 1.25rem; color: var(--ink-primary);">
-                Browser Extension Development
-            </h2>
-            <p class="milestone-desc" style="margin: 0; font-size: 1rem; color: var(--ink-secondary); line-height: 1.7;">
-                Develop a downloadable browser extension that brings ShareSafe's privacy-checking capabilities directly into the browsing experience, reducing the need for users to manually upload files to the website.
-            </p>
-        </section>
 
-        <!-- Milestone 2 -->
-        <section class="info-card section-card milestone-card">
-            <div class="milestone-header-row" style="margin-bottom: 8px;">
-                <div class="milestone-badge-box">
-                    <span class="m-num">2</span>
+            <!-- Milestone 2 -->
+            <div class="timeline-item-row">
+                <div class="timeline-node-circle">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--coral-primary); text-transform: uppercase;">Node</span>
+                    <span>2</span>
+                </div>
+                <div class="timeline-card-content pres-card">
+                    <div class="milestone-num-label">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Milestone 2 &bull; Platform Ecosystem
+                    </div>
+                    <h2 class="milestone-title-text">
+                        Integration with Supported Platforms
+                    </h2>
+                    <p class="milestone-desc-text">
+                        Explore integration with commonly used web-based platforms where users upload, attach or share files, allowing privacy checks to become part of the file-sharing process.
+                    </p>
                 </div>
             </div>
-            <h2 class="milestone-title" style="margin: 0 0 10px; font-size: 1.25rem; color: var(--ink-primary);">
-                Integration with Supported Platforms
-            </h2>
-            <p class="milestone-desc" style="margin: 0; font-size: 1rem; color: var(--ink-secondary); line-height: 1.7;">
-                Explore integration with commonly used web-based platforms where users upload, attach or share files, allowing privacy checks to become part of the file-sharing process.
-            </p>
-        </section>
 
-        <!-- Milestone 3 -->
-        <section class="info-card section-card milestone-card">
-            <div class="milestone-header-row" style="margin-bottom: 8px;">
-                <div class="milestone-badge-box">
-                    <span class="m-num">3</span>
+            <!-- Milestone 3 -->
+            <div class="timeline-item-row">
+                <div class="timeline-node-circle">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--coral-primary); text-transform: uppercase;">Node</span>
+                    <span>3</span>
+                </div>
+                <div class="timeline-card-content pres-card">
+                    <div class="milestone-num-label">
+                        <i class="fa-solid fa-shield-virus"></i> Milestone 3 &bull; Automated Defense
+                    </div>
+                    <h2 class="milestone-title-text">
+                        Automated Privacy Screening
+                    </h2>
+                    <p class="milestone-desc-text">
+                        Work towards automatically screening files when users attempt to upload or share them on supported platforms, providing warnings about potential information exposure before the file is sent.
+                    </p>
                 </div>
             </div>
-            <h2 class="milestone-title" style="margin: 0 0 10px; font-size: 1.25rem; color: var(--ink-primary);">
-                Automated Privacy Screening
-            </h2>
-            <p class="milestone-desc" style="margin: 0; font-size: 1rem; color: var(--ink-secondary); line-height: 1.7;">
-                Work towards automatically screening files when users attempt to upload or share them on supported platforms, providing warnings about potential information exposure before the file is sent.
-            </p>
-        </section>
 
-        <!-- Milestone 4 -->
-        <section class="info-card section-card milestone-card">
-            <div class="milestone-header-row" style="margin-bottom: 8px;">
-                <div class="milestone-badge-box">
-                    <span class="m-num">4</span>
+            <!-- Milestone 4 -->
+            <div class="timeline-item-row">
+                <div class="timeline-node-circle">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--coral-primary); text-transform: uppercase;">Node</span>
+                    <span>4</span>
+                </div>
+                <div class="timeline-card-content pres-card">
+                    <div class="milestone-num-label">
+                        <i class="fa-solid fa-compass"></i> Milestone 4 &bull; Intelligence Calibration
+                    </div>
+                    <h2 class="milestone-title-text">
+                        Improved Context-Aware Recommendations
+                    </h2>
+                    <p class="milestone-desc-text">
+                        Further develop the recommendation system so that privacy warnings and protection suggestions become more relevant to the purpose of sharing and the intended audience.
+                    </p>
                 </div>
             </div>
-            <h2 class="milestone-title" style="margin: 0 0 10px; font-size: 1.25rem; color: var(--ink-primary);">
-                Improved Context-Aware Recommendations
-            </h2>
-            <p class="milestone-desc" style="margin: 0; font-size: 1rem; color: var(--ink-secondary); line-height: 1.7;">
-                Further develop the recommendation system so that privacy warnings and protection suggestions become more relevant to the purpose of sharing and the intended audience.
-            </p>
-        </section>
 
-        <!-- Milestone 5 -->
-        <section class="info-card section-card milestone-card">
-            <div class="milestone-header-row" style="margin-bottom: 8px;">
-                <div class="milestone-badge-box">
-                    <span class="m-num">5</span>
+            <!-- Milestone 5 -->
+            <div class="timeline-item-row">
+                <div class="timeline-node-circle">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--coral-primary); text-transform: uppercase;">Node</span>
+                    <span>5</span>
+                </div>
+                <div class="timeline-card-content pres-card">
+                    <div class="milestone-num-label">
+                        <i class="fa-solid fa-chart-line"></i> Milestone 5 &bull; Verification &amp; Scale
+                    </div>
+                    <h2 class="milestone-title-text">
+                        Testing, Optimisation and Expansion
+                    </h2>
+                    <p class="milestone-desc-text">
+                        Evaluate detection accuracy, minimise false alerts, improve processing efficiency and expand the range of supported file formats and sharing environments.
+                    </p>
                 </div>
             </div>
-            <h2 class="milestone-title" style="margin: 0 0 10px; font-size: 1.25rem; color: var(--ink-primary);">
-                Testing, Optimisation and Expansion
-            </h2>
-            <p class="milestone-desc" style="margin: 0; font-size: 1rem; color: var(--ink-secondary); line-height: 1.7;">
-                Evaluate detection accuracy, minimise false alerts, improve processing efficiency and expand the range of supported file formats and sharing environments.
-            </p>
-        </section>
+        </div>
 
-        <!-- Long-Term Vision Callout -->
-        <div class="highlight-callout-teal" style="margin-top: 1rem;">
-            <i class="fa-solid fa-compass quote-icon"></i>
-            <div>
-                <strong style="color: var(--ink-primary); font-size: 1.05rem; display: block; margin-bottom: 6px;">Long-Term Vision</strong>
-                <p style="font-style: normal; font-size: 0.98rem; line-height: 1.7; color: var(--ink-primary); margin: 0;">
-                    Transform ShareSafe from a standalone web application into an integrated privacy protection tool that helps users safeguard their personal information across different digital sharing environments.
-                </p>
+        <!-- Long-Term Vision Flagship Showcase Banner -->
+        <div class="long-term-vision-banner pres-card">
+            <div class="vision-header-row">
+                <div class="vision-icon-monogram">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <span class="vision-label">Strategic Horizon</span>
+                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--ink-primary);">Long-Term Vision</h3>
+                </div>
             </div>
+            <p class="vision-text-lead">
+                Transform ShareSafe from a standalone web application into an integrated privacy protection tool that helps users safeguard their personal information across different digital sharing environments.
+            </p>
         </div>
     </div>
 

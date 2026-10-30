@@ -3,7 +3,7 @@
 {% block title %}Architecture Design &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
 
 {% block content %}
-<div class="info-page-wrapper">
+<div class="info-page-wrapper pres-animate-in">
     <!-- Breadcrumb & Status Bar -->
     <div class="info-breadcrumb-bar">
         <div class="info-breadcrumb-inner">
@@ -13,6 +13,7 @@
         </div>
         <div class="breadcrumb-meta-chips">
             <span class="meta-tag"><i class="fa-solid fa-network-wired"></i> System Architecture</span>
+            <span class="meta-tag"><i class="fa-solid fa-microchip"></i> Verified Tech Stack</span>
         </div>
     </div>
 
@@ -31,40 +32,73 @@
 
     <!-- Main Content Body -->
     <div class="info-content-grid">
-        <!-- Architecture Diagram Card -->
-        <section class="info-card section-card">
+        <!-- Interactive Visual Architecture Diagram Card -->
+        <section class="info-card section-card pres-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-diagram-project"></i></div>
                 <div>
-                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">System Architecture Diagram</h2>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">System Architecture &amp; Data Flow Diagram</h2>
                 </div>
             </div>
             <div class="card-body-text">
-                <div class="diagram-render-container" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center;">
-                    <div class="mermaid" style="width: 100%; text-align: center;">
-flowchart TD
-    Client["Client Layer (Frontend)<br/>Jinja2, HTML5 Canvas, Vanilla JS"]
-    Server["Application Layer (Backend)<br/>Python 3.13 / Flask 3, Ephemeral Session Manager"]
+                <p style="margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--ink-secondary);">
+                    The following visual architecture traces information flow through ShareSafe's verified components — from browser upload, dual-mode OCR and context-aware AI risk analysis, to permanent raster burn-in and metadata stripping:
+                </p>
 
-    subgraph Core ["Processing &amp; Intelligence Core"]
-        Detect["OCR &amp; Detection Mechanisms<br/>PyMuPDF Native Text, Windows OCR / Tesseract, Contextual Regex, OpenCV QR"]
-        AI["AI Assistance Engine<br/>Local Context-Aware PrivacyAssistant"]
-        Sanitize["File Processing &amp; Sanitisation<br/>Destructive Raster Burn-in, Vector Stream Stripping, MetadataCleaner"]
+                <div class="diagram-render-container" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center; overflow-x: auto;">
+                    <div class="mermaid" style="width: 100%; min-width: 680px; text-align: center;">
+flowchart TD
+    subgraph Client ["Client Layer (Frontend)"]
+        UI["Jinja2 Templates &amp; Responsive UI<br/>(Warm Cream, Rose &amp; Teal Palette)"]
+        Canvas["HTML5 Canvas Annotation Engine<br/>(canvas_editor.js &amp; app.js)"]
+        Split["Before / After Split Comparison"]
     end
 
-    Client -->|1. Upload File| Server
-    Server -->|2. Ingest &amp; Parse| Detect
-    Detect -->|3. Structured Findings| AI
-    AI -->|4. Risk Advice &amp; Recommendations| Client
-    Client -->|5. Apply Actions: Blur, Hide, Remove, Keep| Sanitize
-    Sanitize -->|6. Download Sanitised File &amp; Certificate| Client
+    subgraph Server ["Application Layer (Backend)"]
+        Flask["Flask 3 Web Framework (Python 3.13)"]
+        SessionMgr["Ephemeral Session Manager (Session Isolation)"]
+        Router["Session Routing &amp; File Ingestion Engine"]
+    end
+
+    subgraph Core ["Processing &amp; Intelligence Core"]
+        subgraph DetectionEngines ["OCR &amp; Detection Mechanisms"]
+            PDFParse["PyMuPDF Native Vector Text Parser"]
+            OCREngine["Dual-Mode OCR Engine<br/>(Windows Media OCR &amp; Tesseract pytesseract)"]
+            RegexEngine["SensitiveDetector Contextual Regex<br/>(Verhoeff for Aadhaar, Luhn for Cards, ITD for PAN)"]
+            QREngine["OpenCV QR Forensics Decoder (cv2.QRCodeDetector)"]
+        end
+
+        subgraph AIAssistanceEngine ["AI Assistance"]
+            Assistant["PrivacyAssistant Decision Matrix (core/privacy_assistant.py)<br/>Context-Aware Risk Evaluation (Academic, Professional, Private, Public)"]
+        end
+
+        subgraph SanitisationPipeline ["File Processing &amp; Sanitisation"]
+            RasterRedact["Destructive Raster Redactor (OpenCV &amp; Pillow)<br/>Permanent Burn-in: Blur, Hide, Remove, Keep"]
+            VectorPurge["PyMuPDF Content Stream Purge"]
+            MetaClean["MetadataCleaner (EXIF, GPS, Camera History)"]
+            CertGen["ReportLab Audit Certificate Generator"]
+        end
+    end
+
+    UI -->|1. File Upload POST| Router
+    Router --> SessionMgr
+    SessionMgr --> PDFParse
+    SessionMgr --> OCREngine
+    PDFParse &amp; OCREngine --> RegexEngine
+    RegexEngine &amp; QREngine -->|2. Detections &amp; Payloads| Assistant
+    Assistant -->|3. Risk Advice &amp; Recommendations| Canvas
+    Canvas -->|4. User Redaction Actions| RasterRedact
+    RasterRedact --> VectorPurge
+    VectorPurge --> MetaClean
+    MetaClean --> CertGen
+    CertGen -->|5. Safer Sanitised File Download| UI
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Technical Specification Sections -->
-        <section class="info-card section-card">
+        <!-- Technical Specification Sections (7 Required Verified Technology Areas) -->
+        <section class="info-card section-card pres-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-layer-group"></i></div>
                 <div>
@@ -74,81 +108,81 @@ flowchart TD
             <div class="card-body-text">
                 <div class="vectors-grid" style="gap: 20px;">
                     <!-- Frontend -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1rem;">
+                    <div class="vector-box pres-card" style="padding: 1.4rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
+                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.05rem;">
                             <i class="fa-solid fa-desktop"></i>
                         </div>
                         <h3 class="vector-title" style="margin: 0 0 8px; font-size: 1.1rem; color: var(--ink-primary);">Frontend</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.6;">
+                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65;">
                             Server-rendered Jinja2 templates styled with a cream/off-white palette, muted rose accents, and teal details. Reactive client interactions via vanilla JavaScript (<code style="font-family: var(--font-mono); font-size: 0.82rem;">app.js</code>, <code style="font-family: var(--font-mono); font-size: 0.82rem;">canvas_editor.js</code>), HTML5 Canvas for bounding box annotations, and synchronized Before/After visual split comparison.
                         </p>
                     </div>
 
                     <!-- Backend -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1rem;">
+                    <div class="vector-box pres-card" style="padding: 1.4rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
+                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.05rem;">
                             <i class="fa-solid fa-server"></i>
                         </div>
                         <h3 class="vector-title" style="margin: 0 0 8px; font-size: 1.1rem; color: var(--ink-primary);">Backend</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.6;">
+                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65;">
                             Python 3.13 and Flask 3 web framework managing session routing, multi-page document pagination, magic-byte MIME validation, and automated ephemeral session lifetime controls.
                         </p>
                     </div>
 
-                    <!-- APIs and Integrations -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1rem;">
+                    <!-- APIs and integrations -->
+                    <div class="vector-box pres-card" style="padding: 1.4rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
+                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.05rem;">
                             <i class="fa-solid fa-network-wired"></i>
                         </div>
                         <h3 class="vector-title" style="margin: 0 0 8px; font-size: 1.1rem; color: var(--ink-primary);">APIs and integrations</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.6;">
+                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65;">
                             Internal RESTful JSON endpoints (<code style="font-family: var(--font-mono); font-size: 0.82rem;">/upload</code>, <code style="font-family: var(--font-mono); font-size: 0.82rem;">/api/redact</code>, <code style="font-family: var(--font-mono); font-size: 0.82rem;">/api/assistant/decision</code>, <code style="font-family: var(--font-mono); font-size: 0.82rem;">/api/update_ocr_path</code>, <code style="font-family: var(--font-mono); font-size: 0.82rem;">/api/download_certificate</code>) operating locally with zero external third-party API dependencies or cloud telemetry.
                         </p>
                     </div>
 
                     <!-- AI Assistance -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1rem;">
+                    <div class="vector-box pres-card" style="padding: 1.4rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
+                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.05rem;">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </div>
                         <h3 class="vector-title" style="margin: 0 0 8px; font-size: 1.1rem; color: var(--ink-primary);">AI Assistance</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.6;">
+                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65;">
                             Local, deterministic <code style="font-family: var(--font-mono); font-size: 0.82rem;">PrivacyAssistant</code> engine (<code style="font-family: var(--font-mono); font-size: 0.82rem;">core/privacy_assistant.py</code>) providing context-aware risk analysis across academic, professional, private, and public sharing scenarios. Prioritizes findings into High Priority, Review Recommended, and Informational tiers with clear rationale.
                         </p>
                     </div>
 
-                    <!-- OCR and Detection Mechanisms -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1rem;">
+                    <!-- OCR and detection mechanisms -->
+                    <div class="vector-box pres-card" style="padding: 1.4rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
+                        <div class="vector-icon-badge" style="background: var(--sage-soft); color: var(--sage-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.05rem;">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </div>
                         <h3 class="vector-title" style="margin: 0 0 8px; font-size: 1.1rem; color: var(--ink-primary);">OCR and detection mechanisms</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.6;">
+                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65;">
                             Dual-backend OCR engine supporting native Windows Media OCR runtime and Tesseract OCR (<code style="font-family: var(--font-mono); font-size: 0.82rem;">pytesseract</code>). Contextual regex engine with statutory checksum validation (Verhoeff for Indian Aadhaar, Luhn mod-10 for payment cards, ITD entity format for PAN, phone numbers, emails, IPv4 addresses, and cloud API keys). OpenCV QR detector (<code style="font-family: var(--font-mono); font-size: 0.82rem;">cv2.QRCodeDetector</code>) for QR localization and payload decoding.
                         </p>
                     </div>
 
                     <!-- File processing and sanitisation -->
-                    <div class="vector-box" style="padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 1rem;">
+                    <div class="vector-box pres-card" style="padding: 1.4rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
+                        <div class="vector-icon-badge" style="background: var(--coral-soft); color: var(--coral-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.05rem;">
                             <i class="fa-solid fa-file-shield"></i>
                         </div>
                         <h3 class="vector-title" style="margin: 0 0 8px; font-size: 1.1rem; color: var(--ink-primary);">File processing and sanitisation</h3>
-                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.6;">
+                        <p class="vector-desc" style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65;">
                             PyMuPDF for PDF vector text parsing, bounding box extraction, and underlying text stream purge. OpenCV and Pillow for permanent raster burn-in (Blur, Hide/Blackout, Whiteout, Pixelate). Metadata cleaner (<code style="font-family: var(--font-mono); font-size: 0.82rem;">core/metadata_cleaner.py</code>) removing EXIF tags, GPS coordinates, and camera history. ReportLab for generating audit certificates.
                         </p>
                     </div>
                 </div>
 
                 <!-- Data flow and security architecture -->
-                <div style="margin-top: 20px; padding: 1.25rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                        <div style="background: var(--sage-soft); color: var(--sage-primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                <div class="pres-card" style="margin-top: 20px; padding: 1.4rem; border: 1px solid var(--border-stone); border-radius: var(--radius-md); background: var(--bg-surface-elevated);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                        <div style="background: var(--sage-soft); color: var(--sage-primary); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem;">
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <h3 style="margin: 0; font-size: 1.1rem; color: var(--ink-primary);">Data flow and security architecture</h3>
                     </div>
-                    <p style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.6;">
+                    <p style="margin: 0; font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65;">
                         Strict on-device processing model: uploaded files exist only in ephemeral, isolated session directories with automated cleanup (<code style="font-family: var(--font-mono); font-size: 0.82rem;">core/cleanup.py</code>). True irreversible sanitization permanently overwrites pixels and strips text stream layers to prevent pseudo-redaction recovery, operating with zero cloud telemetry.
                     </p>
                 </div>
