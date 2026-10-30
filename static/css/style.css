@@ -9945,6 +9945,112 @@ input:checked + .toggle-slider::before {
     text-align: center;
 }
 
+/* ==========================================================================
+   Mermaid Professional Diagram Typography & Polish
+   ========================================================================== */
+
+.mermaid,
+.mermaid svg,
+.mermaid text,
+.mermaid .node,
+.mermaid .label,
+.mermaid foreignObject,
+.mermaid foreignObject div,
+.mermaid foreignObject span,
+.mermaid foreignObject p {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Cluster Subgraph Titles */
+.mermaid .cluster-label text,
+.mermaid .cluster-label span,
+.mermaid .cluster text {
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.82rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    fill: var(--ink-muted) !important;
+    color: var(--ink-muted) !important;
+}
+
+/* Node Main Headings */
+.mermaid foreignObject b {
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    color: var(--ink-primary) !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.35 !important;
+    display: inline-block;
+    margin-bottom: 2px;
+}
+
+/* Node Technical Specification Footnotes */
+.mermaid foreignObject i {
+    font-family: 'JetBrains Mono', Consolas, monospace !important;
+    font-style: normal !important;
+    font-size: 0.74rem !important;
+    font-weight: 500 !important;
+    color: var(--ink-secondary) !important;
+    background: rgba(37, 37, 34, 0.05) !important;
+    padding: 2px 7px !important;
+    border-radius: 4px !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    display: inline-block !important;
+    margin-top: 5px !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* Flow Directional Step Edge Labels */
+.mermaid .edgeLabel,
+.mermaid .edgeLabel span,
+.mermaid .edgeLabel p,
+.mermaid .edgeLabel rect {
+    font-family: 'JetBrains Mono', Consolas, monospace !important;
+    font-size: 0.76rem !important;
+    font-weight: 600 !important;
+    color: var(--ink-primary) !important;
+    letter-spacing: -0.01em !important;
+}
+
+.mermaid .edgeLabel span,
+.mermaid .edgeLabel p {
+    background: #FFFFFF !important;
+    padding: 3px 9px !important;
+    border-radius: var(--radius-pill) !important;
+    border: 1px solid var(--border-stone) !important;
+    box-shadow: 0 2px 6px rgba(37, 37, 34, 0.06) !important;
+    display: inline-block !important;
+}
+
+/* Node Boxes Polish */
+.mermaid .node rect,
+.mermaid .node polygon {
+    rx: 10px !important;
+    ry: 10px !important;
+    stroke-width: 1.5px !important;
+    filter: drop-shadow(0 2px 8px rgba(37, 37, 34, 0.05));
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mermaid .node:hover rect {
+    stroke-width: 2px !important;
+    filter: drop-shadow(0 8px 20px rgba(37, 37, 34, 0.12));
+}
+
+.mermaid .edgePath path.path {
+    stroke: var(--sage-primary) !important;
+    stroke-width: 1.8px !important;
+}
+
+.mermaid .marker {
+    fill: var(--sage-primary) !important;
+    stroke: var(--sage-primary) !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 900px) {
     .arch-system-stage {
