@@ -9578,3 +9578,299 @@ input:checked + .toggle-slider::before {
         gap: 16px;
     }
 }
+
+
+/* ==========================================================================
+   5-Layer Presentation Software Architecture Diagram Styles
+   ========================================================================== */
+
+.arch-system-stage {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-lg);
+    padding: 32px 28px;
+    box-shadow: var(--shadow-card);
+    margin: 20px 0 28px;
+    width: 100%;
+}
+
+.arch-stage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-stone-subtle);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.arch-stage-title-group h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink-primary);
+    margin: 0 0 4px;
+}
+
+.arch-stage-title-group p {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    margin: 0;
+}
+
+.arch-stage-hint-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--bg-stone-subtle);
+    color: var(--ink-secondary);
+    border: 1px solid var(--border-stone);
+}
+
+.arch-stage-hint-pill i {
+    color: var(--coral-primary);
+}
+
+/* Layers Container */
+.arch-layers-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+/* Individual Layer Band */
+.arch-layer-band {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-stone);
+    padding: 20px 22px;
+    transition: all 0.25s ease;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
+    align-items: center;
+    position: relative;
+}
+
+.arch-layer-band:hover {
+    box-shadow: 0 6px 20px -4px rgba(37, 37, 34, 0.08);
+}
+
+/* Layer Themes */
+.arch-layer-band.layer-ui {
+    background: linear-gradient(to right, #FAF7F2, #FCFBF9);
+    border-left: 4px solid var(--sage-primary);
+}
+
+.arch-layer-band.layer-app {
+    background: linear-gradient(to right, #F9F5F0, #FAF8F5);
+    border-left: 4px solid var(--amber-primary);
+}
+
+.arch-layer-band.layer-detection {
+    background: linear-gradient(to right, #F4F8F5, #F9FCFA);
+    border-left: 4px solid var(--sage-primary);
+}
+
+.arch-layer-band.layer-intelligence {
+    background: linear-gradient(to right, #FAF3F2, #FCF8F7);
+    border-left: 4px solid var(--coral-primary);
+}
+
+.arch-layer-band.layer-output {
+    background: linear-gradient(to right, #F7F5F0, #FAF9F6);
+    border-left: 4px solid var(--ink-primary);
+}
+
+/* Layer Info Header (Left Column) */
+.arch-layer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.arch-layer-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-muted);
+}
+
+.arch-layer-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink-primary);
+    margin: 0;
+    line-height: 1.25;
+}
+
+.arch-layer-desc {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    line-height: 1.45;
+    margin: 0;
+}
+
+/* Layer Components Grid (Right Column) */
+.arch-components-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    width: 100%;
+}
+
+/* Component Card */
+.arch-comp-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    position: relative;
+    cursor: default;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.arch-comp-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px -4px rgba(37, 37, 34, 0.12);
+    border-color: var(--border-stone-strong);
+}
+
+.arch-comp-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.arch-comp-icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.arch-comp-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--ink-primary);
+    line-height: 1.2;
+}
+
+.arch-comp-tech-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    background: var(--bg-stone-subtle);
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-block;
+    align-self: flex-start;
+    border: 1px solid var(--border-stone-subtle);
+}
+
+/* Hover Explanation Tooltip / Banner */
+.arch-comp-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    background: var(--ink-primary);
+    color: #FFFFFF;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    pointer-events: none;
+    font-weight: 400;
+    text-align: left;
+}
+
+.arch-comp-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--ink-primary) transparent transparent transparent;
+}
+
+.arch-comp-card:hover .arch-comp-tooltip {
+    display: block;
+    animation: presFadeInUp 0.2s ease-out forwards;
+}
+
+/* Directional Flow Connectors */
+.arch-flow-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 0;
+    position: relative;
+}
+
+.arch-flow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-stone);
+    box-shadow: var(--shadow-subtle);
+    padding: 4px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 0.74rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--ink-secondary);
+}
+
+.arch-flow-pill i {
+    color: var(--coral-primary);
+}
+
+/* Bottom Return Loop Strip */
+.arch-return-loop {
+    margin-top: 18px;
+    padding: 12px 18px;
+    background: var(--bg-surface-elevated);
+    border: 1px dashed var(--sage-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: var(--sage-primary);
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .arch-layer-band {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+}

@@ -32,7 +32,295 @@
 
     <!-- Main Content Body -->
     <div class="info-content-grid">
-        <!-- Interactive Visual Architecture Diagram Card -->
+        <!-- Interactive 5-Layer Software Architecture Diagram Stage -->
+        <section class="info-card section-card pres-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-layer-group"></i></div>
+                <div>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Interactive 5-Layer Software Architecture</h2>
+                </div>
+            </div>
+            <div class="card-body-text">
+                <p style="margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--ink-secondary);">
+                    ShareSafe is built upon a modular, five-tier sovereign processing pipeline engineered for local privacy protection. Hover over each component to inspect its implementation specifications:
+                </p>
+
+                <div class="arch-system-stage">
+                    <div class="arch-stage-header">
+                        <div class="arch-stage-title-group">
+                            <h2>ShareSafe Sovereign Architecture Pipeline</h2>
+                            <p>End-to-end multi-layer redaction, detection &amp; zero-telemetry sanitisation</p>
+                        </div>
+                        <div class="arch-stage-hint-pill">
+                            <i class="fa-solid fa-arrow-pointer"></i> Hover components for implementation details
+                        </div>
+                    </div>
+
+                    <div class="arch-layers-stack">
+                        <!-- Layer 1: Client Layer -->
+                        <div class="arch-layer-band layer-ui">
+                            <div class="arch-layer-meta">
+                                <span class="arch-layer-badge"><i class="fa-solid fa-desktop"></i> Layer 01 &bull; Presentation</span>
+                                <h3 class="arch-layer-title">Client Layer (Frontend)</h3>
+                                <p class="arch-layer-desc">Responsive web client with interactive annotation canvas and instant split preview.</p>
+                            </div>
+                            <div class="arch-components-grid">
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                            <i class="fa-solid fa-palette"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Jinja2 &amp; UI Templates</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">Warm Cream / Teal Palette</span>
+                                    <div class="arch-comp-tooltip">Server-rendered templates styled with warm cream, muted rose, and teal tones with fluid layout.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                            <i class="fa-solid fa-pen-ruler"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Annotation Canvas</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">canvas_editor.js / HTML5</span>
+                                    <div class="arch-comp-tooltip">Interactive multi-page coordinate mapping, manual selection, and automated redaction box drawing.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                            <i class="fa-solid fa-table-columns"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Split Comparison</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">app.js / Before-After</span>
+                                    <div class="arch-comp-tooltip">Synchronized side-by-side or sliding comparison ensuring total redaction confidence before export.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 1 -> 2 -->
+                        <div class="arch-flow-connector">
+                            <div class="arch-flow-pill">
+                                <i class="fa-solid fa-arrow-down"></i> 1. File Upload POST (Zero-Cloud Ingestion)
+                            </div>
+                        </div>
+
+                        <!-- Layer 2: Application Layer -->
+                        <div class="arch-layer-band layer-app">
+                            <div class="arch-layer-meta">
+                                <span class="arch-layer-badge"><i class="fa-solid fa-server"></i> Layer 02 &bull; Backend</span>
+                                <h3 class="arch-layer-title">Application Layer (Server)</h3>
+                                <p class="arch-layer-desc">Session routing, pagination, magic-byte validation, and ephemeral lifecycle isolation.</p>
+                            </div>
+                            <div class="arch-components-grid">
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--amber-soft); color: var(--amber-primary);">
+                                            <i class="fa-brands fa-python"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Flask 3 Framework</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">Python 3.13 / Flask 3</span>
+                                    <div class="arch-comp-tooltip">RESTful JSON endpoints managing file uploads, audit verification, and session state.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--amber-soft); color: var(--amber-primary);">
+                                            <i class="fa-solid fa-clock-rotate-left"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Ephemeral Sessions</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">core/cleanup.py</span>
+                                    <div class="arch-comp-tooltip">Automatic lifecycle isolation ensuring files are partitioned per session and purged after processing.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--amber-soft); color: var(--amber-primary);">
+                                            <i class="fa-solid fa-route"></i>
+                                        </div>
+                                        <div class="arch-comp-name">File Ingestion &amp; Routing</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">Magic-Byte MIME Check</span>
+                                    <div class="arch-comp-tooltip">Strict file format validation safeguarding against malicious payloads and forged extensions.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 2 -> 3 -->
+                        <div class="arch-flow-connector">
+                            <div class="arch-flow-pill">
+                                <i class="fa-solid fa-arrow-down"></i> 2. Dispatches Document Stream (PDF / Images)
+                            </div>
+                        </div>
+
+                        <!-- Layer 3: Detection Core -->
+                        <div class="arch-layer-band layer-detection">
+                            <div class="arch-layer-meta">
+                                <span class="arch-layer-badge"><i class="fa-solid fa-magnifying-glass"></i> Layer 03 &bull; Detection</span>
+                                <h3 class="arch-layer-title">Detection &amp; OCR Core</h3>
+                                <p class="arch-layer-desc">Multi-modal scanning across PDF text streams, optical character recognition, and QR matrices.</p>
+                            </div>
+                            <div class="arch-components-grid">
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                            <i class="fa-solid fa-file-pdf"></i>
+                                        </div>
+                                        <div class="arch-comp-name">PyMuPDF Text Parser</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">fitz / Native Vector</span>
+                                    <div class="arch-comp-tooltip">Direct PDF vector stream parser extracting selectable text runs and precise word bounding boxes.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Dual-Mode OCR</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">Windows Media + Tesseract</span>
+                                    <div class="arch-comp-tooltip">Hardware-accelerated local Windows OCR with pytesseract fallback for cross-platform robustness.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                            <i class="fa-solid fa-fingerprint"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Checksum Regex</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">Verhoeff / Luhn / ITD</span>
+                                    <div class="arch-comp-tooltip">Algorithmic validation for Aadhaar (Verhoeff), Credit Cards (Luhn), and PAN to eliminate false positives.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
+                                            <i class="fa-solid fa-qrcode"></i>
+                                        </div>
+                                        <div class="arch-comp-name">OpenCV QR Forensics</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">cv2.QRCodeDetector</span>
+                                    <div class="arch-comp-tooltip">Detects and decodes UPI payment strings, URLs, vCards, and Aadhaar secure QR payloads.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 3 -> 4 -->
+                        <div class="arch-flow-connector">
+                            <div class="arch-flow-pill">
+                                <i class="fa-solid fa-arrow-down"></i> 3. Detections &amp; Payloads Evaluated
+                            </div>
+                        </div>
+
+                        <!-- Layer 4: AI Assistance & Risk Core -->
+                        <div class="arch-layer-band layer-intelligence">
+                            <div class="arch-layer-meta">
+                                <span class="arch-layer-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Layer 04 &bull; Intelligence</span>
+                                <h3 class="arch-layer-title">AI Assistance &amp; Decision Core</h3>
+                                <p class="arch-layer-desc">Context-aware risk scoring prioritizing findings based on the user's sharing scenario.</p>
+                            </div>
+                            <div class="arch-components-grid">
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--coral-soft); color: var(--coral-primary);">
+                                            <i class="fa-solid fa-shield-virus"></i>
+                                        </div>
+                                        <div class="arch-comp-name">PrivacyAssistant</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">core/privacy_assistant.py</span>
+                                    <div class="arch-comp-tooltip">Deterministic on-device rule matrix evaluating entities against sharing contexts.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--coral-soft); color: var(--coral-primary);">
+                                            <i class="fa-solid fa-sliders"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Context Evaluator</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">Academic &bull; Work &bull; Public</span>
+                                    <div class="arch-comp-tooltip">Context-specific risk adjustment—e.g., student IDs in academic sharing vs public forums.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--coral-soft); color: var(--coral-primary);">
+                                            <i class="fa-solid fa-list-check"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Action Recommendations</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">Blur &bull; Hide &bull; Remove &bull; Keep</span>
+                                    <div class="arch-comp-tooltip">Suggests exact treatment rationale (High Priority, Review Recommended, or Informational).</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector 4 -> 5 -->
+                        <div class="arch-flow-connector">
+                            <div class="arch-flow-pill">
+                                <i class="fa-solid fa-arrow-down"></i> 4. Approved Redactions &amp; Coordinates Dispatched
+                            </div>
+                        </div>
+
+                        <!-- Layer 5: Sanitisation & Output Pipeline -->
+                        <div class="arch-layer-band layer-output">
+                            <div class="arch-layer-meta">
+                                <span class="arch-layer-badge"><i class="fa-solid fa-shield-check"></i> Layer 05 &bull; Output</span>
+                                <h3 class="arch-layer-title">File Processing &amp; Sanitisation</h3>
+                                <p class="arch-layer-desc">Permanent raster burn-in, vector stream text purging, metadata wiping, and audit certification.</p>
+                            </div>
+                            <div class="arch-components-grid">
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
+                                            <i class="fa-solid fa-eraser"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Raster Redactor</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">OpenCV &amp; Pillow Burn-in</span>
+                                    <div class="arch-comp-tooltip">Flattens target bounding boxes permanently with blur, solid blackout, or pixelate overlays.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
+                                            <i class="fa-solid fa-file-excel"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Vector Stream Purge</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">PyMuPDF Text Redact</span>
+                                    <div class="arch-comp-tooltip">Strips underlying searchable text bytes and hidden OCR layers to block forensic recovery.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
+                                            <i class="fa-solid fa-broom"></i>
+                                        </div>
+                                        <div class="arch-comp-name">MetadataCleaner</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">core/metadata_cleaner.py</span>
+                                    <div class="arch-comp-tooltip">Wipes EXIF tags, GPS coordinates, camera serial numbers, and author audit traces.</div>
+                                </div>
+                                <div class="arch-comp-card">
+                                    <div class="arch-comp-header">
+                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
+                                            <i class="fa-solid fa-certificate"></i>
+                                        </div>
+                                        <div class="arch-comp-name">Audit Certificate</div>
+                                    </div>
+                                    <span class="arch-comp-tech-badge">ReportLab / SHA-256</span>
+                                    <div class="arch-comp-tooltip">Issues verifiable PDF certificate with cryptographic SHA-256 hashes of original and sanitized files.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return Loop Strip -->
+                    <div class="arch-return-loop">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>5. Safer Sanitised File Download &amp; Cryptographic Audit Verification returned to Client UI</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visual Architecture Diagram Card (Mermaid Data Flow) -->
         <section class="info-card section-card pres-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-diagram-project"></i></div>
