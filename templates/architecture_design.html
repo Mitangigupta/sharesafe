@@ -32,390 +32,66 @@
 
     <!-- Main Content Body -->
     <div class="info-content-grid">
-        <!-- Interactive 5-Layer Software Architecture Diagram Stage -->
+        <!-- Interactive Visual Architecture Diagram Card -->
         <section class="info-card section-card pres-card">
             <div class="card-header-line">
-                <div class="header-icon-box"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="header-icon-box"><i class="fa-solid fa-diagram-project"></i></div>
                 <div>
-                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Interactive 5-Layer Software Architecture</h2>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">System Architecture &amp; Data Flow Diagram</h2>
                 </div>
             </div>
             <div class="card-body-text">
                 <p style="margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--ink-secondary);">
-                    ShareSafe is built upon a modular, five-tier sovereign processing pipeline engineered for local privacy protection. Hover over each component to inspect its implementation specifications:
+                    The following visual architecture traces information flow through ShareSafe's verified components — from browser upload, dual-mode OCR and context-aware AI risk analysis, to permanent raster burn-in and metadata stripping:
                 </p>
 
-                <div class="arch-system-stage">
-                    <div class="arch-stage-header">
-                        <div class="arch-stage-title-group">
-                            <h2>ShareSafe Sovereign Architecture Pipeline</h2>
-                            <p>End-to-end multi-layer redaction, detection &amp; zero-telemetry sanitisation</p>
-                        </div>
-                        <div class="arch-stage-hint-pill">
-                            <i class="fa-solid fa-arrow-pointer"></i> Hover components for implementation details
-                        </div>
-                    </div>
-
-                    <div class="arch-layers-stack">
-                        <!-- Layer 1: Client Layer -->
-                        <div class="arch-layer-band layer-ui">
-                            <div class="arch-layer-meta">
-                                <span class="arch-layer-badge"><i class="fa-solid fa-desktop"></i> Layer 01 &bull; Presentation</span>
-                                <h3 class="arch-layer-title">Client Layer (Frontend)</h3>
-                                <p class="arch-layer-desc">Responsive web client with interactive annotation canvas and instant split preview.</p>
-                            </div>
-                            <div class="arch-components-grid">
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
-                                            <i class="fa-solid fa-palette"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Jinja2 &amp; UI Templates</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">Warm Cream / Teal Palette</span>
-                                    <div class="arch-comp-tooltip">Server-rendered templates styled with warm cream, muted rose, and teal tones with fluid layout.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
-                                            <i class="fa-solid fa-pen-ruler"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Annotation Canvas</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">canvas_editor.js / HTML5</span>
-                                    <div class="arch-comp-tooltip">Interactive multi-page coordinate mapping, manual selection, and automated redaction box drawing.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
-                                            <i class="fa-solid fa-table-columns"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Split Comparison</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">app.js / Before-After</span>
-                                    <div class="arch-comp-tooltip">Synchronized side-by-side or sliding comparison ensuring total redaction confidence before export.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Connector 1 -> 2 -->
-                        <div class="arch-flow-connector">
-                            <div class="arch-flow-pill">
-                                <i class="fa-solid fa-arrow-down"></i> 1. File Upload POST (Zero-Cloud Ingestion)
-                            </div>
-                        </div>
-
-                        <!-- Layer 2: Application Layer -->
-                        <div class="arch-layer-band layer-app">
-                            <div class="arch-layer-meta">
-                                <span class="arch-layer-badge"><i class="fa-solid fa-server"></i> Layer 02 &bull; Backend</span>
-                                <h3 class="arch-layer-title">Application Layer (Server)</h3>
-                                <p class="arch-layer-desc">Session routing, pagination, magic-byte validation, and ephemeral lifecycle isolation.</p>
-                            </div>
-                            <div class="arch-components-grid">
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--amber-soft); color: var(--amber-primary);">
-                                            <i class="fa-brands fa-python"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Flask 3 Framework</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">Python 3.13 / Flask 3</span>
-                                    <div class="arch-comp-tooltip">RESTful JSON endpoints managing file uploads, audit verification, and session state.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--amber-soft); color: var(--amber-primary);">
-                                            <i class="fa-solid fa-clock-rotate-left"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Ephemeral Sessions</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">core/cleanup.py</span>
-                                    <div class="arch-comp-tooltip">Automatic lifecycle isolation ensuring files are partitioned per session and purged after processing.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--amber-soft); color: var(--amber-primary);">
-                                            <i class="fa-solid fa-route"></i>
-                                        </div>
-                                        <div class="arch-comp-name">File Ingestion &amp; Routing</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">Magic-Byte MIME Check</span>
-                                    <div class="arch-comp-tooltip">Strict file format validation safeguarding against malicious payloads and forged extensions.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Connector 2 -> 3 -->
-                        <div class="arch-flow-connector">
-                            <div class="arch-flow-pill">
-                                <i class="fa-solid fa-arrow-down"></i> 2. Dispatches Document Stream (PDF / Images)
-                            </div>
-                        </div>
-
-                        <!-- Layer 3: Detection Core -->
-                        <div class="arch-layer-band layer-detection">
-                            <div class="arch-layer-meta">
-                                <span class="arch-layer-badge"><i class="fa-solid fa-magnifying-glass"></i> Layer 03 &bull; Detection</span>
-                                <h3 class="arch-layer-title">Detection &amp; OCR Core</h3>
-                                <p class="arch-layer-desc">Multi-modal scanning across PDF text streams, optical character recognition, and QR matrices.</p>
-                            </div>
-                            <div class="arch-components-grid">
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
-                                            <i class="fa-solid fa-file-pdf"></i>
-                                        </div>
-                                        <div class="arch-comp-name">PyMuPDF Text Parser</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">fitz / Native Vector</span>
-                                    <div class="arch-comp-tooltip">Direct PDF vector stream parser extracting selectable text runs and precise word bounding boxes.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Dual-Mode OCR</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">Windows Media + Tesseract</span>
-                                    <div class="arch-comp-tooltip">Hardware-accelerated local Windows OCR with pytesseract fallback for cross-platform robustness.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
-                                            <i class="fa-solid fa-fingerprint"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Checksum Regex</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">Verhoeff / Luhn / ITD</span>
-                                    <div class="arch-comp-tooltip">Algorithmic validation for Aadhaar (Verhoeff), Credit Cards (Luhn), and PAN to eliminate false positives.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);">
-                                            <i class="fa-solid fa-qrcode"></i>
-                                        </div>
-                                        <div class="arch-comp-name">OpenCV QR Forensics</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">cv2.QRCodeDetector</span>
-                                    <div class="arch-comp-tooltip">Detects and decodes UPI payment strings, URLs, vCards, and Aadhaar secure QR payloads.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Connector 3 -> 4 -->
-                        <div class="arch-flow-connector">
-                            <div class="arch-flow-pill">
-                                <i class="fa-solid fa-arrow-down"></i> 3. Detections &amp; Payloads Evaluated
-                            </div>
-                        </div>
-
-                        <!-- Layer 4: AI Assistance & Risk Core -->
-                        <div class="arch-layer-band layer-intelligence">
-                            <div class="arch-layer-meta">
-                                <span class="arch-layer-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Layer 04 &bull; Intelligence</span>
-                                <h3 class="arch-layer-title">AI Assistance &amp; Decision Core</h3>
-                                <p class="arch-layer-desc">Context-aware risk scoring prioritizing findings based on the user's sharing scenario.</p>
-                            </div>
-                            <div class="arch-components-grid">
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--coral-soft); color: var(--coral-primary);">
-                                            <i class="fa-solid fa-shield-virus"></i>
-                                        </div>
-                                        <div class="arch-comp-name">PrivacyAssistant</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">core/privacy_assistant.py</span>
-                                    <div class="arch-comp-tooltip">Deterministic on-device rule matrix evaluating entities against sharing contexts.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--coral-soft); color: var(--coral-primary);">
-                                            <i class="fa-solid fa-sliders"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Context Evaluator</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">Academic &bull; Work &bull; Public</span>
-                                    <div class="arch-comp-tooltip">Context-specific risk adjustment—e.g., student IDs in academic sharing vs public forums.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--coral-soft); color: var(--coral-primary);">
-                                            <i class="fa-solid fa-list-check"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Action Recommendations</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">Blur &bull; Hide &bull; Remove &bull; Keep</span>
-                                    <div class="arch-comp-tooltip">Suggests exact treatment rationale (High Priority, Review Recommended, or Informational).</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Connector 4 -> 5 -->
-                        <div class="arch-flow-connector">
-                            <div class="arch-flow-pill">
-                                <i class="fa-solid fa-arrow-down"></i> 4. Approved Redactions &amp; Coordinates Dispatched
-                            </div>
-                        </div>
-
-                        <!-- Layer 5: Sanitisation & Output Pipeline -->
-                        <div class="arch-layer-band layer-output">
-                            <div class="arch-layer-meta">
-                                <span class="arch-layer-badge"><i class="fa-solid fa-shield-check"></i> Layer 05 &bull; Output</span>
-                                <h3 class="arch-layer-title">File Processing &amp; Sanitisation</h3>
-                                <p class="arch-layer-desc">Permanent raster burn-in, vector stream text purging, metadata wiping, and audit certification.</p>
-                            </div>
-                            <div class="arch-components-grid">
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
-                                            <i class="fa-solid fa-eraser"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Raster Redactor</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">OpenCV &amp; Pillow Burn-in</span>
-                                    <div class="arch-comp-tooltip">Flattens target bounding boxes permanently with blur, solid blackout, or pixelate overlays.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
-                                            <i class="fa-solid fa-file-excel"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Vector Stream Purge</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">PyMuPDF Text Redact</span>
-                                    <div class="arch-comp-tooltip">Strips underlying searchable text bytes and hidden OCR layers to block forensic recovery.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
-                                            <i class="fa-solid fa-broom"></i>
-                                        </div>
-                                        <div class="arch-comp-name">MetadataCleaner</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">core/metadata_cleaner.py</span>
-                                    <div class="arch-comp-tooltip">Wipes EXIF tags, GPS coordinates, camera serial numbers, and author audit traces.</div>
-                                </div>
-                                <div class="arch-comp-card">
-                                    <div class="arch-comp-header">
-                                        <div class="arch-comp-icon-box" style="background: var(--stone-soft, #ece7e0); color: var(--ink-primary);">
-                                            <i class="fa-solid fa-certificate"></i>
-                                        </div>
-                                        <div class="arch-comp-name">Audit Certificate</div>
-                                    </div>
-                                    <span class="arch-comp-tech-badge">ReportLab / SHA-256</span>
-                                    <div class="arch-comp-tooltip">Issues verifiable PDF certificate with cryptographic SHA-256 hashes of original and sanitized files.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Return Loop Strip -->
-                    <div class="arch-return-loop">
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>5. Safer Sanitised File Download &amp; Cryptographic Audit Verification returned to Client UI</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Visual Architecture Diagram Card (Mermaid Data Flow) -->
-        <section class="info-card section-card pres-card">
-            <div class="card-header-line">
-                <div class="header-icon-box" style="background: #FDF5F4; color: #D45D55;"><i class="fa-solid fa-diagram-project"></i></div>
-                <div>
-                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem; font-family: 'Inter', sans-serif; font-weight: 700; color: #252522;">System Architecture &amp; Data Flow Diagram</h2>
-                </div>
-            </div>
-            <div class="card-body-text">
-                <p style="margin-bottom: 1.25rem; font-size: 0.95rem; color: #4E4A44; font-family: 'Inter', sans-serif; line-height: 1.6;">
-                    The following high-resolution data flow diagram traces information through ShareSafe's verified components — from browser upload, dual-mode OCR and context-aware AI risk analysis, to permanent raster burn-in and metadata stripping:
-                </p>
-
-                <!-- Interactive Presentation Mode Controls -->
-                <div class="pres-control-bar">
-                    <div class="pres-controls-left">
-                        <button id="btnPlayPause" class="pres-btn pres-btn-primary" type="button" title="Play or pause auto-presentation walkthrough">
-                            <i class="fa-solid fa-play" id="playIcon"></i> <span id="btnPlayText">Play Presentation</span>
-                        </button>
-                        <button id="btnReplay" class="pres-btn pres-btn-secondary" type="button" title="Replay presentation from Step 1">
-                            <i class="fa-solid fa-rotate-left"></i> Replay
-                        </button>
-                        <div class="pres-step-nav">
-                            <button id="btnPrevStep" class="pres-btn-icon" type="button" title="Previous step" disabled>
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-                            <span id="presStepCounter" class="pres-step-indicator">Step 1 of 10</span>
-                            <button id="btnNextStep" class="pres-btn-icon" type="button" title="Next step">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="pres-controls-right">
-                        <div class="pres-narration-badge">
-                            <span class="pres-pulse-dot"></span>
-                            <span id="presStepTitle" class="pres-narration-text">Step 1 &bull; Client Presentation Layer: Browser upload &amp; split preview</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="diagram-render-container">
-                    <div class="diagram-render-toolbar">
-                        <div class="diagram-toolbar-title">
-                            <i class="fa-solid fa-network-wired" style="color: #D45D55;"></i>
-                            End-to-End Sovereign Architecture &bull; Sequential Data Flow Pipeline
-                        </div>
-                        <div class="diagram-toolbar-hint">
-                            <i class="fa-solid fa-arrows-left-right"></i> Horizontal scroll supported on smaller viewports
-                        </div>
-                    </div>
-
-                    <div class="mermaid">
+                <div class="diagram-render-container" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center; overflow-x: auto;">
+                    <div class="mermaid" style="width: 100%; min-width: 680px; text-align: center;">
 flowchart TD
-    subgraph P1 ["PHASE 1: CLIENT INGESTION AND SESSION ISOLATION"]
-        Client["<b>Client Presentation Layer</b><br/>Browser File Ingestion • Drag & Drop • Split Viewer<br/><i>(HTML5 Canvas • Jinja2 Templates • app.js)</i>"]
-        Server["<b>Application Router & Session Manager</b><br/>MIME Magic-Byte Validation • Ephemeral Isolation<br/><i>(Flask 3 • Python 3.13 • core/cleanup.py)</i>"]
+    subgraph Client ["Client Layer (Frontend)"]
+        UI["Jinja2 Templates &amp; Responsive UI<br/>(Warm Cream, Rose &amp; Teal Palette)"]
+        Canvas["HTML5 Canvas Annotation Engine<br/>(canvas_editor.js &amp; app.js)"]
+        Split["Before / After Split Comparison"]
     end
 
-    subgraph P2 ["PHASE 2: DUAL-ENGINE SCANNING AND AI RISK MATRIX"]
-        OCR["<b>Forensic Extraction & OCR Engine</b><br/>Native PDF Text Vector Parser • Dual-Backend OCR<br/><i>(PyMuPDF • Windows Media OCR • Tesseract pytesseract)</i>"]
-        Detector["<b>Checksum RegEx & QR Forensics</b><br/>Contextual Patterns • Algorithmic Validations<br/><i>(Verhoeff Aadhaar • Luhn Cards • ITD PAN • cv2.QRCodeDetector)</i>"]
-        Assistant["<b>PrivacyAssistant Decision Core</b><br/>Deterministic Local AI Threat & Risk Matrix<br/><i>(core/privacy_assistant.py • Academic, Work, Private, Public)</i>"]
+    subgraph Server ["Application Layer (Backend)"]
+        Flask["Flask 3 Web Framework (Python 3.13)"]
+        SessionMgr["Ephemeral Session Manager (Session Isolation)"]
+        Router["Session Routing &amp; File Ingestion Engine"]
     end
 
-    subgraph P3 ["PHASE 3: INTERACTIVE STUDIO AND DESTRUCTIVE REDACTION"]
-        Canvas["<b>Visual Redaction Studio</b><br/>Interactive Multi-Page Coordinate Mapping<br/><i>(Blur • Hide • Remove • Keep Selection)</i>"]
-        Raster["<b>Destructive Raster Burn-In</b><br/>Permanent Pixel-Level Overwrite<br/><i>(OpenCV • Pillow • True Irreversible Flattening)</i>"]
-        Purge["<b>Vector Purge & Metadata Cleaner</b><br/>Underlying PDF Text Stream Scrubbed & EXIF Purged<br/><i>(fitz Stream Strip • core/metadata_cleaner.py)</i>"]
+    subgraph Core ["Processing &amp; Intelligence Core"]
+        subgraph DetectionEngines ["OCR &amp; Detection Mechanisms"]
+            PDFParse["PyMuPDF Native Vector Text Parser"]
+            OCREngine["Dual-Mode OCR Engine<br/>(Windows Media OCR &amp; Tesseract pytesseract)"]
+            RegexEngine["SensitiveDetector Contextual Regex<br/>(Verhoeff for Aadhaar, Luhn for Cards, ITD for PAN)"]
+            QREngine["OpenCV QR Forensics Decoder (cv2.QRCodeDetector)"]
+        end
+
+        subgraph AIAssistanceEngine ["AI Assistance"]
+            Assistant["PrivacyAssistant Decision Matrix (core/privacy_assistant.py)<br/>Context-Aware Risk Evaluation (Academic, Professional, Private, Public)"]
+        end
+
+        subgraph SanitisationPipeline ["File Processing &amp; Sanitisation"]
+            RasterRedact["Destructive Raster Redactor (OpenCV &amp; Pillow)<br/>Permanent Burn-in: Blur, Hide, Remove, Keep"]
+            VectorPurge["PyMuPDF Content Stream Purge"]
+            MetaClean["MetadataCleaner (EXIF, GPS, Camera History)"]
+            CertGen["ReportLab Audit Certificate Generator"]
+        end
     end
 
-    subgraph P4 ["PHASE 4: CRYPTOGRAPHIC AUDIT AND DELIVERY"]
-        Cert["<b>Cryptographic Audit Certificate</b><br/>Tamper-Evident SHA-256 Hash Pair Ledger<br/><i>(ReportLab PDF Generator • Timestamped Audit)</i>"]
-        Download["<b>Safer Sanitised File Delivery</b><br/>Zero Cloud Footprint • Sovereign Export<br/><i>(Safer Document & Certificate Download)</i>"]
-    end
-
-    Client -->|1. Multipart Upload POST| Server
-    Server -->|2. Ephemeral Document Stream| OCR
-    OCR -->|3. Extracted Text Blocks & Coordinates| Detector
-    Detector -->|4. Validated Detections & QR Payloads| Assistant
-    Assistant -->|5. Contextual Risk Advice & Recommendations| Canvas
-    Canvas -->|6. User Redaction Coordinates| Raster
-    Raster -->|7. Non-Recoverable Flattened Pixels| Purge
-    Purge -->|8. Scrubbed Cleaned Document Stream| Cert
-    Cert -->|9. Cryptographically Verified Artifacts| Download
-    Download -->|10. Verified Safe Document Returned to Client| Client
-
-    style P1 fill:#FAF6F0,stroke:#D9822B,stroke-width:1.5px
-    style P2 fill:#F2F7F4,stroke:#4E7D6B,stroke-width:1.5px
-    style P3 fill:#FDF5F4,stroke:#D45D55,stroke-width:1.5px
-    style P4 fill:#F7F8F7,stroke:#3E5C4E,stroke-width:1.5px
-
-    classDef nodeDefault fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.25px,color:#252522;
-    classDef nodeHighlight fill:#FFF4F3,stroke:#D45D55,stroke-width:2.2px,color:#252522;
-
-    class Client,Server,OCR,Detector,Canvas,Raster,Purge,Cert,Download nodeDefault;
-    class Assistant nodeHighlight;
+    UI -->|1. File Upload POST| Router
+    Router --> SessionMgr
+    SessionMgr --> PDFParse
+    SessionMgr --> OCREngine
+    PDFParse &amp; OCREngine --> RegexEngine
+    RegexEngine &amp; QREngine -->|2. Detections &amp; Payloads| Assistant
+    Assistant -->|3. Risk Advice &amp; Recommendations| Canvas
+    Canvas -->|4. User Redaction Actions| RasterRedact
+    RasterRedact --> VectorPurge
+    VectorPurge --> MetaClean
+    MetaClean --> CertGen
+    CertGen -->|5. Safer Sanitised File Download| UI
                     </div>
                 </div>
             </div>
@@ -526,189 +202,21 @@ flowchart TD
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         if (typeof mermaid !== 'undefined') {
-            try {
-                mermaid.initialize({
-                    startOnLoad: false,
-                    theme: 'base',
-                    themeVariables: {
-                        darkMode: false,
-                        background: '#FFFFFF',
-                        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                        fontSize: '14px',
-                        primaryColor: '#FFFFFF',
-                        primaryTextColor: '#252522',
-                        primaryBorderColor: '#DCD6CD',
-                        lineColor: '#647C70',
-                        secondaryColor: '#FAF7F2',
-                        tertiaryColor: '#FDF5F4',
-                        edgeLabelBackground: '#FFFFFF',
-                        clusterBkg: '#FAF7F2',
-                        clusterBorder: '#DCD6CD'
-                    },
-                    flowchart: {
-                        useMaxWidth: false,
-                        htmlLabels: true,
-                        curve: 'basis',
-                        rankSpacing: 68,
-                        nodeSpacing: 46,
-                        padding: 22
-                    }
-                });
-                mermaid.run().then(function() {
-                    setTimeout(function() { updateStepUI(0); }, 300);
-                }).catch(function(err) {
-                    console.warn("Mermaid run caught:", err);
-                    updateStepUI(0);
-                });
-            } catch (e) {
-                console.error("Mermaid init error:", e);
-                updateStepUI(0);
-            }
-        } else {
-            updateStepUI(0);
-        }
-
-        // Architecture Presentation Walkthrough Controller
-        const presentationSteps = [
-            { id: 'Client', layerIndex: 0, title: 'Client Presentation Layer', desc: 'Browser Upload & Split View: Local document selection with synchronized split inspection.' },
-            { id: 'Server', layerIndex: 1, title: 'Application & Ephemeral Session', desc: 'MIME Verification & Isolation: Flask verifies magic-bytes and initializes isolated temporary storage.' },
-            { id: 'OCR', layerIndex: 2, title: 'Forensic Extraction & OCR', desc: 'Dual-Mode OCR & Parser: PyMuPDF extracts vector streams; Windows Media & Tesseract OCR scan pixels.' },
-            { id: 'Detector', layerIndex: 2, title: 'Checksum RegEx & QR Forensics', desc: 'Algorithmic Validation: Verhoeff (Aadhaar), Luhn (Cards), ITD (PAN) & QR forensics prevent false positives.' },
-            { id: 'Assistant', layerIndex: 3, title: 'PrivacyAssistant AI Decision Core', desc: 'Context-Aware Threat Evaluation: Deterministic matrix classifies risks (Academic, Work, Public) into action tiers.' },
-            { id: 'Canvas', layerIndex: 0, title: 'Visual Redaction Studio', desc: 'Interactive Coordinate Mapping: User assigns Blur, Hide, Remove, or Keep selections on canvas.' },
-            { id: 'Raster', layerIndex: 4, title: 'Destructive Raster Burn-In', desc: 'Permanent Pixel Overwrite: OpenCV and Pillow irreversibly flatten target regions to prevent digital recovery.' },
-            { id: 'Purge', layerIndex: 4, title: 'Vector Purge & Metadata Wiping', desc: 'Anti-Forensic Sanitisation: PyMuPDF deletes underlying text streams; core/metadata_cleaner strips all EXIF/GPS tags.' },
-            { id: 'Cert', layerIndex: 4, title: 'Cryptographic Audit Certificate', desc: 'Integrity Verification: ReportLab issues verifiable PDF certificate containing SHA-256 hash pair.' },
-            { id: 'Download', layerIndex: 0, title: 'Sovereign Document Delivery', desc: 'Safer File Export: Sanitised file and tamper-evident certificate are downloaded with zero cloud footprint.' }
-        ];
-
-        let currentStepIndex = 0;
-        let isAutoPlaying = false;
-        let playInterval = null;
-
-        const btnPlayPause = document.getElementById('btnPlayPause');
-        const playIcon = document.getElementById('playIcon');
-        const btnPlayText = document.getElementById('btnPlayText');
-        const btnReplay = document.getElementById('btnReplay');
-        const btnPrevStep = document.getElementById('btnPrevStep');
-        const btnNextStep = document.getElementById('btnNextStep');
-        const presStepCounter = document.getElementById('presStepCounter');
-        const presStepTitle = document.getElementById('presStepTitle');
-
-        function updateStepUI(index) {
-            currentStepIndex = index;
-            const step = presentationSteps[index];
-
-            if (presStepCounter) {
-                presStepCounter.textContent = 'Step ' + (index + 1) + ' of ' + presentationSteps.length;
-            }
-
-            if (presStepTitle) {
-                presStepTitle.textContent = 'Step ' + (index + 1) + ' • ' + step.title + ': ' + step.desc;
-            }
-
-            if (btnPrevStep) {
-                btnPrevStep.disabled = (index === 0);
-            }
-            if (btnNextStep) {
-                btnNextStep.disabled = (index === presentationSteps.length - 1);
-            }
-
-            // 1. Highlight node in Mermaid diagram
-            const allNodes = document.querySelectorAll('.mermaid .node, .mermaid g[class*="node"]');
-            allNodes.forEach(function(node) {
-                node.classList.remove('active-stage');
-            });
-
-            const targetNode = Array.from(allNodes).find(function(node) {
-                const idAttr = node.getAttribute('id') || '';
-                const text = node.textContent || '';
-                return idAttr.toLowerCase().includes(step.id.toLowerCase()) || text.includes(step.id);
-            });
-
-            if (targetNode) {
-                targetNode.classList.add('active-stage');
-            }
-
-            // 2. Also highlight corresponding band in 5-Layer Software Architecture stage
-            const allBands = document.querySelectorAll('.arch-layer-band');
-            allBands.forEach(function(band, bIdx) {
-                band.classList.remove('active-band-highlight');
-                if (bIdx === step.layerIndex) {
-                    band.classList.add('active-band-highlight');
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'base',
+                themeVariables: {
+                    darkMode: false,
+                    background: '#FFFFFF',
+                    primaryColor: '#F3EFE9',
+                    primaryTextColor: '#252522',
+                    primaryBorderColor: '#EAE5DD',
+                    lineColor: '#647C70',
+                    secondaryColor: '#F9ECEB',
+                    tertiaryColor: '#FCFBFA'
                 }
             });
         }
-
-        function playPresentation() {
-            if (isAutoPlaying) return;
-            isAutoPlaying = true;
-            if (playIcon) playIcon.className = 'fa-solid fa-pause';
-            if (btnPlayText) btnPlayText.textContent = 'Pause';
-            if (btnPlayPause) btnPlayPause.classList.add('playing');
-
-            playInterval = setInterval(function() {
-                if (currentStepIndex < presentationSteps.length - 1) {
-                    updateStepUI(currentStepIndex + 1);
-                } else {
-                    pausePresentation();
-                }
-            }, 2400);
-        }
-
-        function pausePresentation() {
-            isAutoPlaying = false;
-            if (playInterval) {
-                clearInterval(playInterval);
-                playInterval = null;
-            }
-            if (playIcon) playIcon.className = 'fa-solid fa-play';
-            if (btnPlayText) btnPlayText.textContent = 'Play Presentation';
-            if (btnPlayPause) btnPlayPause.classList.remove('playing');
-        }
-
-        if (btnPlayPause) {
-            btnPlayPause.addEventListener('click', function() {
-                if (isAutoPlaying) {
-                    pausePresentation();
-                } else {
-                    if (currentStepIndex >= presentationSteps.length - 1) {
-                        currentStepIndex = 0;
-                    }
-                    updateStepUI(currentStepIndex);
-                    playPresentation();
-                }
-            });
-        }
-
-        if (btnReplay) {
-            btnReplay.addEventListener('click', function() {
-                pausePresentation();
-                updateStepUI(0);
-                playPresentation();
-            });
-        }
-
-        if (btnPrevStep) {
-            btnPrevStep.addEventListener('click', function() {
-                pausePresentation();
-                if (currentStepIndex > 0) {
-                    updateStepUI(currentStepIndex - 1);
-                }
-            });
-        }
-
-        if (btnNextStep) {
-            btnNextStep.addEventListener('click', function() {
-                pausePresentation();
-                if (currentStepIndex < presentationSteps.length - 1) {
-                    updateStepUI(currentStepIndex + 1);
-                }
-            });
-        }
-
-        // Initialize at Step 1
-        updateStepUI(0);
     });
 </script>
 {% endblock %}
