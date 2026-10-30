@@ -9902,27 +9902,179 @@ input:checked + .toggle-slider::before {
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
-.arch-return-loop i {
-    font-size: 1.1rem;
-}
-    font-size: 1.1rem;
+/* ==========================================================================
+   Interactive Presentation Control Bar & Narration Styles
+   ========================================================================== */
+
+.pres-control-bar {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 2px 10px rgba(37, 37, 34, 0.04);
 }
 
-/* Mermaid Flowchart Render Container (High-Definition & Readable) */
+.pres-controls-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pres-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(37, 37, 34, 0.05);
+}
+
+.pres-btn-primary {
+    background: #D45D55; /* Vibrant Warm Coral */
+    color: #FFFFFF;
+}
+
+.pres-btn-primary:hover {
+    background: #BA4A43;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212, 93, 85, 0.25);
+}
+
+.pres-btn-secondary {
+    background: #FDFBF8;
+    color: #252522;
+    border-color: var(--border-stone);
+}
+
+.pres-btn-secondary:hover {
+    background: #FAF7F2;
+    border-color: var(--border-stone-strong);
+    transform: translateY(-1px);
+}
+
+.pres-step-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 6px;
+    background: #FAF7F2;
+    padding: 3px 6px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-stone);
+}
+
+.pres-btn-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    color: #252522;
+    border: 1px solid var(--border-stone);
+    font-size: 0.72rem;
+}
+
+.pres-btn-icon:hover:not(:disabled) {
+    background: #D45D55;
+    color: #FFFFFF;
+    border-color: #D45D55;
+}
+
+.pres-btn-icon:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pres-step-indicator {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #252522;
+    padding: 0 8px;
+    white-space: nowrap;
+}
+
+.pres-controls-right {
+    flex: 1;
+    min-width: 260px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.pres-narration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #FAF7F2;
+    border: 1px solid var(--border-stone);
+    padding: 6px 16px;
+    border-radius: var(--radius-pill);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: #373531;
+    max-width: 100%;
+}
+
+.pres-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #D45D55;
+    box-shadow: 0 0 0 0 rgba(212, 93, 85, 0.6);
+    animation: presDotPulse 1.8s infinite;
+    flex-shrink: 0;
+}
+
+@keyframes presDotPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(212, 93, 85, 0.6);
+    }
+    70% {
+        box-shadow: 0 0 0 7px rgba(212, 93, 85, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(212, 93, 85, 0);
+    }
+}
+
+.pres-narration-text {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ==========================================================================
-   Mermaid Enterprise Cybersecurity Architecture Diagram Styles
+   Mermaid Architecture Diagram Styles (Enhanced Original Palette & Animations)
    ========================================================================== */
 
 .diagram-render-container {
     background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 14px;
-    padding: 36px 28px;
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-lg);
+    padding: 34px 26px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-    margin-top: 16px;
+    box-shadow: 0 4px 20px -4px rgba(37, 37, 34, 0.05);
+    margin-top: 14px;
     overflow-x: auto;
 }
 
@@ -9933,7 +10085,7 @@ input:checked + .toggle-slider::before {
     justify-content: space-between;
     padding-bottom: 18px;
     margin-bottom: 24px;
-    border-bottom: 1px solid #E2E8F0;
+    border-bottom: 1px solid var(--border-stone-subtle);
     flex-wrap: wrap;
     gap: 12px;
 }
@@ -9942,7 +10094,7 @@ input:checked + .toggle-slider::before {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 0.92rem;
     font-weight: 700;
-    color: #0F172A; /* Deep Navy */
+    color: #252522; /* Primary Ink */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -9954,11 +10106,11 @@ input:checked + .toggle-slider::before {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 0.78rem;
     font-weight: 500;
-    color: #64748B; /* Muted Steel Blue */
-    background: #F1F5F9; /* Light Blue-Grey */
+    color: var(--ink-secondary);
+    background: #FAF7F2;
     padding: 5px 14px;
-    border-radius: 9999px;
-    border: 1px solid #E2E8F0;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-stone);
 }
 
 .mermaid {
@@ -9984,58 +10136,71 @@ input:checked + .toggle-slider::before {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Phase Container Subgraphs */
-.mermaid .cluster rect {
-    fill: #F8FAFC !important; /* Very light neutral blue-grey */
-    stroke: #CBD5E1 !important; /* Subtle border */
-    stroke-width: 1.25px !important;
-    rx: 12px !important;
-    ry: 12px !important;
-}
-
-/* Major Phase Headings: Inter Bold, Deep Navy Blue */
+/* Major Phase Headings: Inter Bold, Enhanced Original Palette */
 .mermaid .cluster-label text,
 .mermaid .cluster-label span,
 .mermaid .cluster text {
     font-family: 'Inter', sans-serif !important;
     font-weight: 700 !important; /* Inter Bold */
-    font-size: 0.84rem !important;
+    font-size: 0.86rem !important;
     letter-spacing: 0.07em !important;
     text-transform: uppercase !important;
-    fill: #0F172A !important; /* Deep Navy */
-    color: #0F172A !important;
+    fill: #252522 !important; /* Primary Ink */
+    color: #252522 !important;
 }
 
-/* Component Boxes (Subtly Rounded, Soft Shadow, Subtle Border) */
+/* Phase Subgraph Containers */
+.mermaid .cluster rect {
+    rx: 12px !important;
+    ry: 12px !important;
+    filter: drop-shadow(0 2px 8px rgba(37, 37, 34, 0.03));
+}
+
+/* Component Boxes (Enhanced Rounded Corners, Crisp White, Soft Shadow) */
 .mermaid .node rect,
 .mermaid .node polygon {
     rx: 8px !important;
     ry: 8px !important;
-    fill: #FFFFFF !important;
-    stroke: #CBD5E1 !important; /* Muted Steel Blue / Grey Border */
-    stroke-width: 1.25px !important;
-    filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.04)) drop-shadow(0 1px 2px rgba(15, 23, 42, 0.03));
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 2px 5px rgba(37, 37, 34, 0.04));
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mermaid .node:hover rect {
-    stroke: #94A3B8 !important;
-    filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.09));
+    transform: translateY(-2px);
+    filter: drop-shadow(0 8px 18px rgba(37, 37, 34, 0.1));
+}
+
+/* Active Stage Highlight Pulse Animation */
+.mermaid .node.active-stage rect,
+.mermaid .node.active-stage polygon {
+    stroke: #D45D55 !important; /* Vibrant Warm Coral */
+    stroke-width: 2.5px !important;
+    filter: drop-shadow(0 0 14px rgba(212, 93, 85, 0.45)) drop-shadow(0 4px 10px rgba(37, 37, 34, 0.15)) !important;
+    animation: activeStagePulse 2s ease-in-out infinite !important;
+}
+
+@keyframes activeStagePulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(212, 93, 85, 0.4));
+    }
+    50% {
+        filter: drop-shadow(0 0 16px rgba(212, 93, 85, 0.7));
+    }
 }
 
 /* Node Internal Container */
 .mermaid foreignObject div {
-    padding: 4px 6px !important;
+    padding: 6px 8px !important;
     line-height: 1.45 !important;
     text-align: center !important;
 }
 
-/* Component Titles: Inter SemiBold, Deep Navy */
+/* Component Titles: Inter SemiBold, Primary Ink */
 .mermaid foreignObject b {
     font-family: 'Inter', sans-serif !important;
     font-weight: 600 !important; /* Inter SemiBold */
     font-size: 0.96rem !important;
-    color: #0F172A !important; /* Deep Navy */
+    color: #252522 !important; /* Primary Ink */
     letter-spacing: -0.015em !important;
     line-height: 1.35 !important;
     display: inline-block;
@@ -10047,20 +10212,20 @@ input:checked + .toggle-slider::before {
     font-family: 'Inter', sans-serif !important;
     font-weight: 400 !important; /* Inter Regular */
     font-size: 0.82rem !important;
-    color: #334155 !important; /* Dark Charcoal */
+    color: #373531 !important; /* Dark Charcoal */
     line-height: 1.45 !important;
     display: block;
     margin-bottom: 4px;
 }
 
-/* Technical Specification Tag: Inter Medium, Muted Steel Blue */
+/* Technical Specification Tag: Inter Medium, Enhanced Palette */
 .mermaid foreignObject .cyber-tech {
     font-family: 'Inter', sans-serif !important;
     font-weight: 500 !important; /* Inter Medium */
     font-size: 0.74rem !important;
-    color: #475569 !important; /* Muted Steel Blue */
-    background: #F1F5F9 !important; /* Light Blue-Grey */
-    border: 1px solid #E2E8F0 !important;
+    color: #5C5852 !important;
+    background: #FAF7F2 !important;
+    border: 1px solid var(--border-stone) !important;
     border-radius: 5px !important;
     padding: 3px 9px !important;
     display: inline-block !important;
@@ -10068,29 +10233,46 @@ input:checked + .toggle-slider::before {
     letter-spacing: -0.01em !important;
 }
 
-/* Connector Lines & Arrows */
+/* Moving Particles & Animated Flow Lines on Connectors */
 .mermaid .edgePath path.path {
-    stroke: #64748B !important; /* Muted Steel Blue */
+    stroke: #647C70 !important; /* Muted Sage */
     stroke-width: 1.8px !important;
     stroke-linecap: round !important;
     stroke-linejoin: round !important;
+    stroke-dasharray: 6 4 !important;
+    animation: flowDataMovement 1.4s linear infinite !important;
+}
+
+@keyframes flowDataMovement {
+    from {
+        stroke-dashoffset: 20;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
 }
 
 .mermaid .marker {
-    fill: #64748B !important;
-    stroke: #64748B !important;
+    fill: #647C70 !important;
+    stroke: #647C70 !important;
 }
 
-/* Highlighted Important Processing Data Flows (Subtle Teal) */
-.mermaid .edgePath.thick path.path,
+/* Highlighted Important Processing Data Flows (Vibrant Coral & Rich Sage) */
 .mermaid [id*="link-Client"],
 .mermaid [id*="link-Assistant"],
 .mermaid [id*="link-Cert"] {
-    stroke: #0D9488 !important; /* Subtle Teal Accent */
+    stroke: #D45D55 !important; /* Vibrant Coral */
+    stroke-width: 2.4px !important;
+}
+
+.mermaid [id*="link-Server"],
+.mermaid [id*="link-Canvas"],
+.mermaid [id*="link-Purge"] {
+    stroke: #4E7D6B !important; /* Rich Sage */
     stroke-width: 2.2px !important;
 }
 
-/* Step Connection Pill Badges: Inter SemiBold, Crisp Enterprise Label */
+/* Step Connection Pill Badges: Inter SemiBold, Crisp Original Palette */
 .mermaid .edgeLabel,
 .mermaid .edgeLabel span,
 .mermaid .edgeLabel p,
@@ -10098,19 +10280,29 @@ input:checked + .toggle-slider::before {
     font-family: 'Inter', sans-serif !important;
     font-size: 0.76rem !important;
     font-weight: 600 !important; /* Inter SemiBold */
-    color: #0F172A !important; /* Deep Navy */
+    color: #252522 !important;
     letter-spacing: -0.01em !important;
 }
 
 .mermaid .edgeLabel span,
 .mermaid .edgeLabel p {
     background: #FFFFFF !important;
-    color: #0F172A !important;
+    color: #252522 !important;
     padding: 4px 10px !important;
-    border-radius: 9999px !important;
-    border: 1px solid #CBD5E1 !important;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+    border-radius: var(--radius-pill) !important;
+    border: 1px solid var(--border-stone) !important;
+    box-shadow: 0 1px 3px rgba(37, 37, 34, 0.05) !important;
     display: inline-block !important;
+}
+
+/* Accessibility: Reduced-Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+    .mermaid .edgePath path.path,
+    .mermaid .node.active-stage rect,
+    .pres-pulse-dot {
+        animation: none !important;
+        transition: none !important;
+    }
 }
 
 /* Responsive adjustments */
@@ -10122,5 +10314,12 @@ input:checked + .toggle-slider::before {
         grid-template-columns: 1fr;
         gap: 16px;
         padding: 20px 18px;
+    }
+    .pres-control-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .pres-controls-right {
+        justify-content: flex-start;
     }
 }
