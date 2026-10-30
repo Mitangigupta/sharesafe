@@ -26,7 +26,7 @@
             ShareSafe <span class="teal-gradient-text">Architecture Design</span> &amp; Implementation
         </h1>
         <p class="info-hero-lead">
-            A concise overview of the verified technologies, core engines, and data flow architecture powering ShareSafe.
+            A comprehensive overview of the verified technologies, core engines, and data flow architecture powering ShareSafe.
         </p>
     </header>
 
@@ -36,7 +36,7 @@
         <section class="info-card section-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-diagram-project"></i></div>
-                <div style="flex-grow: 1;">
+                <div>
                     <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">System Architecture &amp; Data Flow Diagram</h2>
                     <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
                         End-to-end data flow through ShareSafe's verified multi-layer processing pipeline.
@@ -60,21 +60,74 @@
                     <div class="pipeline-step"><span class="step-num">6</span> Audit Download</div>
                 </div>
 
-                <!-- View Switcher -->
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 1.25rem;">
-                    <div class="arch-view-switcher" role="tablist" aria-label="Diagram Views">
-                        <button type="button" id="btnViewLayers" class="arch-tab-btn active" onclick="switchArchView('layers')" role="tab" aria-selected="true">
-                            <i class="fa-solid fa-layer-group"></i> 5-Layer Architecture Flow
-                        </button>
-                        <button type="button" id="btnViewMermaid" class="arch-tab-btn" onclick="switchArchView('mermaid')" role="tab" aria-selected="false">
-                            <i class="fa-solid fa-diagram-project"></i> Mermaid Topology Graph
-                        </button>
+                <p style="margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--ink-secondary);">
+                    The following visual architecture traces information flow through ShareSafe's verified components &mdash; from browser upload, dual-mode OCR and context-aware AI risk analysis, to permanent raster burn-in, metadata stripping, and cryptographic certificate generation:
+                </p>
+
+                <!-- VISIBLE DATA FLOW DIAGRAM (Mermaid Graph) -->
+                <div class="diagram-render-container" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-stone); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center; overflow-x: auto; margin-bottom: 2rem;">
+                    <div class="mermaid" style="width: 100%; min-width: 680px; text-align: center;">
+flowchart TD
+    subgraph Client ["Client Layer (Frontend)"]
+        UI["Jinja2 Templates & Responsive UI<br/>(Warm Cream, Rose & Teal Palette)"]
+        Canvas["HTML5 Canvas Annotation Engine<br/>(canvas_editor.js & app.js)"]
+        Split["Before / After Split Comparison"]
+    end
+
+    subgraph Server ["Application Layer (Backend)"]
+        Flask["Flask 3 Web Framework (Python 3.13)"]
+        SessionMgr["Ephemeral Session Manager (Session Isolation)"]
+        Router["Session Routing & File Ingestion Engine"]
+    end
+
+    subgraph Core ["Processing & Intelligence Core"]
+        subgraph DetectionEngines ["OCR & Detection Mechanisms"]
+            PDFParse["PyMuPDF Native Vector Text Parser"]
+            OCREngine["Dual-Mode OCR Engine<br/>(Windows Media OCR & Tesseract)"]
+            RegexEngine["SensitiveDetector Contextual Regex<br/>(Verhoeff, Luhn, ITD Checksums)"]
+            QREngine["OpenCV QR Forensics Decoder (cv2.QRCodeDetector)"]
+        end
+
+        subgraph AIAssistanceEngine ["AI Assistance"]
+            Assistant["PrivacyAssistant Decision Matrix (core/privacy_assistant.py)<br/>Context-Aware Risk Evaluation (Academic, Professional, Private, Public)"]
+        end
+
+        subgraph SanitisationPipeline ["File Processing & Sanitisation"]
+            RasterRedact["Destructive Raster Redactor (OpenCV & Pillow)<br/>Permanent Burn-in: Blur, Hide, Remove, Keep"]
+            VectorPurge["PyMuPDF Content Stream Purge"]
+            MetaClean["MetadataCleaner (EXIF, GPS, Camera History)"]
+            CertGen["ReportLab Audit Certificate Generator"]
+        end
+    end
+
+    UI -->|1. File Upload POST| Router
+    Router --> SessionMgr
+    SessionMgr --> PDFParse
+    SessionMgr --> OCREngine
+    PDFParse --> RegexEngine
+    OCREngine --> RegexEngine
+    RegexEngine -->|2. Detections| Assistant
+    QREngine -->|2. Payloads| Assistant
+    Assistant -->|3. Risk Advice & Recommendations| Canvas
+    Canvas -->|4. User Redaction Actions| RasterRedact
+    RasterRedact --> VectorPurge
+    VectorPurge --> MetaClean
+    MetaClean --> CertGen
+    CertGen -->|5. Safer Sanitised File Download| UI
                     </div>
-                    <span style="font-size: 0.82rem; color: var(--ink-muted);"><i class="fa-solid fa-circle-info"></i> Hover over any component for purpose &amp; source code</span>
                 </div>
 
-                <!-- VIEW 1: 5-Layer Architecture & Data Flow Diagram -->
-                <div id="archLayersView" class="arch-stage-container" style="display: block;">
+                <!-- 5-LAYER SOFTWARE ARCHITECTURE PRESENTATION BREAKDOWN -->
+                <div style="margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ink-primary); margin: 0 0 6px;">
+                        <i class="fa-solid fa-layer-group" style="color: var(--sage-primary); margin-right: 8px;"></i>Five-Layer Software Architecture Breakdown
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--ink-secondary); margin: 0 0 1.25rem;">
+                        Verified architectural layers and module responsibilities. Hover over any component card for source implementation details:
+                    </p>
+                </div>
+
+                <div class="arch-stage-container">
                     
                     <!-- LAYER 1: User Interface -->
                     <div class="arch-layer arch-layer-ui">
@@ -426,57 +479,6 @@
 
                 </div>
 
-                <!-- VIEW 2: Technical Mermaid Graph Topology -->
-                <div id="archMermaidView" class="arch-mermaid-container" style="display: none;">
-                    <div class="mermaid" style="width: 100%; min-width: 680px; text-align: center;">
-flowchart TD
-    subgraph Client ["Client Layer (Frontend)"]
-        UI["Jinja2 Templates &amp; Responsive UI<br/>(Warm Cream, Rose &amp; Teal Palette)"]
-        Canvas["HTML5 Canvas Annotation Engine<br/>(canvas_editor.js &amp; app.js)"]
-        Split["Before / After Split Comparison"]
-    end
-
-    subgraph Server ["Application Layer (Backend)"]
-        Flask["Flask 3 Web Framework (Python 3.13)"]
-        SessionMgr["Ephemeral Session Manager (Session Isolation)"]
-        Router["Session Routing &amp; File Ingestion Engine"]
-    end
-
-    subgraph Core ["Processing &amp; Intelligence Core"]
-        subgraph DetectionEngines ["OCR &amp; Detection Mechanisms"]
-            PDFParse["PyMuPDF Native Vector Text Parser"]
-            OCREngine["Dual-Mode OCR Engine<br/>(Windows Media OCR &amp; Tesseract pytesseract)"]
-            RegexEngine["SensitiveDetector Contextual Regex<br/>(Verhoeff for Aadhaar, Luhn for Cards, ITD for PAN)"]
-            QREngine["OpenCV QR Forensics Decoder (cv2.QRCodeDetector)"]
-        end
-
-        subgraph AIAssistanceEngine ["AI Assistance"]
-            Assistant["PrivacyAssistant Decision Matrix (core/privacy_assistant.py)<br/>Context-Aware Risk Evaluation (Academic, Professional, Private, Public)"]
-        end
-
-        subgraph SanitisationPipeline ["File Processing &amp; Sanitisation"]
-            RasterRedact["Destructive Raster Redactor (OpenCV &amp; Pillow)<br/>Permanent Burn-in: Blur, Hide, Remove, Keep"]
-            VectorPurge["PyMuPDF Content Stream Purge"]
-            MetaClean["MetadataCleaner (EXIF, GPS, Camera History)"]
-            CertGen["ReportLab Audit Certificate Generator"]
-        end
-    end
-
-    UI -->|1. File Upload POST| Router
-    Router --> SessionMgr
-    SessionMgr --> PDFParse
-    SessionMgr --> OCREngine
-    PDFParse &amp; OCREngine --> RegexEngine
-    RegexEngine &amp; QREngine -->|2. Detections &amp; Payloads| Assistant
-    Assistant -->|3. Risk Advice &amp; Recommendations| Canvas
-    Canvas -->|4. User Redaction Actions| RasterRedact
-    RasterRedact --> VectorPurge
-    VectorPurge --> MetaClean
-    MetaClean --> CertGen
-    CertGen -->|5. Safer Sanitised File Download| UI
-                    </div>
-                </div>
-
             </div>
         </section>
 
@@ -583,10 +585,8 @@ flowchart TD
 <!-- Mermaid JS for Architecture Diagram -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
-    let mermaidInitialized = false;
-
-    function initMermaidIfNeeded() {
-        if (!mermaidInitialized && typeof mermaid !== 'undefined') {
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof mermaid !== 'undefined') {
             mermaid.initialize({
                 startOnLoad: true,
                 theme: 'base',
@@ -599,42 +599,10 @@ flowchart TD
                     lineColor: '#647C70',
                     secondaryColor: '#F9ECEB',
                     tertiaryColor: '#FCFBFA',
-                    fontFamily: 'Inter, system-ui, sans-serif'
+                    fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
                 }
             });
-            mermaidInitialized = true;
         }
-    }
-
-    function switchArchView(view) {
-        const layersView = document.getElementById('archLayersView');
-        const mermaidView = document.getElementById('archMermaidView');
-        const btnLayers = document.getElementById('btnViewLayers');
-        const btnMermaid = document.getElementById('btnViewMermaid');
-
-        if (view === 'mermaid') {
-            layersView.style.display = 'none';
-            mermaidView.style.display = 'flex';
-            btnLayers.classList.remove('active');
-            btnLayers.setAttribute('aria-selected', 'false');
-            btnMermaid.classList.add('active');
-            btnMermaid.setAttribute('aria-selected', 'true');
-            initMermaidIfNeeded();
-            if (typeof mermaid !== 'undefined' && mermaid.run) {
-                mermaid.run({ nodes: [mermaidView.querySelector('.mermaid')] });
-            }
-        } else {
-            layersView.style.display = 'block';
-            mermaidView.style.display = 'none';
-            btnLayers.classList.add('active');
-            btnLayers.setAttribute('aria-selected', 'true');
-            btnMermaid.classList.remove('active');
-            btnMermaid.setAttribute('aria-selected', 'false');
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        initMermaidIfNeeded();
     });
 </script>
 {% endblock %}
