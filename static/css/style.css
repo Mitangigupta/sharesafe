@@ -9581,17 +9581,18 @@ input:checked + .toggle-slider::before {
 
 
 /* ==========================================================================
-   5-Layer Presentation Software Architecture Diagram Styles (Spacious & Readable)
+   5-Layer Presentation Software Architecture Diagram Styles (Cybersecurity Enterprise)
    ========================================================================== */
 
 .arch-system-stage {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-stone);
-    border-radius: var(--radius-lg);
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
     padding: 36px 32px;
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
     margin: 24px 0 32px;
     width: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .arch-stage-header {
@@ -9600,22 +9601,25 @@ input:checked + .toggle-slider::before {
     justify-content: space-between;
     padding-bottom: 20px;
     margin-bottom: 28px;
-    border-bottom: 1px solid var(--border-stone-subtle);
+    border-bottom: 1px solid #E2E8F0;
     flex-wrap: wrap;
     gap: 14px;
 }
 
 .arch-stage-title-group h2 {
-    font-size: 1.45rem;
-    font-weight: 700;
-    color: var(--ink-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700; /* Inter Bold */
+    color: #0F172A; /* Deep Navy */
     margin: 0 0 6px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 
 .arch-stage-title-group p {
-    font-size: 0.92rem;
-    color: var(--ink-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400; /* Inter Regular */
+    color: #475569; /* Muted Steel Blue */
     margin: 0;
 }
 
@@ -9623,17 +9627,18 @@ input:checked + .toggle-slider::before {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    font-family: 'Inter', sans-serif;
     font-size: 0.78rem;
-    font-weight: 600;
-    padding: 7px 16px;
-    border-radius: var(--radius-pill);
-    background: var(--bg-stone-subtle);
-    color: var(--ink-secondary);
-    border: 1px solid var(--border-stone);
+    font-weight: 500; /* Inter Medium */
+    padding: 6px 15px;
+    border-radius: 9999px;
+    background: #F1F5F9; /* Light Blue-Grey */
+    color: #334155; /* Dark Charcoal */
+    border: 1px solid #CBD5E1;
 }
 
 .arch-stage-hint-pill i {
-    color: var(--coral-primary);
+    color: #0D9488; /* Subtle Teal Accent */
 }
 
 /* Layers Container */
@@ -9647,78 +9652,82 @@ input:checked + .toggle-slider::before {
 
 /* Individual Layer Band */
 .arch-layer-band {
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-stone);
-    padding: 24px 28px;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+    padding: 24px 26px;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     display: grid;
     grid-template-columns: 260px 1fr;
     gap: 28px;
     align-items: center;
     position: relative;
-    box-shadow: 0 2px 8px rgba(37, 37, 34, 0.03);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
 .arch-layer-band:hover {
-    box-shadow: 0 10px 28px -6px rgba(37, 37, 34, 0.1);
-    border-color: var(--border-stone-strong);
+    box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+    border-color: #CBD5E1;
 }
 
-/* Layer Themes */
+/* Layer Themes - Subtle Blue-Grey & Steel with Teal Accents */
 .arch-layer-band.layer-ui {
-    background: linear-gradient(to right, #FAF7F2, #FCFBF9);
-    border-left: 5px solid var(--sage-primary);
+    background: linear-gradient(to right, #F8FAFC, #FFFFFF);
+    border-left: 4px solid #64748B;
 }
 
 .arch-layer-band.layer-app {
-    background: linear-gradient(to right, #F9F5F0, #FAF8F5);
-    border-left: 5px solid var(--amber-primary);
+    background: linear-gradient(to right, #F8FAFC, #FFFFFF);
+    border-left: 4px solid #475569;
 }
 
 .arch-layer-band.layer-detection {
-    background: linear-gradient(to right, #F4F8F5, #F9FCFA);
-    border-left: 5px solid var(--sage-primary);
+    background: linear-gradient(to right, #F8FAFC, #FFFFFF);
+    border-left: 4px solid #0D9488;
 }
 
 .arch-layer-band.layer-intelligence {
-    background: linear-gradient(to right, #FAF3F2, #FCF8F7);
-    border-left: 5px solid var(--coral-primary);
+    background: linear-gradient(to right, #F0FDFA, #FFFFFF);
+    border-left: 4px solid #0F766E;
 }
 
 .arch-layer-band.layer-output {
-    background: linear-gradient(to right, #F7F5F0, #FAF9F6);
-    border-left: 5px solid var(--ink-primary);
+    background: linear-gradient(to right, #F8FAFC, #FFFFFF);
+    border-left: 4px solid #0F172A;
 }
 
 /* Layer Info Header (Left Column) */
 .arch-layer-meta {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
 }
 
 .arch-layer-badge {
+    font-family: 'Inter', sans-serif;
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 700; /* Inter Bold */
     text-transform: uppercase;
     letter-spacing: 0.08em;
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    color: var(--ink-muted);
+    color: #64748B; /* Muted Steel Blue */
 }
 
 .arch-layer-title {
-    font-size: 1.22rem;
-    font-weight: 700;
-    color: var(--ink-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.18rem;
+    font-weight: 600; /* Inter SemiBold */
+    color: #0F172A; /* Deep Navy */
     margin: 0;
-    line-height: 1.25;
+    line-height: 1.3;
 }
 
 .arch-layer-desc {
+    font-family: 'Inter', sans-serif;
     font-size: 0.82rem;
-    color: var(--ink-muted);
+    font-weight: 400; /* Inter Regular */
+    color: #475569; /* Muted Steel Blue */
     line-height: 1.5;
     margin: 0;
 }
@@ -9733,14 +9742,14 @@ input:checked + .toggle-slider::before {
 
 /* Component Card */
 .arch-comp-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-stone);
-    border-radius: var(--radius-md);
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px; /* Consistent corner radius */
     padding: 16px 18px;
     position: relative;
     cursor: default;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: var(--shadow-subtle);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -9748,9 +9757,9 @@ input:checked + .toggle-slider::before {
 }
 
 .arch-comp-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 22px -4px rgba(37, 37, 34, 0.12);
-    border-color: var(--border-stone-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px -3px rgba(15, 23, 42, 0.09);
+    border-color: #CBD5E1;
 }
 
 .arch-comp-header {
@@ -9763,31 +9772,35 @@ input:checked + .toggle-slider::before {
 .arch-comp-icon-box {
     width: 36px;
     height: 36px;
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
     flex-shrink: 0;
+    background: #F1F5F9;
+    color: #0F172A;
 }
 
 .arch-comp-name {
-    font-size: 0.96rem;
-    font-weight: 700;
-    color: var(--ink-primary);
-    line-height: 1.25;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.94rem;
+    font-weight: 600; /* Inter SemiBold */
+    color: #0F172A; /* Deep Navy */
+    line-height: 1.3;
 }
 
 .arch-comp-tech-badge {
-    font-family: var(--font-mono);
+    font-family: 'Inter', sans-serif;
     font-size: 0.74rem;
-    color: var(--ink-secondary);
-    background: var(--bg-stone-subtle);
+    font-weight: 500; /* Inter Medium */
+    color: #475569; /* Muted Steel Blue */
+    background: #F8FAFC; /* Light Blue-Grey */
     padding: 3px 9px;
-    border-radius: 6px;
+    border-radius: 5px;
     display: inline-block;
     align-self: flex-start;
-    border: 1px solid var(--border-stone-subtle);
+    border: 1px solid #E2E8F0;
 }
 
 /* Hover Explanation Tooltip / Banner */
@@ -9798,16 +9811,17 @@ input:checked + .toggle-slider::before {
     left: 50%;
     transform: translateX(-50%);
     width: 270px;
-    background: var(--ink-primary);
-    color: #FFFFFF;
+    background: #0F172A; /* Deep Navy */
+    color: #F8FAFC;
+    font-family: 'Inter', sans-serif;
     font-size: 0.78rem;
-    line-height: 1.55;
+    font-weight: 400; /* Inter Regular */
+    line-height: 1.5;
     padding: 12px 14px;
-    border-radius: var(--radius-md);
-    box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.4);
     z-index: 100;
     pointer-events: none;
-    font-weight: 400;
     text-align: left;
 }
 
@@ -9819,7 +9833,7 @@ input:checked + .toggle-slider::before {
     transform: translateX(-50%);
     border-width: 6px;
     border-style: solid;
-    border-color: var(--ink-primary) transparent transparent transparent;
+    border-color: #0F172A transparent transparent transparent;
 }
 
 .arch-comp-card:hover .arch-comp-tooltip {
@@ -9827,7 +9841,7 @@ input:checked + .toggle-slider::before {
     animation: presFadeInUp 0.2s ease-out forwards;
 }
 
-/* Directional Flow Connectors (Spacious & Visual) */
+/* Directional Flow Connectors */
 .arch-flow-connector {
     display: flex;
     align-items: center;
@@ -9844,7 +9858,7 @@ input:checked + .toggle-slider::before {
     top: 0;
     bottom: 0;
     width: 2px;
-    background: repeating-linear-gradient(to bottom, var(--border-stone-strong) 0, var(--border-stone-strong) 4px, transparent 4px, transparent 8px);
+    background: repeating-linear-gradient(to bottom, #CBD5E1 0, #CBD5E1 4px, transparent 4px, transparent 8px);
     z-index: 0;
 }
 
@@ -9854,19 +9868,19 @@ input:checked + .toggle-slider::before {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-stone);
-    box-shadow: 0 4px 12px rgba(37, 37, 34, 0.06);
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
     padding: 6px 18px;
-    border-radius: var(--radius-pill);
-    font-size: 0.82rem;
-    font-family: var(--font-mono);
-    font-weight: 600;
-    color: var(--ink-secondary);
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600; /* Inter SemiBold */
+    color: #0F172A; /* Deep Navy */
 }
 
 .arch-flow-pill i {
-    color: var(--coral-primary);
+    color: #0D9488; /* Subtle Teal Accent */
     font-size: 0.85rem;
 }
 
@@ -9874,34 +9888,41 @@ input:checked + .toggle-slider::before {
 .arch-return-loop {
     margin-top: 24px;
     padding: 16px 22px;
-    background: var(--bg-surface-elevated);
-    border: 1.5px dashed var(--sage-border);
-    border-radius: var(--radius-lg);
+    background: #F8FAFC;
+    border: 1.5px dashed #CBD5E1;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 14px;
-    font-size: 0.88rem;
-    color: var(--sage-primary);
-    font-weight: 600;
-    box-shadow: var(--shadow-subtle);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.86rem;
+    color: #0F766E; /* Subtle Teal */
+    font-weight: 600; /* Inter SemiBold */
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
 .arch-return-loop i {
     font-size: 1.1rem;
 }
+    font-size: 1.1rem;
+}
 
 /* Mermaid Flowchart Render Container (High-Definition & Readable) */
+/* ==========================================================================
+   Mermaid Enterprise Cybersecurity Architecture Diagram Styles
+   ========================================================================== */
+
 .diagram-render-container {
     background: #FFFFFF;
-    border: 1px solid var(--border-stone);
-    border-radius: var(--radius-lg);
-    padding: 32px 24px;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 36px 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: var(--shadow-subtle);
-    margin-top: 14px;
+    box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    margin-top: 16px;
     overflow-x: auto;
 }
 
@@ -9910,45 +9931,45 @@ input:checked + .toggle-slider::before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 16px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-stone-subtle);
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #E2E8F0;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
 }
 
 .diagram-toolbar-title {
-    font-size: 0.88rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.92rem;
     font-weight: 700;
-    color: var(--ink-primary);
+    color: #0F172A; /* Deep Navy */
     display: flex;
     align-items: center;
-    gap: 8px;
-    letter-spacing: 0.02em;
+    gap: 10px;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
 }
 
 .diagram-toolbar-hint {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 0.78rem;
-    color: var(--ink-muted);
-    background: var(--bg-stone-subtle);
-    padding: 4px 12px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--border-stone);
+    font-weight: 500;
+    color: #64748B; /* Muted Steel Blue */
+    background: #F1F5F9; /* Light Blue-Grey */
+    padding: 5px 14px;
+    border-radius: 9999px;
+    border: 1px solid #E2E8F0;
 }
 
 .mermaid {
     width: 100%;
-    min-width: 820px;
-    max-width: 1080px;
+    min-width: 860px;
+    max-width: 1120px;
     margin: 0 auto;
     text-align: center;
 }
 
-/* ==========================================================================
-   Mermaid Professional Diagram Typography & Polish
-   ========================================================================== */
-
+/* Base Typography: Force Inter throughout diagram */
 .mermaid,
 .mermaid svg,
 .mermaid text,
@@ -9958,97 +9979,138 @@ input:checked + .toggle-slider::before {
 .mermaid foreignObject div,
 .mermaid foreignObject span,
 .mermaid foreignObject p {
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Cluster Subgraph Titles */
+/* Phase Container Subgraphs */
+.mermaid .cluster rect {
+    fill: #F8FAFC !important; /* Very light neutral blue-grey */
+    stroke: #CBD5E1 !important; /* Subtle border */
+    stroke-width: 1.25px !important;
+    rx: 12px !important;
+    ry: 12px !important;
+}
+
+/* Major Phase Headings: Inter Bold, Deep Navy Blue */
 .mermaid .cluster-label text,
 .mermaid .cluster-label span,
 .mermaid .cluster text {
-    font-family: 'DM Sans', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 0.82rem !important;
-    letter-spacing: 0.08em !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important; /* Inter Bold */
+    font-size: 0.84rem !important;
+    letter-spacing: 0.07em !important;
     text-transform: uppercase !important;
-    fill: var(--ink-muted) !important;
-    color: var(--ink-muted) !important;
+    fill: #0F172A !important; /* Deep Navy */
+    color: #0F172A !important;
 }
 
-/* Node Main Headings */
+/* Component Boxes (Subtly Rounded, Soft Shadow, Subtle Border) */
+.mermaid .node rect,
+.mermaid .node polygon {
+    rx: 8px !important;
+    ry: 8px !important;
+    fill: #FFFFFF !important;
+    stroke: #CBD5E1 !important; /* Muted Steel Blue / Grey Border */
+    stroke-width: 1.25px !important;
+    filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.04)) drop-shadow(0 1px 2px rgba(15, 23, 42, 0.03));
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mermaid .node:hover rect {
+    stroke: #94A3B8 !important;
+    filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.09));
+}
+
+/* Node Internal Container */
+.mermaid foreignObject div {
+    padding: 4px 6px !important;
+    line-height: 1.45 !important;
+    text-align: center !important;
+}
+
+/* Component Titles: Inter SemiBold, Deep Navy */
 .mermaid foreignObject b {
-    font-family: 'DM Sans', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    color: var(--ink-primary) !important;
-    letter-spacing: -0.01em !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important; /* Inter SemiBold */
+    font-size: 0.96rem !important;
+    color: #0F172A !important; /* Deep Navy */
+    letter-spacing: -0.015em !important;
     line-height: 1.35 !important;
     display: inline-block;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 
-/* Node Technical Specification Footnotes */
-.mermaid foreignObject i {
-    font-family: 'JetBrains Mono', Consolas, monospace !important;
-    font-style: normal !important;
+/* Descriptions: Inter Regular, Dark Charcoal */
+.mermaid foreignObject .cyber-desc {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important; /* Inter Regular */
+    font-size: 0.82rem !important;
+    color: #334155 !important; /* Dark Charcoal */
+    line-height: 1.45 !important;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Technical Specification Tag: Inter Medium, Muted Steel Blue */
+.mermaid foreignObject .cyber-tech {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important; /* Inter Medium */
     font-size: 0.74rem !important;
-    font-weight: 500 !important;
-    color: var(--ink-secondary) !important;
-    background: rgba(37, 37, 34, 0.05) !important;
-    padding: 2px 7px !important;
-    border-radius: 4px !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    color: #475569 !important; /* Muted Steel Blue */
+    background: #F1F5F9 !important; /* Light Blue-Grey */
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 5px !important;
+    padding: 3px 9px !important;
     display: inline-block !important;
-    margin-top: 5px !important;
+    margin-top: 4px !important;
     letter-spacing: -0.01em !important;
 }
 
-/* Flow Directional Step Edge Labels */
+/* Connector Lines & Arrows */
+.mermaid .edgePath path.path {
+    stroke: #64748B !important; /* Muted Steel Blue */
+    stroke-width: 1.8px !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+}
+
+.mermaid .marker {
+    fill: #64748B !important;
+    stroke: #64748B !important;
+}
+
+/* Highlighted Important Processing Data Flows (Subtle Teal) */
+.mermaid .edgePath.thick path.path,
+.mermaid [id*="link-Client"],
+.mermaid [id*="link-Assistant"],
+.mermaid [id*="link-Cert"] {
+    stroke: #0D9488 !important; /* Subtle Teal Accent */
+    stroke-width: 2.2px !important;
+}
+
+/* Step Connection Pill Badges: Inter SemiBold, Crisp Enterprise Label */
 .mermaid .edgeLabel,
 .mermaid .edgeLabel span,
 .mermaid .edgeLabel p,
 .mermaid .edgeLabel rect {
-    font-family: 'JetBrains Mono', Consolas, monospace !important;
+    font-family: 'Inter', sans-serif !important;
     font-size: 0.76rem !important;
-    font-weight: 600 !important;
-    color: var(--ink-primary) !important;
+    font-weight: 600 !important; /* Inter SemiBold */
+    color: #0F172A !important; /* Deep Navy */
     letter-spacing: -0.01em !important;
 }
 
 .mermaid .edgeLabel span,
 .mermaid .edgeLabel p {
     background: #FFFFFF !important;
-    padding: 3px 9px !important;
-    border-radius: var(--radius-pill) !important;
-    border: 1px solid var(--border-stone) !important;
-    box-shadow: 0 2px 6px rgba(37, 37, 34, 0.06) !important;
+    color: #0F172A !important;
+    padding: 4px 10px !important;
+    border-radius: 9999px !important;
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
     display: inline-block !important;
-}
-
-/* Node Boxes Polish */
-.mermaid .node rect,
-.mermaid .node polygon {
-    rx: 10px !important;
-    ry: 10px !important;
-    stroke-width: 1.5px !important;
-    filter: drop-shadow(0 2px 8px rgba(37, 37, 34, 0.05));
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.mermaid .node:hover rect {
-    stroke-width: 2px !important;
-    filter: drop-shadow(0 8px 20px rgba(37, 37, 34, 0.12));
-}
-
-.mermaid .edgePath path.path {
-    stroke: var(--sage-primary) !important;
-    stroke-width: 1.8px !important;
-}
-
-.mermaid .marker {
-    fill: var(--sage-primary) !important;
-    stroke: var(--sage-primary) !important;
 }
 
 /* Responsive adjustments */
