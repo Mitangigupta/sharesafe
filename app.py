@@ -166,10 +166,14 @@ def trigger_periodic_cleanup():
     SessionManager.cleanup_old_sessions()
 
 @app.after_request
-def add_no_cache_headers(response):
+def add_security_and_cors_headers(response):
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
+    # Enable CORS for Chrome Extension and local API clients
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
     return response
 
 @app.route('/')
@@ -768,6 +772,81 @@ def set_ocr_path():
     path = data.get('path', '').strip()
     success, msg = ocr_engine.set_tesseract_path(path)
     return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/health', methods=['GET', 'OPTIONS'])
+def api_health():
+    """Health check endpoint for Chrome extension and monitoring."""
+    if request.method == 'OPTIONS':
+        return ('', 204)
+    return jsonify({
+        'status': 'online',
+        'service': 'ShareSafe Core Engine',
+        'version': '1.0.0',
+        'ocr_available': ocr_engine.is_available()
+    })
+
+@app.route('/api/scan-text', methods=['POST', 'OPTIONS'])
+def api_scan_text():
+    """Scans raw text for sensitive PII, credentials, and identity leaks without file upload.
+    Used by the ShareSafe Chrome Extension for selected text, WhatsApp, and Gmail scanning.
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    data = request.get_json(silent=True) or {}
+    text = data.get('text', '')
+    if not isinstance(text, str):
+        return jsonify({'error': 'Invalid request: "text" field must be a string.'}), 400
+
+    if len(text) > 500000:
+        return jsonify({'error': 'Text payload exceeds maximum allowed size (500 KB).'}), 400
+
+    sharing_context = data.get('sharing_context', 'academic').lower()
+    if sharing_context not in ['academic', 'professional', 'private', 'public']:
+        sharing_context = 'academic'
+
+    from core.risk_assessor import RiskAssessor
+    from core.privacy_assistant import PrivacyAssistant
+
+    raw_matches = scanner.detector.scan_text(text)
+
+    detections = []
+    for m in raw_matches:
+        d = dict(m)
+        d['id'] = f"det_{uuid.uuid4().hex[:8]}"
+        detections.append(d)
+
+    sorted_matches = sorted(
+        [m for m in detections if 'char_span' in m and m['char_span']],
+        key=lambda x: x['char_span'][0],
+        reverse=True
+    )
+    masked_text_chars = list(text)
+    for m in sorted_matches:
+        start, end = m['char_span']
+        replacement = m.get('masked') or '[REDACTED]'
+        masked_text_chars[start:end] = list(replacement)
+    masked_text = "".join(masked_text_chars)
+
+    risk_summary = RiskAssessor.assess(detections, context=sharing_context)
+    assistant_analysis = PrivacyAssistant.generate_recommendations(
+        detections,
+        sharing_context=sharing_context,
+        file_name='Webpage Selection',
+        is_pdf=False,
+        page_count=1
+    )
+
+    return jsonify({
+        'success': True,
+        'text_length': len(text),
+        'total_findings': len(detections),
+        'detections': detections,
+        'risk_summary': risk_summary,
+        'assistant': assistant_analysis,
+        'masked_text': masked_text,
+        'sharing_context': sharing_context
+    })
 
 if __name__ == '__main__':
     print("================================================================")
