@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ShareSafe — PII & Privacy Guard",
+  "name": "ShareSafe - PII & Privacy Guard",
   "version": "1.0.0",
   "description": "Defensive privacy scanner that detects sensitive PII, credentials, and identity leaks on webpages and drafts before sharing.",
   "icons": {
@@ -30,9 +30,5 @@
   "host_permissions": [
     "http://127.0.0.1:5000/*",
     "http://localhost:5000/*"
-  ],
-  "optional_host_permissions": [
-    "https://web.whatsapp.com/*",
-    "https://mail.google.com/*"
   ]
 }
