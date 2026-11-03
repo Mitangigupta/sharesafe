@@ -147,6 +147,57 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAssistant(assistant);
   }
 
+  function getSimpleGuidance(r) {
+    const type = (r.type || "").toLowerCase();
+    const isHigh = r.priority === "HIGH_PRIORITY" || r.action === "REDACT";
+
+    let icon = "⚠️";
+    let badgeText = isHigh ? "Must Redact" : "Check First";
+    let badgeClass = isHigh ? "badge-must-redact" : "badge-check-first";
+    let why = "";
+    let action = "";
+
+    if (type.includes("card") || type === "credit_card") {
+      icon = "💳";
+      why = "Card numbers can be stolen for unauthorized purchases.";
+      action = "Black out or delete the card digits before sharing.";
+    } else if (type.includes("aadhaar")) {
+      icon = "🆔";
+      why = "Government identity number linked to your personal profile.";
+      action = "Mask to keep only the last 4 digits (e.g. XXXX-XXXX-0123).";
+    } else if (type.includes("pan")) {
+      icon = "📋";
+      why = "Official tax ID; can be misused for identity impersonation.";
+      action = "Mask or remove before sharing externally.";
+    } else if (type.includes("api_key") || type.includes("token")) {
+      icon = "🔑";
+      why = "Private password or secret key that unlocks your accounts.";
+      action = "Delete immediately. Never send private keys.";
+    } else if (type.includes("phone")) {
+      icon = "📞";
+      why = "Direct phone number that anyone reading this can contact.";
+      action = "Keep only if the recipient genuinely needs to call you.";
+    } else if (type.includes("email")) {
+      icon = "✉️";
+      why = "Personal email address exposed to spam or phishing.";
+      action = "Safe to share for contact, or mask if posting publicly.";
+    } else if (type.includes("ssn")) {
+      icon = "🔒";
+      why = "Confidential Social Security Number; extreme identity theft risk.";
+      action = "Never send over plain text. Black out completely.";
+    } else if (type.includes("ip_address")) {
+      icon = "🌐";
+      why = "Internal network address that reveals system details.";
+      action = "Mask private IPs before sharing screenshots or logs.";
+    } else {
+      icon = isHigh ? "🚨" : "🔍";
+      why = r.risk_description || r.explanation || "Sensitive pattern detected in your text.";
+      action = r.recommendation || (isHigh ? "Redact this item before distribution." : "Review if this information is intended to be public.");
+    }
+
+    return { icon, badgeText, badgeClass, why, action };
+  }
+
   function renderAssistant(assistant) {
     if (!assistant || (!assistant.summary && (!assistant.recommendations || assistant.recommendations.length === 0))) {
       assistantPanel.innerHTML = `
@@ -157,42 +208,62 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const summaryText = typeof assistant.summary === 'string'
-      ? assistant.summary
-      : (assistant.summary?.overview || assistant.summary?.headline || "");
     const recs = assistant.recommendations || [];
+    const stats = assistant.stats || {};
+    const highCount = stats.high_priority || recs.filter(r => r.priority === 'HIGH_PRIORITY').length;
+    const reviewCount = stats.review_recommended || recs.filter(r => r.priority === 'REVIEW').length;
 
-    let html = "";
-    if (summaryText) {
-      html += `
-        <div class="asst-summary-card">
-          <div class="asst-headline">Executive Privacy Assessment</div>
-          <div class="asst-overview">${escapeHtml(summaryText)}</div>
-        </div>
-      `;
+    let bannerIcon = "✅";
+    let bannerTitle = "All Clear — Safe to Share";
+    let bannerDesc = "No sensitive identity or credential threats detected.";
+    let bannerClass = "banner-clean";
+
+    if (highCount > 0) {
+      bannerIcon = "🚨";
+      bannerTitle = `${highCount} critical item${highCount > 1 ? 's' : ''} must be removed!`;
+      bannerDesc = "Private financial or identity data was found. Remove before sending.";
+      bannerClass = "banner-critical";
+    } else if (reviewCount > 0) {
+      bannerIcon = "🔍";
+      bannerTitle = `${reviewCount} personal item${reviewCount > 1 ? 's' : ''} to check`;
+      bannerDesc = "Contact or identifier info found. Make sure the recipient needs it.";
+      bannerClass = "banner-review";
     }
 
+    let html = `
+      <div class="asst-banner ${bannerClass}">
+        <div class="asst-banner-icon">${bannerIcon}</div>
+        <div class="asst-banner-text">
+          <div class="asst-banner-title">${escapeHtml(bannerTitle)}</div>
+          <div class="asst-banner-sub">${escapeHtml(bannerDesc)}</div>
+        </div>
+      </div>
+    `;
+
     if (recs.length > 0) {
+      html += `<div class="asst-cards-list">`;
       recs.forEach((r) => {
-        const prioClass = (r.priority || "INFORMATIONAL").toLowerCase().replace("_", "-");
-        const actionTag = escapeHtml(r.action_label || r.action || "Guidance");
-        const itemLabel = escapeHtml(r.label || "Detected Item");
-        const explanation = escapeHtml(r.explanation || "");
-        const riskDesc = escapeHtml(r.risk_description || "");
-        const advice = escapeHtml(r.recommendation || "");
+        const guide = getSimpleGuidance(r);
+        const itemLabel = escapeHtml(r.label || "Sensitive Item");
 
         html += `
-          <div class="rec-item priority-${prioClass}">
-            <div class="rec-header">
-              <span class="rec-title">${itemLabel}</span>
-              <span class="rec-action-badge badge-${prioClass}">${actionTag}</span>
+          <div class="rec-simple-card ${guide.badgeClass}-border">
+            <div class="rec-simple-top">
+              <span class="rec-simple-title">${guide.icon} ${itemLabel}</span>
+              <span class="rec-simple-badge ${guide.badgeClass}">${guide.badgeText}</span>
             </div>
-            ${explanation ? `<div class="rec-desc"><span class="rec-field-label">Found:</span> ${explanation}</div>` : ""}
-            ${riskDesc ? `<div class="rec-desc"><span class="rec-field-label">Risk:</span> ${riskDesc}</div>` : ""}
-            ${advice ? `<div class="rec-advice"><span class="rec-field-label">Guidance:</span> ${advice}</div>` : ""}
+            <div class="rec-simple-row">
+              <span class="rec-dot">⚠️</span>
+              <span class="rec-simple-why"><strong>Why:</strong> ${escapeHtml(guide.why)}</span>
+            </div>
+            <div class="rec-simple-row rec-row-action">
+              <span class="rec-dot">👉</span>
+              <span class="rec-simple-action"><strong>What to do:</strong> ${escapeHtml(guide.action)}</span>
+            </div>
           </div>
         `;
       });
+      html += `</div>`;
     }
 
     assistantPanel.innerHTML = html;
