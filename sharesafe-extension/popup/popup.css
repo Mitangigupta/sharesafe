@@ -466,18 +466,22 @@ body {
   border: 1px solid var(--border-stone);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
+  margin-bottom: 4px;
 }
 
 .asst-headline {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--ink-primary);
+  color: var(--coral-primary);
   margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .asst-overview {
   font-size: 12px;
   color: var(--ink-secondary);
+  line-height: 1.45;
 }
 
 .rec-item {
@@ -485,23 +489,71 @@ body {
   border: 1px solid var(--border-stone);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.rec-item.priority-high { border-left: 3px solid var(--red-finding); }
+.rec-item.priority-high-priority { border-left: 3px solid var(--red-finding); }
 .rec-item.priority-review { border-left: 3px solid var(--amber-primary); }
-.rec-item.priority-info { border-left: 3px solid var(--sage-primary); }
+.rec-item.priority-informational { border-left: 3px solid var(--sage-primary); }
+
+.rec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
 
 .rec-title {
   font-size: 12px;
   font-weight: 700;
   color: var(--ink-primary);
-  margin-bottom: 2px;
+}
+
+.rec-action-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-high-priority {
+  background-color: var(--red-finding-soft);
+  color: var(--red-finding);
+}
+
+.badge-review {
+  background-color: var(--amber-soft);
+  color: var(--amber-primary);
+}
+
+.badge-informational {
+  background-color: var(--sage-soft);
+  color: var(--sage-primary);
+}
+
+.rec-field-label {
+  font-weight: 600;
+  color: var(--ink-primary);
 }
 
 .rec-desc {
   font-size: 11px;
   color: var(--ink-secondary);
   line-height: 1.4;
+}
+
+.rec-advice {
+  font-size: 11px;
+  color: var(--ink-primary);
+  line-height: 1.4;
+  background-color: var(--bg-stone-subtle);
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  margin-top: 2px;
 }
 
 /* Quick Input Panel */

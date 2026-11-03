@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderAssistant(assistant) {
-    if (!assistant || !assistant.summary) {
+    if (!assistant || (!assistant.summary && (!assistant.recommendations || assistant.recommendations.length === 0))) {
       assistantPanel.innerHTML = `
         <div class="empty-state">
           <p class="empty-desc">No specific assistant recommendations for this text.</p>
@@ -157,23 +157,39 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const summary = assistant.summary || {};
+    const summaryText = typeof assistant.summary === 'string'
+      ? assistant.summary
+      : (assistant.summary?.overview || assistant.summary?.headline || "");
     const recs = assistant.recommendations || [];
 
-    let html = `
-      <div class="asst-summary-card">
-        <div class="asst-headline">${escapeHtml(summary.headline || "Privacy Assessment")}</div>
-        <div class="asst-overview">${escapeHtml(summary.overview || "")}</div>
-      </div>
-    `;
+    let html = "";
+    if (summaryText) {
+      html += `
+        <div class="asst-summary-card">
+          <div class="asst-headline">Executive Privacy Assessment</div>
+          <div class="asst-overview">${escapeHtml(summaryText)}</div>
+        </div>
+      `;
+    }
 
     if (recs.length > 0) {
       recs.forEach((r) => {
         const prioClass = (r.priority || "INFORMATIONAL").toLowerCase().replace("_", "-");
+        const actionTag = escapeHtml(r.action_label || r.action || "Guidance");
+        const itemLabel = escapeHtml(r.label || "Detected Item");
+        const explanation = escapeHtml(r.explanation || "");
+        const riskDesc = escapeHtml(r.risk_description || "");
+        const advice = escapeHtml(r.recommendation || "");
+
         html += `
           <div class="rec-item priority-${prioClass}">
-            <div class="rec-title">${escapeHtml(r.action || r.type || "Guidance")}</div>
-            <div class="rec-desc">${escapeHtml(r.rationale || r.description || "")}</div>
+            <div class="rec-header">
+              <span class="rec-title">${itemLabel}</span>
+              <span class="rec-action-badge badge-${prioClass}">${actionTag}</span>
+            </div>
+            ${explanation ? `<div class="rec-desc"><span class="rec-field-label">Found:</span> ${explanation}</div>` : ""}
+            ${riskDesc ? `<div class="rec-desc"><span class="rec-field-label">Risk:</span> ${riskDesc}</div>` : ""}
+            ${advice ? `<div class="rec-advice"><span class="rec-field-label">Guidance:</span> ${advice}</div>` : ""}
           </div>
         `;
       });
