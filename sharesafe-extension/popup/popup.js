@@ -147,55 +147,58 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAssistant(assistant);
   }
 
-  function getSimpleGuidance(r) {
+  function getCleanGuidance(r) {
     const type = (r.type || "").toLowerCase();
     const isHigh = r.priority === "HIGH_PRIORITY" || r.action === "REDACT";
 
-    let icon = "⚠️";
-    let badgeText = isHigh ? "Must Redact" : "Check First";
-    let badgeClass = isHigh ? "badge-must-redact" : "badge-check-first";
+    let priorityLabel = isHigh ? "High Priority" : "Review Recommended";
+    let priClass = isHigh ? "pri-high" : "pri-review";
+    let badgeClass = isHigh ? "badge-pri-high" : "badge-pri-review";
+    let confidenceLabel = r.confidence === "high" ? "Confirmed" : "Unverified";
+
     let why = "";
+    let risk = "";
     let action = "";
 
     if (type.includes("card") || type === "credit_card") {
-      icon = "💳";
-      why = "Card numbers can be stolen for unauthorized purchases.";
-      action = "Black out or delete the card digits before sharing.";
+      why = "Direct payment instrument and cardholder number.";
+      risk = "Exposure allows unauthorized transactions and identity theft.";
+      action = "Apply solid blackout redaction before distribution.";
     } else if (type.includes("aadhaar")) {
-      icon = "🆔";
-      why = "Government identity number linked to your personal profile.";
-      action = "Mask to keep only the last 4 digits (e.g. XXXX-XXXX-0123).";
+      why = "National identity registration identifier.";
+      risk = "Exposure permits profile correlation and identity impersonation.";
+      action = "Mask UID to reveal only the final 4 digits (XXXX-XXXX-0123).";
     } else if (type.includes("pan")) {
-      icon = "📋";
-      why = "Official tax ID; can be misused for identity impersonation.";
-      action = "Mask or remove before sharing externally.";
+      why = "Official tax department permanent account identifier.";
+      risk = "Exposure permits unauthorized financial filings and profile cloning.";
+      action = "Redact full identifier before external disclosure.";
     } else if (type.includes("api_key") || type.includes("token")) {
-      icon = "🔑";
-      why = "Private password or secret key that unlocks your accounts.";
-      action = "Delete immediately. Never send private keys.";
+      why = "Private cryptographic or cloud authentication credential.";
+      risk = "Grants immediate administrative access to linked services.";
+      action = "Purge secret token immediately. Never transmit in plain text.";
     } else if (type.includes("phone")) {
-      icon = "📞";
-      why = "Direct phone number that anyone reading this can contact.";
-      action = "Keep only if the recipient genuinely needs to call you.";
+      why = "Direct personal telecommunication number.";
+      risk = "Enables direct unsolicited contact and identity tracing.";
+      action = "Review recipient need; redact if sharing with untrusted peers.";
     } else if (type.includes("email")) {
-      icon = "✉️";
-      why = "Personal email address exposed to spam or phishing.";
-      action = "Safe to share for contact, or mask if posting publicly.";
+      why = "Standard electronic messaging contact address.";
+      risk = "Exposed to automated scraping, targeted phishing, and spam.";
+      action = "Maintain for legitimate correspondence, or mask recipient username.";
     } else if (type.includes("ssn")) {
-      icon = "🔒";
-      why = "Confidential Social Security Number; extreme identity theft risk.";
-      action = "Never send over plain text. Black out completely.";
+      why = "Restricted government social security record.";
+      risk = "Severe statutory identity theft and credential compromise risk.";
+      action = "Irreversibly redact via solid blackout before sending.";
     } else if (type.includes("ip_address")) {
-      icon = "🌐";
-      why = "Internal network address that reveals system details.";
-      action = "Mask private IPs before sharing screenshots or logs.";
+      why = "Network host gateway and infrastructure address.";
+      risk = "Discloses internal network topology and potential attack surface.";
+      action = "Mask internal IP octets prior to sharing logs or diagnostics.";
     } else {
-      icon = isHigh ? "🚨" : "🔍";
-      why = r.risk_description || r.explanation || "Sensitive pattern detected in your text.";
-      action = r.recommendation || (isHigh ? "Redact this item before distribution." : "Review if this information is intended to be public.");
+      why = r.explanation ? r.explanation.split('.')[0] + '.' : "Recognized sensitive data pattern.";
+      risk = r.risk_description ? r.risk_description.split('.')[0] + '.' : "Potential privacy or compliance exposure.";
+      action = r.recommendation ? r.recommendation.split('.')[0] + '.' : "Review and redact if sensitive.";
     }
 
-    return { icon, badgeText, badgeClass, why, action };
+    return { priorityLabel, priClass, badgeClass, confidenceLabel, why, risk, action };
   }
 
   function renderAssistant(assistant) {
@@ -213,52 +216,69 @@ document.addEventListener("DOMContentLoaded", () => {
     const highCount = stats.high_priority || recs.filter(r => r.priority === 'HIGH_PRIORITY').length;
     const reviewCount = stats.review_recommended || recs.filter(r => r.priority === 'REVIEW').length;
 
-    let bannerIcon = "✅";
-    let bannerTitle = "All Clear — Safe to Share";
-    let bannerDesc = "No sensitive identity or credential threats detected.";
-    let bannerClass = "banner-clean";
+    let calloutBadge = "Safe Document";
+    let calloutClass = "badge-clean";
+    let calloutText = "No direct personal identity or credential threats detected under current rules.";
 
     if (highCount > 0) {
-      bannerIcon = "🚨";
-      bannerTitle = `${highCount} critical item${highCount > 1 ? 's' : ''} must be removed!`;
-      bannerDesc = "Private financial or identity data was found. Remove before sending.";
-      bannerClass = "banner-critical";
+      calloutBadge = `${highCount} High Priority`;
+      calloutClass = "badge-high";
+      calloutText = `${highCount} critical identifier${highCount > 1 ? 's' : ''} recommended for immediate redaction prior to distribution.`;
     } else if (reviewCount > 0) {
-      bannerIcon = "🔍";
-      bannerTitle = `${reviewCount} personal item${reviewCount > 1 ? 's' : ''} to check`;
-      bannerDesc = "Contact or identifier info found. Make sure the recipient needs it.";
-      bannerClass = "banner-review";
+      calloutBadge = `${reviewCount} Review Needed`;
+      calloutClass = "badge-review";
+      calloutText = `Review ${reviewCount} personal item${reviewCount > 1 ? 's' : ''} to determine whether disclosure is intended.`;
     }
 
     let html = `
-      <div class="asst-banner ${bannerClass}">
-        <div class="asst-banner-icon">${bannerIcon}</div>
-        <div class="asst-banner-text">
-          <div class="asst-banner-title">${escapeHtml(bannerTitle)}</div>
-          <div class="asst-banner-sub">${escapeHtml(bannerDesc)}</div>
+      <div class="asst-container">
+        <div class="asst-callout">
+          <div class="asst-callout-header">
+            <span class="asst-callout-title">Privacy Guidance</span>
+            <span class="asst-callout-badge ${calloutClass}">${calloutBadge}</span>
+          </div>
+          <p class="asst-callout-text">${escapeHtml(calloutText)}</p>
         </div>
-      </div>
     `;
 
     if (recs.length > 0) {
-      html += `<div class="asst-cards-list">`;
+      html += `<div class="rec-card-list">`;
       recs.forEach((r) => {
-        const guide = getSimpleGuidance(r);
-        const itemLabel = escapeHtml(r.label || "Sensitive Item");
+        const guide = getCleanGuidance(r);
+        const itemLabel = escapeHtml(r.label || "Detected Item");
+        const category = escapeHtml(r.category || "General");
+        const maskedVal = escapeHtml(r.masked || r.value || "");
+        const styleName = escapeHtml(r.suggested_style ? r.suggested_style.charAt(0).toUpperCase() + r.suggested_style.slice(1) : "Blackout");
 
         html += `
-          <div class="rec-simple-card ${guide.badgeClass}-border">
-            <div class="rec-simple-top">
-              <span class="rec-simple-title">${guide.icon} ${itemLabel}</span>
-              <span class="rec-simple-badge ${guide.badgeClass}">${guide.badgeText}</span>
+          <div class="rec-card ${guide.priClass}">
+            <div class="rec-card-header">
+              <span class="rec-priority-badge ${guide.badgeClass}">${guide.priorityLabel}</span>
+              <span class="rec-confidence-chip">${guide.confidenceLabel}</span>
             </div>
-            <div class="rec-simple-row">
-              <span class="rec-dot">⚠️</span>
-              <span class="rec-simple-why"><strong>Why:</strong> ${escapeHtml(guide.why)}</span>
+            <div class="rec-entity-row">
+              <div class="rec-entity-info">
+                <span class="rec-entity-name">${itemLabel}</span>
+                <span class="rec-category-tag">${category}</span>
+              </div>
+              <code class="rec-masked-val">${maskedVal}</code>
             </div>
-            <div class="rec-simple-row rec-row-action">
-              <span class="rec-dot">👉</span>
-              <span class="rec-simple-action"><strong>What to do:</strong> ${escapeHtml(guide.action)}</span>
+            <div class="rec-body">
+              <div class="rec-row">
+                <span class="rec-label">Why Sensitive</span>
+                <p class="rec-text">${escapeHtml(guide.why)}</p>
+              </div>
+              <div class="rec-row">
+                <span class="rec-label">Risk Exposure</span>
+                <p class="rec-text">${escapeHtml(guide.risk)}</p>
+              </div>
+              <div class="rec-row rec-guidance-row">
+                <span class="rec-label text-coral">Action</span>
+                <p class="rec-text">${escapeHtml(guide.action)}</p>
+              </div>
+            </div>
+            <div class="rec-footer-bar">
+              <span class="rec-style-hint">Suggested Redaction: <strong>${styleName}</strong></span>
             </div>
           </div>
         `;
@@ -266,6 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
       html += `</div>`;
     }
 
+    html += `</div>`;
     assistantPanel.innerHTML = html;
   }
 
