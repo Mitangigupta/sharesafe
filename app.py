@@ -227,6 +227,11 @@ def architecture_design():
     ocr_status = ocr_engine.get_status()
     return render_template('architecture_design.html', active_page='architecture-design', ocr_status=ocr_status)
 
+@app.route('/extension')
+def browser_extension():
+    ocr_status = ocr_engine.get_status()
+    return render_template('extension.html', active_page='extension', ocr_status=ocr_status)
+
 @app.route('/next-milestones')
 def next_milestones():
     ocr_status = ocr_engine.get_status()
@@ -728,6 +733,27 @@ def download_certificate(session_id):
     if not os.path.exists(cert_pdf):
         return "Certificate not found", 404
     return send_file(cert_pdf, as_attachment=True, download_name=f"ShareSafe_Audit_Certificate_{session_id[:8]}.pdf")
+
+@app.route('/download/extension-zip')
+def download_extension_zip():
+    zip_path = os.path.join(app.static_folder, 'packages', 'sharesafe-extension.zip')
+    if os.path.exists(zip_path):
+        return send_file(zip_path, as_attachment=True, download_name='sharesafe-extension-v3.zip')
+    
+    extension_dir = os.path.join(os.path.dirname(__file__), 'sharesafe-extension')
+    if not os.path.isdir(extension_dir):
+        return jsonify({'error': 'Extension package not found'}), 404
+        
+    import io, zipfile
+    mem_zip = io.BytesIO()
+    with zipfile.ZipFile(mem_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for root, dirs, files in os.walk(extension_dir):
+            for file in files:
+                abs_p = os.path.join(root, file)
+                rel_p = os.path.relpath(abs_p, extension_dir)
+                zf.write(abs_p, os.path.join('sharesafe-extension', rel_p))
+    mem_zip.seek(0)
+    return send_file(mem_zip, mimetype='application/zip', as_attachment=True, download_name='sharesafe-extension-v3.zip')
 
 @app.route('/download/<session_id>/audit-json')
 def download_audit_json(session_id):

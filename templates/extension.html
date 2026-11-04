@@ -1,0 +1,707 @@
+{% extends "base.html" %}
+
+{% block title %}Browser Extension &mdash; ShareSafe Sovereign Privacy Studio{% endblock %}
+
+{% block content %}
+<div class="info-page-wrapper pres-animate-in">
+    <!-- Breadcrumb & Status Bar -->
+    <div class="info-breadcrumb-bar">
+        <div class="info-breadcrumb-inner">
+            <a href="/" class="breadcrumb-link"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Browser Extension</span>
+        </div>
+        <div class="breadcrumb-meta-chips">
+            <span class="meta-tag"><i class="fa-solid fa-puzzle-piece"></i> Official Component</span>
+            <span class="meta-tag"><i class="fa-solid fa-shield-halved"></i> Real-Time Privacy Guard</span>
+            <span class="meta-tag"><i class="fa-brands fa-chrome"></i> Manifest V3 Verified</span>
+        </div>
+    </div>
+
+    <!-- Hero Header -->
+    <header class="info-hero-header">
+        <div class="info-hero-kicker">
+            <span class="kicker-pill"><i class="fa-solid fa-puzzle-piece"></i> Official Client Component</span>
+        </div>
+        <h1 class="info-hero-title">
+            ShareSafe <span class="teal-gradient-text">Browser Extension</span>
+        </h1>
+        <p class="info-hero-lead">
+            An official client-side extension of the ShareSafe ecosystem. While the Web Application provides deep document rasterization, QR threat inspection, and cryptographic audit proofs, the Browser Extension delivers in-situ, real-time sensitive data detection and masking directly within your web browser before data is shared online.
+        </p>
+
+        <!-- Action / Access Toolbar -->
+        <div class="extension-hero-actions">
+            <a href="{{ url_for('download_extension_zip') }}" class="btn-extension-primary" title="Download ShareSafe Extension Package">
+                <i class="fa-solid fa-download"></i>
+                <span>Download Extension Package (.zip)</span>
+            </a>
+            <button type="button" class="btn-extension-secondary" onclick="toggleInstallGuide()" id="btnToggleInstall" title="Toggle step-by-step setup guide">
+                <i class="fa-solid fa-terminal"></i>
+                <span>Installation Instructions</span>
+            </button>
+            <span style="font-size: 0.8rem; color: var(--ink-muted); margin-left: 4px;">
+                <i class="fa-solid fa-check-double" style="color: var(--sage-primary);"></i> Manifest V3 &bull; Chromium &amp; Edge Compatible
+            </span>
+        </div>
+
+        <!-- Collapsible Installation Guide -->
+        <div class="ext-install-guide" id="installGuideBox" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="font-size: 0.92rem; font-weight: 700; color: var(--ink-primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-screwdriver-wrench" style="color: var(--sage-primary);"></i>
+                    <span>Quick 4-Step Setup in Google Chrome or Microsoft Edge</span>
+                </div>
+                <button type="button" onclick="toggleInstallGuide()" style="background: none; border: none; font-size: 1.1rem; color: var(--ink-muted); cursor: pointer;" aria-label="Close guide">&times;</button>
+            </div>
+            <div class="install-steps-grid">
+                <div class="install-step-card">
+                    <div class="install-step-num">1</div>
+                    <div class="install-step-title">Download &amp; Unzip</div>
+                    <div class="install-step-desc">
+                        Click the download button above and extract <code>sharesafe-extension-v3.zip</code> to a local folder.
+                    </div>
+                </div>
+                <div class="install-step-card">
+                    <div class="install-step-num">2</div>
+                    <div class="install-step-title">Open Extensions Page</div>
+                    <div class="install-step-desc">
+                        In Chrome or Edge, navigate to <code>chrome://extensions</code> or <code>edge://extensions</code>.
+                    </div>
+                </div>
+                <div class="install-step-card">
+                    <div class="install-step-num">3</div>
+                    <div class="install-step-title">Enable Developer Mode</div>
+                    <div class="install-step-desc">
+                        Toggle on the <strong>Developer mode</strong> switch in the upper-right corner of the extensions page.
+                    </div>
+                </div>
+                <div class="install-step-card">
+                    <div class="install-step-num">4</div>
+                    <div class="install-step-title">Load Unpacked</div>
+                    <div class="install-step-desc">
+                        Click <strong>Load unpacked</strong> (top-left) and select the extracted <code>sharesafe-extension</code> folder. Pin the shield icon to your toolbar.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <div class="info-content-grid">
+
+        <!-- 1. Functional Extension Showcase Section -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-window-restore"></i></div>
+                <div>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Functional Extension Showcase &amp; Interface</h2>
+                    <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
+                        Authentic representation of the ShareSafe Manifest V3 popup interface, sensitive data alerts, checksum validation, and 1-click sanitization.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body-text">
+                <div class="extension-showcase-grid">
+
+                    <!-- Left: Interactive Realistic Popup Frame -->
+                    <div class="ext-mockup-frame">
+                        <div class="ext-mockup-titlebar">
+                            <div class="ext-mockup-dots">
+                                <span class="ext-mockup-dot dot-red"></span>
+                                <span class="ext-mockup-dot dot-amber"></span>
+                                <span class="ext-mockup-dot dot-green"></span>
+                            </div>
+                            <span>ShareSafe Extension &bull; Popup Interface</span>
+                            <span style="font-size: 0.7rem; color: var(--ink-muted);">v1.0.0 (MV3)</span>
+                        </div>
+
+                        <div class="ext-popup-body">
+                            <!-- Extension Header -->
+                            <div class="ext-popup-header">
+                                <div class="ext-popup-brand">
+                                    <div class="ext-popup-icon">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </div>
+                                    <div>
+                                        <div class="ext-popup-title">ShareSafe</div>
+                                        <div class="ext-popup-subtitle">Privacy &amp; PII Guard</div>
+                                    </div>
+                                </div>
+                                <div class="ext-status-badge" title="Unified ShareSafe Python backend active">
+                                    <span class="ext-status-dot"></span>
+                                    <span>Core Engine Active</span>
+                                </div>
+                            </div>
+
+                            <!-- Context Selector -->
+                            <div class="ext-context-bar">
+                                <span style="font-weight: 600; color: var(--ink-secondary);">Sharing Context:</span>
+                                <select id="showcaseContextSelect" onchange="updateShowcaseContext(this.value)">
+                                    <option value="academic" selected>Academic (Coursework &amp; Lab) [1.0&times;]</option>
+                                    <option value="professional">Professional (Enterprise &amp; Client) [1.1&times;]</option>
+                                    <option value="private">Private (Trusted Peers) [0.85&times;]</option>
+                                    <option value="public">Public (Social Media &amp; Web) [1.3&times;]</option>
+                                </select>
+                            </div>
+
+                            <!-- Risk Banner -->
+                            <div class="ext-risk-banner" id="showcaseRiskBanner">
+                                <div class="ext-risk-header-row">
+                                    <span class="ext-risk-pill-critical" id="showcaseRiskPill">CRITICAL RISK</span>
+                                    <span class="ext-risk-score-mono" id="showcaseRiskScore">Score: 92/100</span>
+                                </div>
+                                <p class="ext-risk-msg" id="showcaseRiskMsg">
+                                    Sovereign legal identity and payment credentials detected. High risk of identity theft and financial exposure if shared unmasked.
+                                </p>
+                            </div>
+
+                            <!-- Tabs Navigation -->
+                            <div class="ext-nav-tabs">
+                                <button type="button" class="ext-tab-btn active" id="tabBtnFindings" onclick="switchShowcaseTab('findings')">
+                                    <span>Findings</span>
+                                    <span class="ext-tab-badge" id="badgeFindingsCount">3</span>
+                                </button>
+                                <button type="button" class="ext-tab-btn" id="tabBtnSanitized" onclick="switchShowcaseTab('sanitized')">
+                                    <span>Sanitized Text</span>
+                                </button>
+                                <button type="button" class="ext-tab-btn" id="tabBtnAssistant" onclick="switchShowcaseTab('assistant')">
+                                    <span>Assistant</span>
+                                </button>
+                                <button type="button" class="ext-tab-btn" id="tabBtnQuick" onclick="switchShowcaseTab('quick')">
+                                    <span>Quick Input</span>
+                                </button>
+                            </div>
+
+                            <!-- Panel 1: Findings -->
+                            <div class="ext-tab-panel active" id="panelFindings">
+                                <div class="ext-findings-stack">
+                                    <!-- Item 1: Aadhaar -->
+                                    <div class="ext-finding-entry critical">
+                                        <div class="ext-finding-top">
+                                            <span class="ext-finding-name">Indian Aadhaar UID</span>
+                                            <span class="ext-finding-badge ext-badge-critical">CRITICAL</span>
+                                        </div>
+                                        <div class="ext-finding-masked">XXXX XXXX 0123</div>
+                                        <div class="ext-finding-detail">
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            <span>Verhoeff Checksum Validated (Mod-10 Dihedral $D_5$)</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Item 2: PAN -->
+                                    <div class="ext-finding-entry high">
+                                        <div class="ext-finding-top">
+                                            <span class="ext-finding-name">Indian PAN Card</span>
+                                            <span class="ext-finding-badge ext-badge-high">HIGH</span>
+                                        </div>
+                                        <div class="ext-finding-masked">ABCDE****F</div>
+                                        <div class="ext-finding-detail">
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            <span>Income Tax Entity Code: Individual (P) Validated</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Item 3: Credit Card -->
+                                    <div class="ext-finding-entry critical">
+                                        <div class="ext-finding-top">
+                                            <span class="ext-finding-name">Credit Card (Visa)</span>
+                                            <span class="ext-finding-badge ext-badge-critical">CRITICAL</span>
+                                        </div>
+                                        <div class="ext-finding-masked">4111 **** **** 1111</div>
+                                        <div class="ext-finding-detail">
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            <span>Luhn Mod-10 Checksum Algorithm Verified</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Panel 2: Sanitized Text -->
+                            <div class="ext-tab-panel" id="panelSanitized">
+                                <div class="ext-sanitized-box">
+                                    <div class="ext-sanitized-top">
+                                        <span class="ext-sanitized-title">Redacted &amp; Safe Output</span>
+                                        <button type="button" class="ext-btn-copy" id="btnCopyDemo" onclick="copyShowcaseSanitized()">
+                                            <i class="fa-regular fa-copy" id="copyIcon"></i>
+                                            <span id="copyLabel">Copy Text</span>
+                                        </button>
+                                    </div>
+                                    <textarea class="ext-sanitized-text" id="showcaseSanitizedText" readonly>Client submission verified: Please confirm transaction details for resident holding Aadhaar [REDACTED_AADHAAR] with PAN [REDACTED_PAN] and registered payment card [REDACTED_CARD].</textarea>
+                                </div>
+                            </div>
+
+                            <!-- Panel 3: Privacy Assistant -->
+                            <div class="ext-tab-panel" id="panelAssistant">
+                                <div class="ext-findings-stack">
+                                    <div class="ext-assistant-card">
+                                        <div class="ext-assistant-header">
+                                            <span class="ext-assistant-title"><i class="fa-solid fa-triangle-exclamation"></i> High Priority: Identity Leak</span>
+                                            <span style="font-size: 0.68rem; font-weight: 700; color: #A74440; background: #FCE8E7; padding: 1px 6px; border-radius: 4px;">REDACT</span>
+                                        </div>
+                                        <div class="ext-assistant-body">
+                                            Aadhaar UID and PAN Card numbers are sovereign personal identifiers under the DPDP Act 2023. Never transmit in cleartext across web forms or AI chat prompts.
+                                        </div>
+                                    </div>
+
+                                    <div class="ext-assistant-card">
+                                        <div class="ext-assistant-header">
+                                            <span class="ext-assistant-title"><i class="fa-solid fa-credit-card"></i> High Priority: PCI-DSS Compliance</span>
+                                            <span style="font-size: 0.68rem; font-weight: 700; color: #A74440; background: #FCE8E7; padding: 1px 6px; border-radius: 4px;">MASK</span>
+                                        </div>
+                                        <div class="ext-assistant-body">
+                                            Primary Account Numbers (PAN/Credit Card) must be truncated with all middle digits masked before submission to third-party endpoints.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Panel 4: Quick Input (Live Scan Backend Call) -->
+                            <div class="ext-tab-panel" id="panelQuick">
+                                <div class="ext-live-scan-box">
+                                    <div style="font-size: 0.74rem; color: var(--ink-secondary);">
+                                        Type or paste any text below to execute a real-time scan against the active <code>/api/scan-text</code> engine:
+                                    </div>
+                                    <textarea class="ext-live-textarea" id="liveInputText" placeholder="Paste an email, Aadhaar, PAN, card number, or phone number...">Contact resident at +91 98765 43210 or Aadhaar 2345 6789 0123 with PAN ABCDE1234F</textarea>
+                                    <button type="button" class="ext-live-scan-btn" onclick="executeLiveScan()" id="btnExecuteLive">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        <span>Scan with ShareSafe</span>
+                                    </button>
+                                    <div id="liveScanFeedback" style="font-size: 0.72rem; color: var(--ink-muted); display: none;"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Right: Workflow & Security Guarantees -->
+                    <div>
+                        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ink-primary); margin: 0 0 12px 0;">
+                            In-Situ Workflow Sequence
+                        </h3>
+                        <p style="font-size: 0.88rem; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 16px;">
+                            The ShareSafe extension intercepts accidental data leakage at the moment of creation, avoiding the need to manually export files or navigate away from active browser tabs:
+                        </p>
+
+                        <!-- Workflow 4-Step Track -->
+                        <div class="ext-workflow-track">
+                            <div class="ext-workflow-step">
+                                <div class="ext-step-bubble">1</div>
+                                <div class="ext-step-info">
+                                    <h4>In-Browser Text Selection</h4>
+                                    <p>Select text in any draft email, ChatGPT prompt, support ticket, or social media message.</p>
+                                </div>
+                            </div>
+
+                            <div class="ext-workflow-step">
+                                <div class="ext-step-bubble">2</div>
+                                <div class="ext-step-info">
+                                    <h4>Context Menu Trigger</h4>
+                                    <p>Right-click the selection and choose <strong>"Scan with ShareSafe"</strong> from the browser context menu.</p>
+                                </div>
+                            </div>
+
+                            <div class="ext-workflow-step">
+                                <div class="ext-step-bubble">3</div>
+                                <div class="ext-step-info">
+                                    <h4>Checksum &amp; Risk Verification</h4>
+                                    <p>Dispatched to <code>/api/scan-text</code> to evaluate mathematical checksums (Verhoeff, Luhn) and context risk multipliers.</p>
+                                </div>
+                            </div>
+
+                            <div class="ext-workflow-step">
+                                <div class="ext-step-bubble">4</div>
+                                <div class="ext-step-info">
+                                    <h4>Defensive Masking &amp; Guidance</h4>
+                                    <p>Popup badge lights up with risk classification, Privacy Assistant instructions, and 1-click sanitized clipboard copy.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Core Architectural Guarantees -->
+                        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ink-primary); margin: 24px 0 12px 0;">
+                            Client Privacy Guarantees
+                        </h3>
+                        <div class="ext-guarantees-grid">
+                            <div class="ext-guarantee-card">
+                                <div class="ext-guarantee-icon"><i class="fa-solid fa-eye-slash"></i></div>
+                                <h4>Zero Surveillance</h4>
+                                <p>No keyloggers, passive sniffing, or DOM tracking. Only processes text explicitly selected or pasted by the user.</p>
+                            </div>
+
+                            <div class="ext-guarantee-card">
+                                <div class="ext-guarantee-icon"><i class="fa-solid fa-lock"></i></div>
+                                <h4>Scoped Permissions</h4>
+                                <p>Restricted strictly to <code>contextMenus</code>, <code>storage</code>, and <code>activeTab</code>. Zero access to browsing history or global URLs.</p>
+                            </div>
+
+                            <div class="ext-guarantee-card">
+                                <div class="ext-guarantee-icon"><i class="fa-solid fa-memory"></i></div>
+                                <h4>Ephemeral Caching</h4>
+                                <p>Findings reside exclusively in <code>chrome.storage.session</code>, which is automatically purged when the browser closes.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Unified Project Architecture Section -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-network-wired"></i></div>
+                <div>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Unified Project Architecture &amp; Data Flow</h2>
+                    <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
+                        How the ShareSafe Web Studio and Browser Extension seamlessly complement each other through a single shared Python sovereign core.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body-text">
+                <p style="font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65; margin-bottom: 20px;">
+                    ShareSafe is architected around a <strong>Unified Sovereign Engine</strong>. Rather than implementing duplicate or naive regular expressions in JavaScript, the browser extension communicates with the same robust Python core that powers the Web Application. Both client interfaces execute identical Verhoeff and Luhn checksum algorithms, identical context-aware risk multipliers, and identical privacy guidance models:
+                </p>
+
+                <!-- VISIBLE UNIFIED ARCHITECTURE MERMAID DIAGRAM -->
+                <div class="arch-mermaid-container">
+                    <div class="mermaid" style="width: 100%; min-width: 680px; text-align: center;">
+flowchart TD
+    subgraph Client_Interfaces ["1. Dual Ingestion Client Layer"]
+        WebUI["🌐 ShareSafe Web Application<br/>(Full PDF/Image Redaction Studio)"]
+        Extension["🛡️ ShareSafe Browser Extension<br/>(Real-Time Web Selection & Form Guard)"]
+    end
+
+    subgraph Transport_Layer ["2. Secure Local Transport & API Routing"]
+        WebUpload["POST /upload<br/>(Multipart Document Pipeline)"]
+        ScanAPI["POST /api/scan-text<br/>(Low-Latency JSON Endpoint)"]
+    end
+
+    subgraph Sovereign_Core ["3. Unified Python Detection & Risk Engine (core/)"]
+        Detectors["Algorithmic Detector Suite (core/detectors.py)<br/>• Verhoeff Checksum (Indian Aadhaar UID)<br/>• Luhn Mod-10 (Credit & Debit Cards)<br/>• PAN Entity Validation (Income Tax)<br/>• Cloud Secrets & Infrastructure Tokens"]
+        RiskEngine["Contextual Risk Engine (core/risk_engine.py)<br/>• Academic (1.0x) • Professional (1.1x)<br/>• Private (0.85x) • Public (1.3x)"]
+        Sanitizer["Sanitization & Masking Core<br/>• Character Span Redaction<br/>• In-Memory Dynamic Replacement"]
+    end
+
+    subgraph Security_Output ["4. Privacy-Preserving Output Layer"]
+        WebOut["Cryptographic Audit PDF & Vector Flattened File"]
+        ExtOut["Masked Clipboard Payload & In-Situ Assistant Guidance"]
+    end
+
+    WebUI --> WebUpload
+    Extension --> ScanAPI
+    WebUpload --> Detectors
+    ScanAPI --> Detectors
+    Detectors --> RiskEngine
+    RiskEngine --> Sanitizer
+    Sanitizer --> WebOut
+    Sanitizer --> ExtOut
+                    </div>
+                </div>
+
+                <div style="margin-top: 18px; padding: 14px 18px; background: var(--bg-surface); border: 1px solid var(--border-stone); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--ink-secondary); line-height: 1.6;">
+                    <strong style="color: var(--ink-primary);"><i class="fa-solid fa-code-compare" style="color: var(--coral-primary);"></i> Zero Duplication Benefit:</strong>
+                    When an algorithmic detector is updated or a new compliance rule is introduced in the Python core, both the Web Application and the Browser Extension automatically inherit the enhancement without requiring separate client-side reimplementations.
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Project Integration Matrix Section -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box"><i class="fa-solid fa-table-columns"></i></div>
+                <div>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Project Integration: Two Interfaces, One Ecosystem</h2>
+                    <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
+                        Comparing the dedicated operational responsibilities of the Web Studio and the Browser Extension.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body-text">
+                <div class="integration-matrix-grid">
+
+                    <!-- Column 1: Web App Studio -->
+                    <div class="integration-col-card web-app">
+                        <div class="int-col-header">
+                            <div class="int-col-icon coral"><i class="fa-solid fa-file-shield"></i></div>
+                            <div>
+                                <div class="int-col-title">ShareSafe Web Studio</div>
+                                <div class="int-col-role">Document Auditing &amp; Permanent Destruction</div>
+                            </div>
+                        </div>
+
+                        <ul class="int-feature-list">
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Multi-Format Ingestion:</strong> Handles PDFs, PNGs, JPGs, BMPs, and WEBP documents.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Dual OCR Engines:</strong> PyMuPDF native vector extraction + Windows Media OCR / Tesseract.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>QR Threat X-Ray:</strong> Decodes barcode payloads (UPI IDs, vCards, Wi-Fi credentials).</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>True Stream Destruction:</strong> Irreversibly strips vector objects (0 extractable characters).</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Audit Certification:</strong> Generates tamper-evident SHA-256 PDF/JSON compliance proofs.</span>
+                            </li>
+                        </ul>
+
+                        <div class="int-use-case-box">
+                            <div class="int-use-case-label">Primary Academic &amp; Professional Use-Case</div>
+                            Batch document audits before emailing assignments, sending KYC identification to banks, or sharing commercial invoices.
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Browser Extension -->
+                    <div class="integration-col-card extension">
+                        <div class="int-col-header">
+                            <div class="int-col-icon sage"><i class="fa-brands fa-chrome"></i></div>
+                            <div>
+                                <div class="int-col-title">ShareSafe Browser Extension</div>
+                                <div class="int-col-role">In-Situ Live Web &amp; Selection Protection</div>
+                            </div>
+                        </div>
+
+                        <ul class="int-feature-list">
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>In-Browser Selection:</strong> Highlight any text on any website to scan immediately.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Context Menu Integration:</strong> Native Manifest V3 right-click workflow without switching tabs.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>1-Click Masked Copy:</strong> Instantly replaces confidential credentials with safe redactions.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Dynamic Context Multipliers:</strong> Toggle between Academic, Professional, Private, and Public.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Quick Input Utility:</strong> In-popup clipboard paste area for immediate verification.</span>
+                            </li>
+                        </ul>
+
+                        <div class="int-use-case-box">
+                            <div class="int-use-case-label">Primary Academic &amp; Professional Use-Case</div>
+                            Drafting emails in Gmail, entering form submissions, communicating on WhatsApp/Slack, and prompting AI chatbots.
+                        </div>
+                    </div>
+
+                    <!-- Shared Ecosystem Banner -->
+                    <div class="shared-core-banner">
+                        <div class="shared-core-icon"><i class="fa-solid fa-cubes"></i></div>
+                        <div>
+                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--ink-primary); margin-bottom: 3px;">
+                                One Sovereign Privacy Ecosystem
+                            </div>
+                            <div style="font-size: 0.82rem; color: var(--ink-secondary); line-height: 1.5;">
+                                Both components are built on the foundational principles of <strong>100% on-device sovereign computation</strong>, ephemeral memory sandboxing (zero persistent storage of scanned text), and mathematical checksum validation. Together, they safeguard user privacy across both static files and dynamic web communications.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Mermaid JS for Architecture Diagram -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof mermaid !== 'undefined') {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'neutral',
+                fontFamily: 'Inter, sans-serif',
+                flowchart: {
+                    useMaxWidth: true,
+                    htmlLabels: true,
+                    curve: 'basis'
+                }
+            });
+        }
+    });
+
+    // Toggle Installation Guide Box
+    function toggleInstallGuide() {
+        const box = document.getElementById('installGuideBox');
+        const btn = document.getElementById('btnToggleInstall');
+        if (!box) return;
+        const isHidden = box.style.display === 'none';
+        box.style.display = isHidden ? 'block' : 'none';
+        if (btn) {
+            btn.classList.toggle('active', isHidden);
+        }
+    }
+
+    // Switch Tabs inside the Showcase Popup Mockup
+    function switchShowcaseTab(tabId) {
+        const tabs = ['findings', 'sanitized', 'assistant', 'quick'];
+        tabs.forEach(t => {
+            const btn = document.getElementById('tabBtn' + capitalize(t));
+            const panel = document.getElementById('panel' + capitalize(t));
+            if (btn) btn.classList.remove('active');
+            if (panel) panel.classList.remove('active');
+        });
+
+        const activeBtn = document.getElementById('tabBtn' + capitalize(tabId));
+        const activePanel = document.getElementById('panel' + capitalize(tabId));
+        if (activeBtn) activeBtn.classList.add('active');
+        if (activePanel) activePanel.classList.add('active');
+    }
+
+    function capitalize(s) {
+        if (!s) return '';
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    // Update Context Multiplier Simulation
+    function updateShowcaseContext(context) {
+        const scoreElem = document.getElementById('showcaseRiskScore');
+        const pillElem = document.getElementById('showcaseRiskPill');
+        const bannerElem = document.getElementById('showcaseRiskBanner');
+        if (!scoreElem || !pillElem) return;
+
+        let baseScore = 92;
+        let mult = 1.0;
+        if (context === 'professional') mult = 1.1;
+        else if (context === 'private') mult = 0.85;
+        else if (context === 'public') mult = 1.3;
+
+        let finalScore = Math.min(100, Math.round(baseScore * mult));
+        scoreElem.textContent = 'Score: ' + finalScore + '/100';
+
+        if (finalScore >= 80) {
+            pillElem.textContent = 'CRITICAL RISK';
+            pillElem.className = 'ext-risk-pill-critical';
+            bannerElem.style.borderLeftColor = 'var(--coral-primary)';
+        } else if (finalScore >= 50) {
+            pillElem.textContent = 'HIGH RISK';
+            pillElem.className = 'ext-finding-badge ext-badge-high';
+            bannerElem.style.borderLeftColor = 'var(--coral-primary)';
+        } else {
+            pillElem.textContent = 'MEDIUM RISK';
+            pillElem.className = 'ext-finding-badge';
+            pillElem.style.background = 'var(--amber-soft)';
+            pillElem.style.color = 'var(--amber-primary)';
+            bannerElem.style.borderLeftColor = 'var(--amber-primary)';
+        }
+    }
+
+    // Copy Sanitized Text Demo Button
+    function copyShowcaseSanitized() {
+        const textElem = document.getElementById('showcaseSanitizedText');
+        const labelElem = document.getElementById('copyLabel');
+        const iconElem = document.getElementById('copyIcon');
+        if (!textElem) return;
+
+        navigator.clipboard.writeText(textElem.value).then(() => {
+            if (labelElem) labelElem.textContent = 'Copied!';
+            if (iconElem) iconElem.className = 'fa-solid fa-check';
+            setTimeout(() => {
+                if (labelElem) labelElem.textContent = 'Copy Text';
+                if (iconElem) iconElem.className = 'fa-regular fa-copy';
+            }, 2000);
+        }).catch(() => {
+            textElem.select();
+            document.execCommand('copy');
+            if (labelElem) labelElem.textContent = 'Copied!';
+            setTimeout(() => {
+                if (labelElem) labelElem.textContent = 'Copy Text';
+            }, 2000);
+        });
+    }
+
+    // Real-Time Live Scan Execution calling actual /api/scan-text
+    async function executeLiveScan() {
+        const inputElem = document.getElementById('liveInputText');
+        const feedbackElem = document.getElementById('liveScanFeedback');
+        const btnElem = document.getElementById('btnExecuteLive');
+        if (!inputElem || !inputElem.value.trim()) return;
+
+        if (btnElem) {
+            btnElem.disabled = true;
+            btnElem.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
+        }
+        if (feedbackElem) {
+            feedbackElem.style.display = 'block';
+            feedbackElem.textContent = 'Dispatching text to /api/scan-text engine...';
+        }
+
+        try {
+            const res = await fetch('/api/scan-text', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: inputElem.value,
+                    sharing_context: document.getElementById('showcaseContextSelect') ? document.getElementById('showcaseContextSelect').value : 'academic'
+                })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                // Update findings badge
+                const badge = document.getElementById('badgeFindingsCount');
+                if (badge) badge.textContent = data.total_findings;
+
+                // Update sanitized output tab with real masked result
+                const sanitizedElem = document.getElementById('showcaseSanitizedText');
+                if (sanitizedElem && data.masked_text) {
+                    sanitizedElem.value = data.masked_text;
+                }
+
+                // Update risk score
+                const scoreElem = document.getElementById('showcaseRiskScore');
+                const pillElem = document.getElementById('showcaseRiskPill');
+                if (scoreElem && data.risk_summary) {
+                    scoreElem.textContent = 'Score: ' + data.risk_summary.score + '/100';
+                }
+                if (pillElem && data.risk_summary) {
+                    pillElem.textContent = data.risk_summary.level + ' RISK';
+                }
+
+                if (feedbackElem) {
+                    feedbackElem.innerHTML = '<span style="color: var(--sage-primary); font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Live Scan Complete: Found ' + data.total_findings + ' sensitive entities. Switched to Sanitized Text tab!</span>';
+                }
+
+                // Switch to sanitized tab to showcase the live result
+                setTimeout(() => {
+                    switchShowcaseTab('sanitized');
+                }, 800);
+            } else {
+                if (feedbackElem) {
+                    feedbackElem.textContent = 'Server response: ' + (data.error || 'Scan complete');
+                }
+            }
+        } catch (err) {
+            if (feedbackElem) {
+                feedbackElem.textContent = 'Engine offline or request timeout. Check local server.';
+            }
+        } finally {
+            if (btnElem) {
+                btnElem.disabled = false;
+                btnElem.innerHTML = '<i class="fa-solid fa-shield-halved"></i> <span>Scan with ShareSafe</span>';
+            }
+        }
+    }
+</script>
+{% endblock %}
