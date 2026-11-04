@@ -65,22 +65,32 @@
                 </div>
             </div>
 
-            <!-- Milestone 2 -->
-            <div class="timeline-item-row">
-                <div class="timeline-node-circle">
-                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--coral-primary); text-transform: uppercase;">Node</span>
-                    <span>2</span>
+            <!-- Milestone 2 (Phase 2 Implemented) -->
+            <div class="timeline-item-row node-active">
+                <div class="timeline-node-circle" style="border-color: var(--sage-primary); background: var(--sage-soft); color: var(--sage-primary);">
+                    <i class="fa-solid fa-check" style="font-size: 0.85rem;"></i>
                 </div>
-                <div class="timeline-card-content pres-card">
-                    <div class="milestone-num-label">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Milestone 2 &bull; Platform Ecosystem
+                <div class="timeline-card-content pres-card" style="border-left: 3px solid var(--sage-primary);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+                        <div class="milestone-num-label" style="color: var(--sage-primary); margin: 0;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Milestone 2 &bull; Platform Ecosystem
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--sage-soft); color: var(--sage-primary); border: 1px solid var(--sage-border);">
+                            <i class="fa-solid fa-circle-check"></i> Phase 2 Implemented
+                        </span>
                     </div>
                     <h2 class="milestone-title-text">
-                        Integration with Supported Platforms
+                        Integration with Supported Platforms (Gmail &amp; WhatsApp Web)
                     </h2>
                     <p class="milestone-desc-text">
-                        Explore integration with commonly used web-based platforms where users upload, attach or share files, allowing privacy checks to become part of the file-sharing process.
+                        Engineered platform adapters for <strong>Gmail</strong> (webmail compose bodies) and <strong>WhatsApp Web</strong> (chat compose footer). Enables on-demand draft scanning, 1-click in-place redaction, and pre-send alert badges without background surveillance or keystroke logging.
                     </p>
+                    <div style="margin-top: 14px;">
+                        <a href="/extension" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-sm); background: var(--bg-surface); border: 1px solid var(--border-stone); color: var(--ink-primary); text-decoration: none; transition: all 0.2s ease;">
+                            <i class="fa-solid fa-arrow-up-right-from-square" style="color: var(--coral-primary);"></i>
+                            <span>View Platform Adapters Showcase &rarr;</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 

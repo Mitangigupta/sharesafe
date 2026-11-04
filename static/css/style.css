@@ -10854,3 +10854,114 @@ input:checked + .toggle-slider::before {
     font-size: 18px;
     flex-shrink: 0;
 }
+
+/* Phase 2 Platform Simulation in Showcase */
+.ext-platform-sim-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--sage-soft);
+    border: 1px solid var(--sage-border);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    margin-bottom: 12px;
+}
+
+.platform-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--sage-primary);
+    color: #FFFFFF;
+}
+
+.ext-btn-replace {
+    background: var(--coral-soft);
+    border: 1px solid var(--coral-border);
+    border-radius: var(--radius-xs);
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--coral-primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+
+.ext-btn-replace:hover {
+    background: var(--coral-primary);
+    color: #FFFFFF;
+}
+
+.ext-btn-replace.replaced {
+    background: var(--sage-soft);
+    border-color: var(--sage-border);
+    color: var(--sage-primary);
+}
+
+.platform-adapters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+    .platform-adapters-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.platform-adapter-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-stone);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    position: relative;
+}
+
+.platform-adapter-card.gmail {
+    border-top: 3px solid #EA4335;
+}
+
+.platform-adapter-card.whatsapp {
+    border-top: 3px solid #25D366;
+}
+
+.adapter-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.adapter-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.adapter-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.adapter-icon-box.gmail {
+    background: #FCE8E6;
+    color: #EA4335;
+}
+
+.adapter-icon-box.whatsapp {
+    background: #E8F8EE;
+    color: #25D366;
+}

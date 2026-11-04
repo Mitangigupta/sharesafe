@@ -778,3 +778,107 @@ body {
   color: var(--coral-hover);
   text-decoration: underline;
 }
+
+
+/* ==========================================================================
+   Phase 2: In-Situ Platform Compose Adapter Styles
+   ========================================================================== */
+
+.platform-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 16px 8px 16px;
+  padding: 8px 12px;
+  background-color: var(--sage-soft);
+  border: 1px solid var(--sage-border);
+  border-radius: var(--radius-sm);
+  animation: fadeIn 0.2s ease;
+}
+
+.platform-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.platform-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background-color: var(--sage-primary);
+  color: #FFFFFF;
+}
+
+.platform-desc {
+  font-size: 11px;
+  color: var(--sage-primary);
+  font-weight: 500;
+}
+
+.btn-platform-scan {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--sage-border);
+  border-radius: var(--radius-xs);
+  padding: 4px 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sage-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-platform-scan:hover {
+  background-color: var(--sage-primary);
+  color: #FFFFFF;
+}
+
+.scan-mini-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.sanitized-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-replace {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--coral-soft);
+  border: 1px solid var(--coral-border);
+  border-radius: var(--radius-xs);
+  padding: 4px 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--coral-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-replace:hover {
+  background-color: var(--coral-primary);
+  color: #FFFFFF;
+}
+
+.btn-replace.replaced {
+  background-color: var(--sage-soft);
+  border-color: var(--sage-border);
+  color: var(--sage-primary);
+}
+
+.replace-icon {
+  width: 13px;
+  height: 13px;
+}

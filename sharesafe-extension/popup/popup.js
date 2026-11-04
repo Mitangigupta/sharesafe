@@ -1,6 +1,7 @@
 /**
- * ShareSafe Chrome Extension — Popup Logic
- * Coordinates tab switching, scan state rendering, context changes, and clipboard operations.
+ * ShareSafe Chrome Extension — Popup Logic (Phase 2 Integrated)
+ * Coordinates tab switching, scan state rendering, context changes, 
+ * in-situ Gmail/WhatsApp draft scanning, and clipboard/replacement operations.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,6 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCopySanitized = document.getElementById("btnCopySanitized");
   const copyBtnText = document.getElementById("copyBtnText");
 
+  // Phase 2 Elements
+  const platformBanner = document.getElementById("platformBanner");
+  const platformPill = document.getElementById("platformPill");
+  const platformDesc = document.getElementById("platformDesc");
+  const btnPlatformScan = document.getElementById("btnPlatformScan");
+  const btnReplaceDraft = document.getElementById("btnReplaceDraft");
+  const replaceBtnText = document.getElementById("replaceBtnText");
+
   const assistantPanel = document.getElementById("assistantPanel");
   const manualInput = document.getElementById("manualInput");
   const btnRunManualScan = document.getElementById("btnRunManualScan");
@@ -31,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnClearAll = document.getElementById("btnClearAll");
 
   let currentScanRecord = null;
+  let activePlatformTab = null;
 
   // 1. Check Server Connection
   function checkServer() {
@@ -78,25 +88,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 4. Render Scan Results
-  function renderScan(record) {
-    currentScanRecord = record;
+  function renderScan(scanRecord) {
+    if (!scanRecord || !scanRecord.data) return;
+    currentScanRecord = scanRecord;
 
-    if (!record || record.error) {
-      renderError(record ? record.error : "No scan data available");
-      return;
-    }
+    const data = scanRecord.data;
+    const detections = data.detections || [];
+    const risk = data.risk_summary || {};
+    const assistant = data.assistant || {};
+    const masked = data.masked_text || "";
 
-    const scanData = record.data || {};
-    const risk = scanData.risk_summary || {};
-    const detections = scanData.detections || [];
-    const assistant = scanData.assistant || {};
-    const masked = scanData.masked_text || record.sourceText || "";
-
-    // Update Risk Card
-    const level = (risk.level || "CLEAN").toUpperCase();
-    riskBadge.textContent = level;
-    riskBadge.className = `risk-pill pill-${level.toLowerCase()}`;
-    riskScore.textContent = `Score: ${risk.score !== undefined ? risk.score : 0}`;
+    // Update Risk Badge & Summary
+    const riskLevel = risk.level || "CLEAN";
+    riskBadge.textContent = `${riskLevel} RISK`;
+    riskBadge.className = `risk-pill pill-${riskLevel.toLowerCase()}`;
+    riskScore.textContent = `Score: ${risk.score || 0}/100`;
     findingsCount.textContent = `${detections.length} Finding${detections.length === 1 ? "" : "s"}`;
     tabBadgeFindings.textContent = String(detections.length);
 
@@ -145,6 +151,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Populate Privacy Assistant Panel
     renderAssistant(assistant);
+
+    // If on a supported platform (Gmail/WhatsApp), trigger in-page pre-send warning badge
+    if (activePlatformTab && detections.length > 0) {
+      chrome.tabs.sendMessage(activePlatformTab.tabId, {
+        action: "SHOW_PRE_SEND_WARNING",
+        findingsCount: detections.length,
+        riskLevel: riskLevel
+      }).catch(() => {});
+    }
   }
 
   function getCleanGuidance(r) {
@@ -158,145 +173,92 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let why = "";
     let risk = "";
-    let action = "";
 
-    if (type.includes("card") || type === "credit_card") {
-      why = "Direct payment instrument and cardholder number.";
-      risk = "Exposure allows unauthorized transactions and identity theft.";
-      action = "Apply solid blackout redaction before distribution.";
-    } else if (type.includes("aadhaar")) {
-      why = "National identity registration identifier.";
-      risk = "Exposure permits profile correlation and identity impersonation.";
-      action = "Mask UID to reveal only the final 4 digits (XXXX-XXXX-0123).";
+    if (type.includes("aadhaar")) {
+      why = "Aadhaar numbers are government-issued identity credentials under the DPDP Act 2023.";
+      risk = "Sharing in cleartext risks unauthorized KYC verification or identity theft.";
     } else if (type.includes("pan")) {
-      why = "Official tax department permanent account identifier.";
-      risk = "Exposure permits unauthorized financial filings and profile cloning.";
-      action = "Redact full identifier before external disclosure.";
-    } else if (type.includes("api_key") || type.includes("token")) {
-      why = "Private cryptographic or cloud authentication credential.";
-      risk = "Grants immediate administrative access to linked services.";
-      action = "Purge secret token immediately. Never transmit in plain text.";
+      why = "PAN cards are statutory tax identifiers linked to banking and tax records.";
+      risk = "Exposing PANs enables fraudulent financial filings and credit profiling.";
+    } else if (type.includes("card") || type.includes("credit") || type.includes("debit")) {
+      why = "Payment card numbers fall strictly under PCI-DSS standards.";
+      risk = "Cleartext transmission enables unauthorized billing and card-not-present fraud.";
     } else if (type.includes("phone")) {
-      why = "Direct personal telecommunication number.";
-      risk = "Enables direct unsolicited contact and identity tracing.";
-      action = "Review recipient need; redact if sharing with untrusted peers.";
+      why = "Direct mobile contact identifier linked to communication services.";
+      risk = "Leaking phone numbers causes targeted phishing, spam, and social engineering.";
     } else if (type.includes("email")) {
-      why = "Standard electronic messaging contact address.";
-      risk = "Exposed to automated scraping, targeted phishing, and spam.";
-      action = "Maintain for legitimate correspondence, or mask recipient username.";
-    } else if (type.includes("ssn")) {
-      why = "Restricted government social security record.";
-      risk = "Severe statutory identity theft and credential compromise risk.";
-      action = "Irreversibly redact via solid blackout before sending.";
-    } else if (type.includes("ip_address")) {
-      why = "Network host gateway and infrastructure address.";
-      risk = "Discloses internal network topology and potential attack surface.";
-      action = "Mask internal IP octets prior to sharing logs or diagnostics.";
+      why = "Primary electronic communication endpoint and account recovery identifier.";
+      risk = "Exposure increases credential stuffing attacks and unsolicited contact.";
+    } else if (type.includes("secret") || type.includes("key") || type.includes("jwt") || type.includes("token")) {
+      why = "Cryptographic infrastructure credential or API authentication secret.";
+      risk = "Leaking secret keys compromises backend systems and cloud resources immediately.";
     } else {
-      why = r.explanation ? r.explanation.split('.')[0] + '.' : "Recognized sensitive data pattern.";
-      risk = r.risk_description ? r.risk_description.split('.')[0] + '.' : "Potential privacy or compliance exposure.";
-      action = r.recommendation ? r.recommendation.split('.')[0] + '.' : "Review and redact if sensitive.";
+      why = r.recommendation || "Sensitive personal or configuration entity detected.";
+      risk = "Unrestricted disclosure risks privacy and security non-compliance.";
     }
 
-    return { priorityLabel, priClass, badgeClass, confidenceLabel, why, risk, action };
+    return {
+      title: r.recommendation || `${r.type} Detected`,
+      priorityLabel,
+      confidenceLabel,
+      priClass,
+      badgeClass,
+      why,
+      risk
+    };
   }
 
   function renderAssistant(assistant) {
-    if (!assistant || (!assistant.summary && (!assistant.recommendations || assistant.recommendations.length === 0))) {
+    const recs = assistant.recommendations || [];
+    if (recs.length === 0) {
       assistantPanel.innerHTML = `
         <div class="empty-state">
-          <p class="empty-desc">No specific assistant recommendations for this text.</p>
+          <p class="empty-title">Privacy Assistant: Clear</p>
+          <p class="empty-desc">No high-risk concerns identified for the current sharing context.</p>
         </div>
       `;
       return;
     }
 
-    const recs = assistant.recommendations || [];
-    const stats = assistant.stats || {};
-    const highCount = stats.high_priority || recs.filter(r => r.priority === 'HIGH_PRIORITY').length;
-    const reviewCount = stats.review_recommended || recs.filter(r => r.priority === 'REVIEW').length;
-
-    let calloutBadge = "Safe Document";
-    let calloutClass = "badge-clean";
-    let calloutText = "No direct personal identity or credential threats detected under current rules.";
-
-    if (highCount > 0) {
-      calloutBadge = `${highCount} High Priority`;
-      calloutClass = "badge-high";
-      calloutText = `${highCount} critical identifier${highCount > 1 ? 's' : ''} recommended for immediate redaction prior to distribution.`;
-    } else if (reviewCount > 0) {
-      calloutBadge = `${reviewCount} Review Needed`;
-      calloutClass = "badge-review";
-      calloutText = `Review ${reviewCount} personal item${reviewCount > 1 ? 's' : ''} to determine whether disclosure is intended.`;
-    }
-
-    let html = `
+    assistantPanel.innerHTML = `
       <div class="asst-container">
-        <div class="asst-callout">
-          <div class="asst-callout-header">
-            <span class="asst-callout-title">Privacy Guidance</span>
-            <span class="asst-callout-badge ${calloutClass}">${calloutBadge}</span>
-          </div>
-          <p class="asst-callout-text">${escapeHtml(calloutText)}</p>
+        <div class="asst-intro">
+          Actionable privacy guidance evaluated for <strong>${escapeHtml(contextSelect.value)}</strong> mode:
         </div>
+        ${recs
+          .map((r) => {
+            const g = getCleanGuidance(r);
+            return `
+              <div class="asst-card ${g.priClass}">
+                <div class="asst-header">
+                  <span class="asst-badge ${g.badgeClass}">${g.priorityLabel}</span>
+                  <span class="asst-confidence">${g.confidenceLabel}</span>
+                </div>
+                <div class="asst-title">${escapeHtml(g.title)}</div>
+                <div class="asst-body">
+                  <div class="asst-section">
+                    <span class="asst-label">Why:</span>
+                    <span class="asst-text">${escapeHtml(g.why)}</span>
+                  </div>
+                  <div class="asst-section">
+                    <span class="asst-label">Risk:</span>
+                    <span class="asst-text">${escapeHtml(g.risk)}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
     `;
-
-    if (recs.length > 0) {
-      html += `<div class="rec-card-list">`;
-      recs.forEach((r) => {
-        const guide = getCleanGuidance(r);
-        const itemLabel = escapeHtml(r.label || "Detected Item");
-        const category = escapeHtml(r.category || "General");
-        const maskedVal = escapeHtml(r.masked || r.value || "");
-        const styleName = escapeHtml(r.suggested_style ? r.suggested_style.charAt(0).toUpperCase() + r.suggested_style.slice(1) : "Blackout");
-
-        html += `
-          <div class="rec-card ${guide.priClass}">
-            <div class="rec-card-header">
-              <span class="rec-priority-badge ${guide.badgeClass}">${guide.priorityLabel}</span>
-              <span class="rec-confidence-chip">${guide.confidenceLabel}</span>
-            </div>
-            <div class="rec-entity-row">
-              <div class="rec-entity-info">
-                <span class="rec-entity-name">${itemLabel}</span>
-                <span class="rec-category-tag">${category}</span>
-              </div>
-              <code class="rec-masked-val">${maskedVal}</code>
-            </div>
-            <div class="rec-body">
-              <div class="rec-row">
-                <span class="rec-label">Why Sensitive</span>
-                <p class="rec-text">${escapeHtml(guide.why)}</p>
-              </div>
-              <div class="rec-row">
-                <span class="rec-label">Risk Exposure</span>
-                <p class="rec-text">${escapeHtml(guide.risk)}</p>
-              </div>
-              <div class="rec-row rec-guidance-row">
-                <span class="rec-label text-coral">Action</span>
-                <p class="rec-text">${escapeHtml(guide.action)}</p>
-              </div>
-            </div>
-            <div class="rec-footer-bar">
-              <span class="rec-style-hint">Suggested Redaction: <strong>${styleName}</strong></span>
-            </div>
-          </div>
-        `;
-      });
-      html += `</div>`;
-    }
-
-    html += `</div>`;
-    assistantPanel.innerHTML = html;
   }
 
   function renderError(errMessage) {
-    riskBadge.textContent = "ERROR";
-    riskBadge.className = "risk-pill pill-critical";
-    riskScore.textContent = "Offline";
-    findingsCount.textContent = "0 Findings";
+    riskBadge.textContent = "OFFLINE";
+    riskBadge.className = "risk-pill pill-neutral";
+    riskScore.textContent = "Score: --";
+    findingsCount.textContent = "Server Offline";
     riskMessage.innerHTML = `
-      <span style="color: var(--red-finding); font-weight: 600;">Scan Failed:</span>
       ${escapeHtml(errMessage)}. Make sure the ShareSafe server is running at <code>http://127.0.0.1:5000</code>.
     `;
     findingsList.innerHTML = `
@@ -329,7 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (res && res.success) {
           renderScan(res.record);
-          // Switch to findings tab
           document.querySelector('[data-tab="tab-findings"]').click();
         } else {
           renderError(res?.error || "Failed to communicate with background worker.");
@@ -338,7 +299,71 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // 6. Action Listeners
+  // 6. Platform Detection (Phase 2)
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs || !tabs.length) return;
+    const tab = tabs[0];
+    const url = tab.url || "";
+
+    if (url.includes("mail.google.com")) {
+      activePlatformTab = { tabId: tab.id, platform: "Gmail" };
+      platformPill.textContent = "Gmail";
+      platformDesc.textContent = "Active Gmail compose session";
+      platformBanner.style.display = "flex";
+      btnReplaceDraft.style.display = "inline-flex";
+    } else if (url.includes("web.whatsapp.com")) {
+      activePlatformTab = { tabId: tab.id, platform: "WhatsApp Web" };
+      platformPill.textContent = "WhatsApp";
+      platformDesc.textContent = "Active message compose box";
+      platformBanner.style.display = "flex";
+      btnReplaceDraft.style.display = "inline-flex";
+    }
+  });
+
+  if (btnPlatformScan) {
+    btnPlatformScan.addEventListener("click", () => {
+      if (!activePlatformTab) return;
+      btnPlatformScan.disabled = true;
+      const originalLabel = btnPlatformScan.innerHTML;
+      btnPlatformScan.innerHTML = "<span>Reading draft...</span>";
+
+      chrome.tabs.sendMessage(activePlatformTab.tabId, { action: "GET_DRAFT_TEXT" }, (response) => {
+        btnPlatformScan.disabled = false;
+        btnPlatformScan.innerHTML = originalLabel;
+
+        if (response && response.found && response.text) {
+          manualInput.value = response.text;
+          triggerScan(response.text, contextSelect.value);
+        } else {
+          alert(response?.error || `No active text found in ${activePlatformTab.platform} compose area. Please type or click into the message box first.`);
+        }
+      });
+    });
+  }
+
+  if (btnReplaceDraft) {
+    btnReplaceDraft.addEventListener("click", () => {
+      if (!activePlatformTab || !sanitizedText.value) return;
+      chrome.tabs.sendMessage(
+        activePlatformTab.tabId,
+        { action: "REPLACE_DRAFT_TEXT", sanitizedText: sanitizedText.value },
+        (res) => {
+          if (res && res.success) {
+            btnReplaceDraft.classList.add("replaced");
+            replaceBtnText.textContent = "Replaced in Draft!";
+            setTimeout(() => {
+              btnReplaceDraft.classList.remove("replaced");
+              replaceBtnText.textContent = "Replace in Draft";
+            }, 2500);
+          } else {
+            alert(res?.error || "Could not replace text in active compose box.");
+          }
+        }
+      );
+    });
+  }
+
+  // 7. Action Listeners
   btnRunManualScan.addEventListener("click", () => {
     const text = manualInput.value.trim();
     if (text) {
@@ -392,7 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 7. Initial Load: Check session storage for existing scan
+  // 8. Initial Load: Check session storage for existing scan
   chrome.storage.session.get(["sharesafe_last_scan"], (res) => {
     if (res && res.sharesafe_last_scan) {
       renderScan(res.sharesafe_last_scan);
@@ -400,23 +425,14 @@ document.addEventListener("DOMContentLoaded", () => {
       // Check if user has active text selection on the current webpage tab
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs && tabs[0] && tabs[0].id) {
-          chrome.scripting.executeScript(
-            {
-              target: { tabId: tabs[0].id },
-              func: () => window.getSelection().toString()
-            },
-            (results) => {
-              if (chrome.runtime.lastError) {
-                // Cannot access chrome:// or restricted page; harmless
-                return;
-              }
-              const selectedText = results && results[0] && results[0].result ? results[0].result.trim() : "";
-              if (selectedText && selectedText.length > 2) {
-                manualInput.value = selectedText;
-                triggerScan(selectedText, contextSelect.value);
-              }
+          chrome.tabs.sendMessage(tabs[0].id, { action: "GET_SELECTION" }, (res) => {
+            if (chrome.runtime.lastError) return;
+            const selectedText = res && res.text ? res.text.trim() : "";
+            if (selectedText && selectedText.length > 2) {
+              manualInput.value = selectedText;
+              triggerScan(selectedText, contextSelect.value);
             }
-          ).catch(() => {});
+          });
         }
       });
     }

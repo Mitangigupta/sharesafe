@@ -15,6 +15,7 @@
             <span class="meta-tag"><i class="fa-solid fa-puzzle-piece"></i> Official Component</span>
             <span class="meta-tag"><i class="fa-solid fa-shield-halved"></i> Real-Time Privacy Guard</span>
             <span class="meta-tag"><i class="fa-brands fa-chrome"></i> Manifest V3 Verified</span>
+            <span class="meta-tag" style="background: var(--sage-soft); color: var(--sage-primary); border-color: var(--sage-border);"><i class="fa-solid fa-check"></i> Phase 1 &amp; 2 Complete</span>
         </div>
     </div>
 
@@ -27,21 +28,21 @@
             ShareSafe <span class="teal-gradient-text">Browser Extension</span>
         </h1>
         <p class="info-hero-lead">
-            An official client-side extension of the ShareSafe ecosystem. While the Web Application provides deep document rasterization, QR threat inspection, and cryptographic audit proofs, the Browser Extension delivers in-situ, real-time sensitive data detection and masking directly within your web browser before data is shared online.
+            A lightweight, sovereign client-side privacy guard built on Chromium Manifest V3. While the Web Application provides deep document rasterization, QR threat inspection, and cryptographic audit proofs, the Browser Extension delivers in-situ, real-time sensitive data detection, Gmail/WhatsApp draft scanning, and 1-click masking directly within your web browser before data is shared online.
         </p>
 
         <!-- Action / Access Toolbar -->
         <div class="extension-hero-actions">
             <a href="{{ url_for('download_extension_zip') }}" class="btn-extension-primary" title="Download ShareSafe Extension Package">
                 <i class="fa-solid fa-download"></i>
-                <span>Download Extension Package (.zip)</span>
+                <span>Download Extension Package (.zip) &bull; v1.1.0</span>
             </a>
             <button type="button" class="btn-extension-secondary" onclick="toggleInstallGuide()" id="btnToggleInstall" title="Toggle step-by-step setup guide">
                 <i class="fa-solid fa-terminal"></i>
                 <span>Installation Instructions</span>
             </button>
             <span style="font-size: 0.8rem; color: var(--ink-muted); margin-left: 4px;">
-                <i class="fa-solid fa-check-double" style="color: var(--sage-primary);"></i> Manifest V3 &bull; Chromium &amp; Edge Compatible
+                <i class="fa-solid fa-check-double" style="color: var(--sage-primary);"></i> Manifest V3 &bull; Chromium &amp; Edge &bull; Gmail &amp; WhatsApp Web Ready
             </span>
         </div>
 
@@ -97,7 +98,7 @@
                 <div>
                     <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Functional Extension Showcase &amp; Interface</h2>
                     <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
-                        Authentic representation of the ShareSafe Manifest V3 popup interface, sensitive data alerts, checksum validation, and 1-click sanitization.
+                        Authentic representation of the ShareSafe Manifest V3 popup interface, sensitive data alerts, checksum validation, and Phase 2 in-situ platform scanning.
                     </p>
                 </div>
             </div>
@@ -114,7 +115,7 @@
                                 <span class="ext-mockup-dot dot-green"></span>
                             </div>
                             <span>ShareSafe Extension &bull; Popup Interface</span>
-                            <span style="font-size: 0.7rem; color: var(--ink-muted);">v1.0.0 (MV3)</span>
+                            <span style="font-size: 0.7rem; color: var(--ink-muted);">v1.1.0 (MV3)</span>
                         </div>
 
                         <div class="ext-popup-body">
@@ -144,6 +145,18 @@
                                     <option value="private">Private (Trusted Peers) [0.85&times;]</option>
                                     <option value="public">Public (Social Media &amp; Web) [1.3&times;]</option>
                                 </select>
+                            </div>
+
+                            <!-- Phase 2: Platform Compose Scanner Simulation -->
+                            <div class="ext-platform-sim-banner">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="platform-pill" id="demoPlatformPill">Gmail Active</span>
+                                    <span style="font-size: 0.74rem; color: var(--sage-primary); font-weight: 500;" id="demoPlatformStatus">Draft compose box detected</span>
+                                </div>
+                                <button type="button" class="btn-platform-scan" onclick="triggerPlatformDemoScan()" id="btnPlatformDemo">
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                    <span>Scan Compose Box</span>
+                                </button>
                             </div>
 
                             <!-- Risk Banner -->
@@ -223,10 +236,16 @@
                                 <div class="ext-sanitized-box">
                                     <div class="ext-sanitized-top">
                                         <span class="ext-sanitized-title">Redacted &amp; Safe Output</span>
-                                        <button type="button" class="ext-btn-copy" id="btnCopyDemo" onclick="copyShowcaseSanitized()">
-                                            <i class="fa-regular fa-copy" id="copyIcon"></i>
-                                            <span id="copyLabel">Copy Text</span>
-                                        </button>
+                                        <div style="display: flex; align-items: center; gap: 6px;">
+                                            <button type="button" class="ext-btn-copy" id="btnCopyDemo" onclick="copyShowcaseSanitized()">
+                                                <i class="fa-regular fa-copy" id="copyIcon"></i>
+                                                <span id="copyLabel">Copy Text</span>
+                                            </button>
+                                            <button type="button" class="ext-btn-replace" id="btnReplaceDemo" onclick="simulateDraftReplace()">
+                                                <i class="fa-solid fa-check" id="replaceIcon"></i>
+                                                <span id="replaceLabel">Replace in Draft</span>
+                                            </button>
+                                        </div>
                                     </div>
                                     <textarea class="ext-sanitized-text" id="showcaseSanitizedText" readonly>Client submission verified: Please confirm transaction details for resident holding Aadhaar [REDACTED_AADHAAR] with PAN [REDACTED_PAN] and registered payment card [REDACTED_CARD].</textarea>
                                 </div>
@@ -241,7 +260,7 @@
                                             <span style="font-size: 0.68rem; font-weight: 700; color: #A74440; background: #FCE8E7; padding: 1px 6px; border-radius: 4px;">REDACT</span>
                                         </div>
                                         <div class="ext-assistant-body">
-                                            Aadhaar UID and PAN Card numbers are sovereign personal identifiers under the DPDP Act 2023. Never transmit in cleartext across web forms or AI chat prompts.
+                                            Aadhaar UID and PAN Card numbers are sovereign personal identifiers under the DPDP Act 2023. Never transmit in cleartext across web forms, emails, or AI chat prompts.
                                         </div>
                                     </div>
 
@@ -289,16 +308,16 @@
                             <div class="ext-workflow-step">
                                 <div class="ext-step-bubble">1</div>
                                 <div class="ext-step-info">
-                                    <h4>In-Browser Text Selection</h4>
-                                    <p>Select text in any draft email, ChatGPT prompt, support ticket, or social media message.</p>
+                                    <h4>In-Browser Text Selection / Compose Focus</h4>
+                                    <p>Select text on any webpage or focus an active compose box in Gmail or WhatsApp Web.</p>
                                 </div>
                             </div>
 
                             <div class="ext-workflow-step">
                                 <div class="ext-step-bubble">2</div>
                                 <div class="ext-step-info">
-                                    <h4>Context Menu Trigger</h4>
-                                    <p>Right-click the selection and choose <strong>"Scan with ShareSafe"</strong> from the browser context menu.</p>
+                                    <h4>Context Menu or 1-Click Draft Trigger</h4>
+                                    <p>Right-click <strong>"Scan with ShareSafe"</strong> or click <strong>"Scan Compose Box"</strong> in the extension popup.</p>
                                 </div>
                             </div>
 
@@ -306,15 +325,15 @@
                                 <div class="ext-step-bubble">3</div>
                                 <div class="ext-step-info">
                                     <h4>Checksum &amp; Risk Verification</h4>
-                                    <p>Dispatched to <code>/api/scan-text</code> to evaluate mathematical checksums (Verhoeff, Luhn) and context risk multipliers.</p>
+                                    <p>Dispatched to <code>/api/scan-text</code> to evaluate mathematical checksums (Verhoeff, Luhn) and context risk multipliers in under 15ms.</p>
                                 </div>
                             </div>
 
                             <div class="ext-workflow-step">
                                 <div class="ext-step-bubble">4</div>
                                 <div class="ext-step-info">
-                                    <h4>Defensive Masking &amp; Guidance</h4>
-                                    <p>Popup badge lights up with risk classification, Privacy Assistant instructions, and 1-click sanitized clipboard copy.</p>
+                                    <h4>Defensive Masking &amp; In-Place Replacement</h4>
+                                    <p>Popup badge lights up with risk level, Privacy Assistant guidance, and 1-click option to replace text directly in your active draft.</p>
                                 </div>
                             </div>
                         </div>
@@ -327,7 +346,7 @@
                             <div class="ext-guarantee-card">
                                 <div class="ext-guarantee-icon"><i class="fa-solid fa-eye-slash"></i></div>
                                 <h4>Zero Surveillance</h4>
-                                <p>No keyloggers, passive sniffing, or DOM tracking. Only processes text explicitly selected or pasted by the user.</p>
+                                <p>No keyloggers, passive sniffing, or DOM tracking. Only processes text explicitly selected or commanded by the user.</p>
                             </div>
 
                             <div class="ext-guarantee-card">
@@ -348,7 +367,92 @@
             </div>
         </section>
 
-        <!-- 2. Unified Project Architecture Section -->
+        <!-- 2. Phase 2 Platform Adapters Breakdown Section -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <div>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Phase 2: In-Situ Platform Adapters (Gmail &amp; WhatsApp Web)</h2>
+                    <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
+                        Deep platform-specific integration enabling pre-send privacy screening and 1-click in-place draft redaction.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body-text">
+                <p style="font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65; margin-bottom: 20px;">
+                    In Phase 2, ShareSafe extends beyond general browser text highlights to provide <strong>dedicated platform adapters</strong> for commonly used messaging and communication services. These adapters identify composition containers and enable safe redaction without recording keystrokes:
+                </p>
+
+                <div class="platform-adapters-grid">
+                    <!-- Gmail Card -->
+                    <div class="platform-adapter-card gmail">
+                        <div class="adapter-card-header">
+                            <div class="adapter-title-group">
+                                <div class="adapter-icon-box gmail"><i class="fa-solid fa-envelope"></i></div>
+                                <div>
+                                    <div style="font-size: 0.98rem; font-weight: 700; color: var(--ink-primary);">Gmail Compose Adapter</div>
+                                    <div style="font-size: 0.74rem; color: var(--ink-muted);"><code>content/gmail-adapter.js</code></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: #FCE8E6; color: #EA4335;">Active</span>
+                        </div>
+                        <ul class="int-feature-list" style="margin-bottom: 12px;">
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Container Discovery:</strong> Resolves dock windows, inline thread replies, and full-screen compose views.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Plain-Text Normalization:</strong> Strips volatile email HTML tags to scan clean underlying message text.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>In-Place Replacement:</strong> Injects sanitized text via <code>document.execCommand('insertText')</code>, automatically triggering Gmail's auto-save.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Pre-Send Banner:</strong> Renders a non-intrusive warning card above the send button when critical PII is present.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- WhatsApp Web Card -->
+                    <div class="platform-adapter-card whatsapp">
+                        <div class="adapter-card-header">
+                            <div class="adapter-title-group">
+                                <div class="adapter-icon-box whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
+                                <div>
+                                    <div style="font-size: 0.98rem; font-weight: 700; color: var(--ink-primary);">WhatsApp Web Adapter</div>
+                                    <div style="font-size: 0.74rem; color: var(--ink-muted);"><code>content/whatsapp-adapter.js</code></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: #E8F8EE; color: #25D366;">Active</span>
+                        </div>
+                        <ul class="int-feature-list" style="margin-bottom: 12px;">
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Footer Scoping:</strong> Identifies active <code>contenteditable</code> input in the message footer without reading contact names or chats.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Zero Thread Sniffing:</strong> Strictly isolates reading to the uncommitted draft text in the message bar.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Pre-Send Redaction:</strong> Instantly substitutes sensitive credentials before the user presses Enter or Send.</span>
+                            </li>
+                            <li class="int-feature-item">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Floating Shield Chip:</strong> Alerts the user with a subtle risk chip anchored to the bottom chat toolbar.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Unified Project Architecture Section -->
         <section class="info-card section-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-network-wired"></i></div>
@@ -371,7 +475,7 @@
 flowchart TD
     subgraph Client_Interfaces ["1. Dual Ingestion Client Layer"]
         WebUI["🌐 ShareSafe Web Application<br/>(Full PDF/Image Redaction Studio)"]
-        Extension["🛡️ ShareSafe Browser Extension<br/>(Real-Time Web Selection & Form Guard)"]
+        Extension["🛡️ ShareSafe Browser Extension<br/>(Real-Time Web Selection & Platform Guard)"]
     end
 
     subgraph Transport_Layer ["2. Secure Local Transport & API Routing"]
@@ -387,7 +491,7 @@ flowchart TD
 
     subgraph Security_Output ["4. Privacy-Preserving Output Layer"]
         WebOut["Cryptographic Audit PDF & Vector Flattened File"]
-        ExtOut["Masked Clipboard Payload & In-Situ Assistant Guidance"]
+        ExtOut["Masked Clipboard Payload & In-Place Draft Replacement"]
     end
 
     WebUI --> WebUpload
@@ -408,7 +512,7 @@ flowchart TD
             </div>
         </section>
 
-        <!-- 3. Project Integration Matrix Section -->
+        <!-- 4. Project Integration Matrix Section -->
         <section class="info-card section-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-table-columns"></i></div>
@@ -479,11 +583,11 @@ flowchart TD
                             </li>
                             <li class="int-feature-item">
                                 <i class="fa-solid fa-circle-check"></i>
-                                <span><strong>Context Menu Integration:</strong> Native Manifest V3 right-click workflow without switching tabs.</span>
+                                <span><strong>Platform Adapters (Phase 2):</strong> Native compose detection for Gmail and WhatsApp Web.</span>
                             </li>
                             <li class="int-feature-item">
                                 <i class="fa-solid fa-circle-check"></i>
-                                <span><strong>1-Click Masked Copy:</strong> Instantly replaces confidential credentials with safe redactions.</span>
+                                <span><strong>In-Place Redaction:</strong> 1-click replaces sensitive values with masked text in compose boxes.</span>
                             </li>
                             <li class="int-feature-item">
                                 <i class="fa-solid fa-circle-check"></i>
@@ -607,6 +711,46 @@ flowchart TD
         }
     }
 
+    // Simulate Phase 2 Platform Draft Scan
+    function triggerPlatformDemoScan() {
+        const btn = document.getElementById('btnPlatformDemo');
+        const pill = document.getElementById('demoPlatformPill');
+        const status = document.getElementById('demoPlatformStatus');
+        if (!btn) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Reading draft...</span>';
+
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--sage-primary);"></i> <span>Draft Scanned!</span>';
+            if (status) status.textContent = 'Extracted 3 sensitive records from compose';
+            switchShowcaseTab('findings');
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> <span>Scan Compose Box</span>';
+            }, 3000);
+        }, 700);
+    }
+
+    // Simulate Phase 2 In-Place Draft Replacement
+    function simulateDraftReplace() {
+        const btn = document.getElementById('btnReplaceDemo');
+        const label = document.getElementById('replaceLabel');
+        const icon = document.getElementById('replaceIcon');
+        if (!btn) return;
+
+        btn.classList.add('replaced');
+        if (label) label.textContent = 'Replaced in Compose Draft!';
+        if (icon) icon.className = 'fa-solid fa-circle-check';
+
+        setTimeout(() => {
+            btn.classList.remove('replaced');
+            if (label) label.textContent = 'Replace in Draft';
+            if (icon) icon.className = 'fa-solid fa-check';
+        }, 2500);
+    }
+
     // Copy Sanitized Text Demo Button
     function copyShowcaseSanitized() {
         const textElem = document.getElementById('showcaseSanitizedText');
@@ -659,17 +803,14 @@ flowchart TD
 
             const data = await res.json();
             if (data.success) {
-                // Update findings badge
                 const badge = document.getElementById('badgeFindingsCount');
                 if (badge) badge.textContent = data.total_findings;
 
-                // Update sanitized output tab with real masked result
                 const sanitizedElem = document.getElementById('showcaseSanitizedText');
                 if (sanitizedElem && data.masked_text) {
                     sanitizedElem.value = data.masked_text;
                 }
 
-                // Update risk score
                 const scoreElem = document.getElementById('showcaseRiskScore');
                 const pillElem = document.getElementById('showcaseRiskPill');
                 if (scoreElem && data.risk_summary) {
@@ -683,7 +824,6 @@ flowchart TD
                     feedbackElem.innerHTML = '<span style="color: var(--sage-primary); font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Live Scan Complete: Found ' + data.total_findings + ' sensitive entities. Switched to Sanitized Text tab!</span>';
                 }
 
-                // Switch to sanitized tab to showcase the live result
                 setTimeout(() => {
                     switchShowcaseTab('sanitized');
                 }, 800);

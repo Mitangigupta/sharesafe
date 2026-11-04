@@ -4,9 +4,9 @@
  * SECURITY & PRIVACY MANDATES:
  * 1. Strictly user-initiated: Executed ONLY when user triggers scan action.
  * 2. Zero background surveillance: Never hooks keystrokes, input events, or typing activity.
- * 3. Scoped extraction: Only reads the active compose box currently focused.
+ * 3. Scoped extraction: Only reads the active compose box currently focused or active.
  * 4. Zero inbox access: Never queries or collects inbox threads, sent messages, or contacts.
- * 5. Non-destructive: Never auto-sends, auto-edits, or deletes drafts.
+ * 5. Non-destructive: Never auto-sends or deletes drafts without explicit user action.
  */
 
 class GmailAdapter {
@@ -16,7 +16,7 @@ class GmailAdapter {
 
   /**
    * Discovers the currently active email compose body element.
-   * Handles both dock compose windows and full-screen compose views.
+   * Handles dock compose windows, inline replies, and full-screen compose views.
    */
   getActiveComposeElement() {
     // 1. Check focused element first
@@ -54,22 +54,109 @@ class GmailAdapter {
       };
     }
 
-    // Extract normalized plain text
     const text = (composeEl.innerText || composeEl.textContent || "").trim();
     return {
       found: true,
       text: text,
-      element: composeEl
+      length: text.length
     };
   }
 
   /**
-   * Pre-send warning display (non-destructive visual indicator)
+   * Safely replaces draft text with sanitized / masked representation upon user confirmation.
    */
-  showPreSendWarning(findings, riskSummary) {
-    console.log("[ShareSafe] Gmail pre-send review findings:", findings);
+  replaceDraftText(sanitizedText) {
+    const composeEl = this.getActiveComposeElement();
+    if (!composeEl) {
+      return { success: false, error: "Active Gmail compose area not found." };
+    }
+
+    try {
+      composeEl.focus();
+      // Select all content inside compose box
+      document.execCommand("selectAll", false, null);
+      // Replace with sanitized text
+      document.execCommand("insertText", false, sanitizedText);
+
+      // Dispatch input event so Gmail auto-save registers change
+      composeEl.dispatchEvent(new Event("input", { bubbles: true }));
+      return { success: true };
+    } catch (err) {
+      // Fallback direct assignment
+      composeEl.innerText = sanitizedText;
+      composeEl.dispatchEvent(new Event("input", { bubbles: true }));
+      return { success: true, fallback: true };
+    }
+  }
+
+  /**
+   * Pre-send warning display attached to the compose box.
+   */
+  showPreSendWarning(findingsCount, riskLevel) {
+    const existing = document.getElementById("sharesafe-gmail-warning");
+    if (existing) existing.remove();
+
+    const composeEl = this.getActiveComposeElement();
+    if (!composeEl) return;
+
+    const banner = document.createElement("div");
+    banner.id = "sharesafe-gmail-warning";
+    banner.style.cssText = `
+      margin: 8px 16px;
+      padding: 8px 12px;
+      background: #FCE8E7;
+      border: 1px solid #E8B4B2;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      color: #A74440;
+      z-index: 9999;
+    `;
+
+    banner.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-weight: 700;">🛡️ ShareSafe Alert:</span>
+        <span>Detected ${findingsCount} sensitive item(s) (${riskLevel} risk). Review in extension popup before sending.</span>
+      </div>
+      <button style="background: none; border: none; font-size: 14px; color: #A74440; cursor: pointer; padding: 0 4px;" onclick="this.parentElement.remove()">✕</button>
+    `;
+
+    const composeContainer = composeEl.closest('div[role="region"]') || composeEl.parentElement;
+    if (composeContainer && composeContainer.parentElement) {
+      composeContainer.parentElement.insertBefore(banner, composeContainer);
+    }
   }
 }
 
-// Export for extension runtime
-window.ShareSafeGmailAdapter = new GmailAdapter();
+const adapter = new GmailAdapter();
+window.ShareSafeGmailAdapter = adapter;
+
+// Runtime message listener for background/popup commands
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "GET_DRAFT_TEXT") {
+    const res = adapter.extractDraftText();
+    sendResponse(res);
+    return true;
+  }
+
+  if (message.action === "REPLACE_DRAFT_TEXT") {
+    const res = adapter.replaceDraftText(message.sanitizedText);
+    sendResponse(res);
+    return true;
+  }
+
+  if (message.action === "SHOW_PRE_SEND_WARNING") {
+    adapter.showPreSendWarning(message.findingsCount || 0, message.riskLevel || "HIGH");
+    sendResponse({ success: true });
+    return true;
+  }
+
+  if (message.action === "CHECK_PLATFORM_SUPPORT") {
+    const el = adapter.getActiveComposeElement();
+    sendResponse({ supported: true, platform: "Gmail", hasActiveCompose: !!el });
+    return true;
+  }
+});
