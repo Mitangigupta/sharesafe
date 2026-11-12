@@ -109,5 +109,49 @@ class TestApiScanText(unittest.TestCase):
         data = response.get_json()
         self.assertIn('exceeds maximum allowed size', data.get('error', ''))
 
+    def test_inspect_file_options(self):
+        """Verify OPTIONS /api/inspect-file returns 204 preflight."""
+        response = self.client.open('/api/inspect-file', method='OPTIONS')
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*')
+
+    def test_inspect_file_no_file(self):
+        """Verify missing file parameter returns 400."""
+        response = self.client.post('/api/inspect-file', data={})
+        self.assertEqual(response.status_code, 400)
+
+    def test_inspect_file_unsupported_ext(self):
+        """Verify unsupported file extension returns 400."""
+        import io
+        response = self.client.post(
+            '/api/inspect-file',
+            data={'file': (io.BytesIO(b'malicious exe content'), 'virus.exe')},
+            content_type='multipart/form-data'
+        )
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertIn('Unsupported file extension', data.get('error', ''))
+
+    def test_inspect_file_pdf_detection(self):
+        """Verify inspecting sample PDF returns detections and risk summary."""
+        import os, io
+        from config import Config
+        sample_path = os.path.join(Config.SAMPLES_FOLDER, 'medical_invoice.pdf')
+        with open(sample_path, 'rb') as f:
+            pdf_bytes = f.read()
+
+        response = self.client.post(
+            '/api/inspect-file',
+            data={'file': (io.BytesIO(pdf_bytes), 'medical_invoice.pdf')},
+            content_type='multipart/form-data'
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data['success'])
+        self.assertIn('session_id', data)
+        self.assertIn('workbench_url', data)
+        self.assertGreater(data['total_findings'], 0)
+        self.assertFalse(data['can_share_safely'])
+
 if __name__ == '__main__':
     unittest.main()

@@ -15,7 +15,7 @@
             <span class="meta-tag"><i class="fa-solid fa-puzzle-piece"></i> Official Component</span>
             <span class="meta-tag"><i class="fa-solid fa-shield-halved"></i> Real-Time Privacy Guard</span>
             <span class="meta-tag"><i class="fa-brands fa-chrome"></i> Manifest V3 Verified</span>
-            <span class="meta-tag" style="background: var(--sage-soft); color: var(--sage-primary); border-color: var(--sage-border);"><i class="fa-solid fa-check"></i> Phase 1 &amp; 2 Complete</span>
+            <span class="meta-tag" style="background: var(--sage-soft); color: var(--sage-primary); border-color: var(--sage-border);"><i class="fa-solid fa-shield-virus"></i> Phase 1, 2 &amp; 3 Complete</span>
         </div>
     </div>
 
@@ -28,22 +28,23 @@
             ShareSafe <span class="teal-gradient-text">Browser Extension</span>
         </h1>
         <p class="info-hero-lead">
-            A lightweight, sovereign client-side privacy guard built on Chromium Manifest V3. While the Web Application provides deep document rasterization, QR threat inspection, and cryptographic audit proofs, the Browser Extension delivers in-situ, real-time sensitive data detection, Gmail/WhatsApp draft scanning, and 1-click masking directly within your web browser before data is shared online.
+            A comprehensive, client-side privacy guard built on Chromium Manifest V3. While the Web Application provides deep document rasterization, QR threat inspection, and cryptographic audit proofs, the Browser Extension delivers in-situ sensitive data detection, Gmail/WhatsApp draft scanning, and <strong>automated pre-upload file screening</strong> directly within your browser before data leaves your device.
         </p>
 
         <!-- Action / Access Toolbar -->
         <div class="extension-hero-actions">
             <a href="{{ url_for('download_extension_zip') }}" class="btn-extension-primary" title="Download ShareSafe Extension Package">
                 <i class="fa-solid fa-download"></i>
-                <span>Download Extension Package (.zip) &bull; v1.1.0</span>
+                <span>Download Extension Package (.zip) &bull; v1.2.0</span>
             </a>
             <button type="button" class="btn-extension-secondary" onclick="toggleInstallGuide()" id="btnToggleInstall" title="Toggle step-by-step setup guide">
                 <i class="fa-solid fa-terminal"></i>
                 <span>Installation Instructions</span>
             </button>
-            <span style="font-size: 0.8rem; color: var(--ink-muted); margin-left: 4px;">
-                <i class="fa-solid fa-check-double" style="color: var(--sage-primary);"></i> Manifest V3 &bull; Chromium &amp; Edge &bull; Gmail &amp; WhatsApp Web Ready
-            </span>
+            <button type="button" class="btn-extension-secondary" onclick="simulateShieldModal()" style="border-color: var(--coral-border); color: var(--coral-primary) !important;">
+                <i class="fa-solid fa-shield-virus"></i>
+                <span>Test Pre-Upload File Shield Demo</span>
+            </button>
         </div>
 
         <!-- Collapsible Installation Guide -->
@@ -98,7 +99,7 @@
                 <div>
                     <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Functional Extension Showcase &amp; Interface</h2>
                     <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
-                        Authentic representation of the ShareSafe Manifest V3 popup interface, sensitive data alerts, checksum validation, and Phase 2 in-situ platform scanning.
+                        Authentic representation of the ShareSafe Manifest V3 popup interface, draft adapters, and automated pre-upload screening.
                     </p>
                 </div>
             </div>
@@ -115,7 +116,7 @@
                                 <span class="ext-mockup-dot dot-green"></span>
                             </div>
                             <span>ShareSafe Extension &bull; Popup Interface</span>
-                            <span style="font-size: 0.7rem; color: var(--ink-muted);">v1.1.0 (MV3)</span>
+                            <span style="font-size: 0.7rem; color: var(--ink-muted);">v1.2.0 (MV3)</span>
                         </div>
 
                         <div class="ext-popup-body">
@@ -147,11 +148,11 @@
                                 </select>
                             </div>
 
-                            <!-- Phase 2: Platform Compose Scanner Simulation -->
+                            <!-- Platform Compose Scanner Simulation -->
                             <div class="ext-platform-sim-banner">
                                 <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span class="platform-pill" id="demoPlatformPill">Gmail Active</span>
-                                    <span style="font-size: 0.74rem; color: var(--sage-primary); font-weight: 500;" id="demoPlatformStatus">Draft compose box detected</span>
+                                    <span class="platform-pill" id="demoPlatformPill">WhatsApp Web</span>
+                                    <span style="font-size: 0.74rem; color: var(--sage-primary); font-weight: 500;" id="demoPlatformStatus">Active chat compose detected</span>
                                 </div>
                                 <button type="button" class="btn-platform-scan" onclick="triggerPlatformDemoScan()" id="btnPlatformDemo">
                                     <i class="fa-solid fa-arrows-rotate"></i>
@@ -309,15 +310,15 @@
                                 <div class="ext-step-bubble">1</div>
                                 <div class="ext-step-info">
                                     <h4>In-Browser Text Selection / Compose Focus</h4>
-                                    <p>Select text on any webpage or focus an active compose box in Gmail or WhatsApp Web.</p>
+                                    <p>Select text on any webpage, focus a message draft in WhatsApp/Gmail, or drop a document to attach.</p>
                                 </div>
                             </div>
 
                             <div class="ext-workflow-step">
                                 <div class="ext-step-bubble">2</div>
                                 <div class="ext-step-info">
-                                    <h4>Context Menu or 1-Click Draft Trigger</h4>
-                                    <p>Right-click <strong>"Scan with ShareSafe"</strong> or click <strong>"Scan Compose Box"</strong> in the extension popup.</p>
+                                    <h4>Context Menu or Automated Shield Trigger</h4>
+                                    <p>Right-click <strong>"Scan with ShareSafe"</strong>, click <strong>"Scan Compose Box"</strong>, or trigger automated upload screening.</p>
                                 </div>
                             </div>
 
@@ -325,15 +326,15 @@
                                 <div class="ext-step-bubble">3</div>
                                 <div class="ext-step-info">
                                     <h4>Checksum &amp; Risk Verification</h4>
-                                    <p>Dispatched to <code>/api/scan-text</code> to evaluate mathematical checksums (Verhoeff, Luhn) and context risk multipliers in under 15ms.</p>
+                                    <p>Dispatched to <code>/api/scan-text</code> or <code>/api/inspect-file</code> to evaluate mathematical checksums (Verhoeff, Luhn) and QR threats in under 50ms.</p>
                                 </div>
                             </div>
 
                             <div class="ext-workflow-step">
                                 <div class="ext-step-bubble">4</div>
                                 <div class="ext-step-info">
-                                    <h4>Defensive Masking &amp; In-Place Replacement</h4>
-                                    <p>Popup badge lights up with risk level, Privacy Assistant guidance, and 1-click option to replace text directly in your active draft.</p>
+                                    <h4>Defensive Masking &amp; Pre-Upload Modal</h4>
+                                    <p>Popup badge alerts risk level, or an in-page modal pauses file upload allowing 1-click Studio redirection before files leave the device.</p>
                                 </div>
                             </div>
                         </div>
@@ -346,7 +347,7 @@
                             <div class="ext-guarantee-card">
                                 <div class="ext-guarantee-icon"><i class="fa-solid fa-eye-slash"></i></div>
                                 <h4>Zero Surveillance</h4>
-                                <p>No keyloggers, passive sniffing, or DOM tracking. Only processes text explicitly selected or commanded by the user.</p>
+                                <p>No keyloggers, passive sniffing, or DOM tracking. Only processes text explicitly selected or files attached by the user.</p>
                             </div>
 
                             <div class="ext-guarantee-card">
@@ -367,7 +368,77 @@
             </div>
         </section>
 
-        <!-- 2. Phase 2 Platform Adapters Breakdown Section -->
+        <!-- 2. Phase 3: Automated Pre-Upload File Shield Section -->
+        <section class="info-card section-card">
+            <div class="card-header-line">
+                <div class="header-icon-box" style="background: var(--coral-soft); color: var(--coral-primary);"><i class="fa-solid fa-shield-virus"></i></div>
+                <div>
+                    <h2 class="section-title" style="margin: 0; font-size: 1.25rem;">Phase 3: Automated Pre-Upload File Shield</h2>
+                    <p class="section-subtitle" style="margin: 4px 0 0; font-size: 0.88rem; color: var(--ink-secondary);">
+                        Real-time file interception screening documents and images before they are uploaded to WhatsApp Web, Gmail, or cloud services.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body-text">
+                <p style="font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65; margin-bottom: 20px;">
+                    Users frequently leak sensitive credentials not by typing them in text, but by attaching raw identity documents, invoices, or screenshots into chat windows. <strong>Phase 3 introduces automated pre-upload screening</strong>: the extension automatically intercepts attachments across three distinct entry points:
+                </p>
+
+                <div class="install-steps-grid" style="margin-bottom: 20px;">
+                    <div class="install-step-card">
+                        <div class="install-step-num" style="background: var(--coral-soft); color: var(--coral-primary);">A</div>
+                        <div class="install-step-title">File Picker Interception</div>
+                        <div class="install-step-desc">
+                            Hooks the native DOM <code>change</code> event on <code>&lt;input type="file"&gt;</code> elements whenever the user clicks the attach paperclip in WhatsApp Web or Gmail.
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="install-step-num" style="background: var(--coral-soft); color: var(--coral-primary);">B</div>
+                        <div class="install-step-title">Drag-and-Drop Capture</div>
+                        <div class="install-step-desc">
+                            Intercepts the browser <code>drop</code> event when files are dragged directly from desktop/File Explorer into active chat areas.
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="install-step-num" style="background: var(--coral-soft); color: var(--coral-primary);">C</div>
+                        <div class="install-step-title">Clipboard Screenshot Paste</div>
+                        <div class="install-step-desc">
+                            Intercepts <code>paste</code> events carrying image files (e.g. Snipping Tool screenshots or copied PDF clippings).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automated Shield Workflow Comparison -->
+                <div class="before-after-stage-grid">
+                    <div class="stage-preview-card before" style="border-top: 3px solid var(--sage-primary);">
+                        <div class="stage-badge-header">
+                            <span class="stage-pill" style="background: var(--sage-soft); color: var(--sage-primary); border: 1px solid var(--sage-border);">
+                                <i class="fa-solid fa-circle-check"></i> Scenario A: Clean File Upload
+                            </span>
+                            <span style="font-size: 0.75rem; color: var(--sage-primary); font-weight: 600;">Zero Friction</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--ink-secondary); line-height: 1.6; padding: 10px 0;">
+                            When an audited document contains no PII, financial numbers, or leaking QR payloads, the ShareSafe shield approves the upload in under 50ms. A subtle green status pill confirms validation and the platform sends the file without interruption.
+                        </div>
+                    </div>
+
+                    <div class="stage-preview-card after" style="border-top: 3px solid var(--coral-primary);">
+                        <div class="stage-badge-header">
+                            <span class="stage-pill coral">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Scenario B: Sensitive File Intercepted
+                            </span>
+                            <span style="font-size: 0.75rem; color: var(--coral-primary); font-weight: 600;">Upload Paused</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--ink-secondary); line-height: 1.6; padding: 10px 0;">
+                            When sensitive credentials (Aadhaar UID, Credit Card, PAN, secret tokens) are discovered, the upload is immediately halted. An in-page defensive modal allows the user to <strong>Cancel</strong>, <strong>Redact in ShareSafe Studio</strong>, or deliberately override.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Phase 2 Platform Adapters Breakdown Section -->
         <section class="info-card section-card">
             <div class="card-header-line">
                 <div class="header-icon-box" style="background: var(--sage-soft); color: var(--sage-primary);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
@@ -380,10 +451,6 @@
             </div>
 
             <div class="card-body-text">
-                <p style="font-size: 0.92rem; color: var(--ink-secondary); line-height: 1.65; margin-bottom: 20px;">
-                    In Phase 2, ShareSafe extends beyond general browser text highlights to provide <strong>dedicated platform adapters</strong> for commonly used messaging and communication services. These adapters identify composition containers and enable safe redaction without recording keystrokes:
-                </p>
-
                 <div class="platform-adapters-grid">
                     <!-- Gmail Card -->
                     <div class="platform-adapter-card gmail">
@@ -452,7 +519,7 @@
             </div>
         </section>
 
-        <!-- 3. Unified Project Architecture Section -->
+        <!-- 4. Unified Project Architecture Section -->
         <section class="info-card section-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-network-wired"></i></div>
@@ -473,35 +540,45 @@
                 <div class="arch-mermaid-container">
                     <div class="mermaid" style="width: 100%; min-width: 680px; text-align: center;">
 flowchart TD
-    subgraph Client_Interfaces ["1. Dual Ingestion Client Layer"]
+    subgraph Client_Interfaces ["1. Multi-Modal Ingestion Client Layer"]
         WebUI["🌐 ShareSafe Web Application<br/>(Full PDF/Image Redaction Studio)"]
-        Extension["🛡️ ShareSafe Browser Extension<br/>(Real-Time Web Selection & Platform Guard)"]
+        ExtText["🛡️ Extension In-Situ Draft Guard<br/>(Gmail & WhatsApp Compose Box)"]
+        ExtUpload["⚡ Extension Pre-Upload File Shield<br/>(Drop / Attach / Paste Interception)"]
     end
 
     subgraph Transport_Layer ["2. Secure Local Transport & API Routing"]
         WebUpload["POST /upload<br/>(Multipart Document Pipeline)"]
         ScanAPI["POST /api/scan-text<br/>(Low-Latency JSON Endpoint)"]
+        InspectFileAPI["POST /api/inspect-file<br/>(Pre-Upload Screening Endpoint)"]
     end
 
     subgraph Sovereign_Core ["3. Unified Python Detection & Risk Engine (core/)"]
         Detectors["Algorithmic Detector Suite (core/detectors.py)<br/>• Verhoeff Checksum (Indian Aadhaar UID)<br/>• Luhn Mod-10 (Credit & Debit Cards)<br/>• PAN Entity Validation (Income Tax)<br/>• Cloud Secrets & Infrastructure Tokens"]
+        QRForensics["QR Payload Threat X-Ray (core/qr_inspector.py)<br/>• UPI Strings • vCards • Identity XML"]
         RiskEngine["Contextual Risk Engine (core/risk_engine.py)<br/>• Academic (1.0x) • Professional (1.1x)<br/>• Private (0.85x) • Public (1.3x)"]
         Sanitizer["Sanitization & Masking Core<br/>• Character Span Redaction<br/>• In-Memory Dynamic Replacement"]
     end
 
     subgraph Security_Output ["4. Privacy-Preserving Output Layer"]
         WebOut["Cryptographic Audit PDF & Vector Flattened File"]
-        ExtOut["Masked Clipboard Payload & In-Place Draft Replacement"]
+        ExtTextOut["Masked Clipboard Payload & In-Place Draft Replacement"]
+        ShieldModal["In-Page Pre-Upload Shield Modal (Cancel / Redact Studio / Override)"]
     end
 
     WebUI --> WebUpload
-    Extension --> ScanAPI
+    ExtText --> ScanAPI
+    ExtUpload --> InspectFileAPI
     WebUpload --> Detectors
+    WebUpload --> QRForensics
+    InspectFileAPI --> Detectors
+    InspectFileAPI --> QRForensics
     ScanAPI --> Detectors
     Detectors --> RiskEngine
+    QRForensics --> RiskEngine
     RiskEngine --> Sanitizer
     Sanitizer --> WebOut
-    Sanitizer --> ExtOut
+    Sanitizer --> ExtTextOut
+    InspectFileAPI --> ShieldModal
                     </div>
                 </div>
 
@@ -512,7 +589,7 @@ flowchart TD
             </div>
         </section>
 
-        <!-- 4. Project Integration Matrix Section -->
+        <!-- 5. Project Integration Matrix Section -->
         <section class="info-card section-card">
             <div class="card-header-line">
                 <div class="header-icon-box"><i class="fa-solid fa-table-columns"></i></div>
@@ -587,7 +664,7 @@ flowchart TD
                             </li>
                             <li class="int-feature-item">
                                 <i class="fa-solid fa-circle-check"></i>
-                                <span><strong>In-Place Redaction:</strong> 1-click replaces sensitive values with masked text in compose boxes.</span>
+                                <span><strong>Automated Pre-Upload Shield (Phase 3):</strong> Intercepts document drops, file picker attachments, and clipboard pastes.</span>
                             </li>
                             <li class="int-feature-item">
                                 <i class="fa-solid fa-circle-check"></i>
@@ -601,7 +678,7 @@ flowchart TD
 
                         <div class="int-use-case-box">
                             <div class="int-use-case-label">Primary Academic &amp; Professional Use-Case</div>
-                            Drafting emails in Gmail, entering form submissions, communicating on WhatsApp/Slack, and prompting AI chatbots.
+                            Drafting emails in Gmail, entering form submissions, communicating on WhatsApp/Slack, and attaching files to chats.
                         </div>
                     </div>
 
@@ -714,7 +791,6 @@ flowchart TD
     // Simulate Phase 2 Platform Draft Scan
     function triggerPlatformDemoScan() {
         const btn = document.getElementById('btnPlatformDemo');
-        const pill = document.getElementById('demoPlatformPill');
         const status = document.getElementById('demoPlatformStatus');
         if (!btn) return;
 
@@ -749,6 +825,95 @@ flowchart TD
             if (label) label.textContent = 'Replace in Draft';
             if (icon) icon.className = 'fa-solid fa-check';
         }, 2500);
+    }
+
+    // Phase 3: Interactive Pre-Upload Shield Modal Simulator
+    function simulateShieldModal() {
+        const existing = document.getElementById('demoShieldModalOverlay');
+        if (existing) { existing.remove(); return; }
+
+        const overlay = document.createElement('div');
+        overlay.id = 'demoShieldModalOverlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(37, 37, 34, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.25s ease;
+        `;
+
+        overlay.innerHTML = `
+            <div style="background: var(--bg-surface); border-radius: var(--radius-md); max-width: 520px; width: 100%; border: 1px solid var(--border-stone); box-shadow: 0 16px 48px rgba(0,0,0,0.25); overflow: hidden;">
+                <div style="padding: 16px 20px; background: var(--bg-stone-subtle); border-bottom: 1px solid var(--border-stone); display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 6px; background: var(--coral-soft); color: var(--coral-primary); display: flex; align-items: center; justify-content: center; font-size: 15px;">
+                            🛡️
+                        </div>
+                        <div>
+                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--ink-primary);">ShareSafe Pre-Upload Privacy Shield</div>
+                            <div style="font-size: 0.72rem; color: var(--ink-muted);">Automated File Interception &bull; WhatsApp Web &amp; Gmail</div>
+                        </div>
+                    </div>
+                    <span style="font-size: 0.7rem; font-weight: 700; background: #FCE8E7; color: #A74440; padding: 2px 8px; border-radius: 999px;">
+                        CRITICAL RISK (94/100)
+                    </span>
+                </div>
+
+                <div style="padding: 20px;">
+                    <div style="background: var(--bg-canvas); border: 1px solid var(--border-stone); border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="font-size: 0.85rem; font-weight: 600; color: var(--ink-primary);"><i class="fa-solid fa-file-pdf" style="color: var(--coral-primary); margin-right: 6px;"></i> medical_invoice_aadhaar.pdf</div>
+                            <div style="font-size: 0.74rem; color: var(--ink-muted);">124.6 KB &bull; Upload paused before sending</div>
+                        </div>
+                        <span style="font-size: 0.74rem; font-weight: 600; color: #A74440;">Intercepted</span>
+                    </div>
+
+                    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--ink-muted); margin-bottom: 8px;">
+                        Protected Items Detected Inside File:
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-stone); border-left: 3px solid #A74440; border-radius: 4px; padding: 7px 10px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--ink-primary);">
+                                <span>Indian Aadhaar UID</span>
+                                <span style="font-size: 0.68rem; color: #A74440;">CRITICAL</span>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-secondary);">XXXX XXXX 0123 &bull; Verhoeff Checksum Validated</div>
+                        </div>
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-stone); border-left: 3px solid #A74440; border-radius: 4px; padding: 7px 10px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--ink-primary);">
+                                <span>Visa Credit Card</span>
+                                <span style="font-size: 0.68rem; color: #A74440;">CRITICAL</span>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-secondary);">4111 **** **** 1111 &bull; Luhn Mod-10 Checksum Verified</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--coral-soft); border: 1px solid var(--coral-border); border-radius: 6px; padding: 9px 12px; font-size: 0.76rem; color: #A74440; line-height: 1.45; margin-bottom: 16px;">
+                        <strong>Defensive Privacy Alert:</strong> This file contains unmasked sovereign personal identity numbers and payment credentials. Sending this document unredacted compromises compliance under India DPDP Act and PCI-DSS.
+                    </div>
+
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" onclick="document.getElementById('demoShieldModalOverlay').remove()" style="flex: 1; min-width: 140px; padding: 8px 12px; background: #A74440; color: #fff; border: none; border-radius: 4px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
+                            🛑 Cancel Upload
+                        </button>
+                        <a href="/" target="_blank" style="flex: 1; min-width: 140px; padding: 8px 12px; background: var(--sage-primary); color: #fff; border: none; border-radius: 4px; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                            <span>✏️ Redact in Studio ↗</span>
+                        </a>
+                        <button type="button" onclick="document.getElementById('demoShieldModalOverlay').remove()" style="width: 100%; background: none; border: none; font-size: 0.72rem; color: var(--ink-muted); text-decoration: underline; cursor: pointer; padding: 4px;">
+                            I understand the risks; send file unredacted (Override)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
     }
 
     // Copy Sanitized Text Demo Button

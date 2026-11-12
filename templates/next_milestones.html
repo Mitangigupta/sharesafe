@@ -94,22 +94,32 @@
                 </div>
             </div>
 
-            <!-- Milestone 3 -->
-            <div class="timeline-item-row">
-                <div class="timeline-node-circle">
-                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--coral-primary); text-transform: uppercase;">Node</span>
-                    <span>3</span>
+            <!-- Milestone 3 (Phase 3 Implemented & Active) -->
+            <div class="timeline-item-row node-active">
+                <div class="timeline-node-circle" style="border-color: var(--sage-primary); background: var(--sage-soft); color: var(--sage-primary);">
+                    <i class="fa-solid fa-check" style="font-size: 0.85rem;"></i>
                 </div>
-                <div class="timeline-card-content pres-card">
-                    <div class="milestone-num-label">
-                        <i class="fa-solid fa-shield-virus"></i> Milestone 3 &bull; Automated Defense
+                <div class="timeline-card-content pres-card" style="border-left: 3px solid var(--sage-primary);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+                        <div class="milestone-num-label" style="color: var(--sage-primary); margin: 0;">
+                            <i class="fa-solid fa-shield-virus"></i> Milestone 3 &bull; Automated Defense
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--sage-soft); color: var(--sage-primary); border: 1px solid var(--sage-border);">
+                            <i class="fa-solid fa-circle-check"></i> Phase 3 Implemented
+                        </span>
                     </div>
                     <h2 class="milestone-title-text">
-                        Automated Privacy Screening
+                        Automated Privacy Screening &amp; Pre-Upload File Shield
                     </h2>
                     <p class="milestone-desc-text">
-                        Work towards automatically screening files when users attempt to upload or share them on supported platforms, providing warnings about potential information exposure before the file is sent.
+                        Engineered automated pre-upload interception for documents and images across WhatsApp Web and Gmail. Intercepts file picker attachments, drag-and-drop uploads, and clipboard pastes, inspecting vector text and QR payloads via <code>/api/inspect-file</code> and presenting a defensive shield modal before files leave the device.
                     </p>
+                    <div style="margin-top: 14px;">
+                        <a href="/extension" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; padding: 6px 14px; border-radius: var(--radius-sm); background: var(--bg-surface); border: 1px solid var(--border-stone); color: var(--ink-primary); text-decoration: none; transition: all 0.2s ease;">
+                            <i class="fa-solid fa-arrow-up-right-from-square" style="color: var(--coral-primary);"></i>
+                            <span>View Automated Screening Showcase &rarr;</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 

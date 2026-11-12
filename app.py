@@ -874,6 +874,94 @@ def api_scan_text():
         'sharing_context': sharing_context
     })
 
+@app.route('/api/inspect-file', methods=['POST', 'OPTIONS'])
+def api_inspect_file():
+    """Inspects an uploaded document/PDF/image for sensitive PII and QR threat payloads.
+    Used by the ShareSafe Browser Extension (Phase 3) for automated pre-upload screening.
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded in "file" form field.'}), 400
+
+    file = request.files['file']
+    if not file or file.filename == '':
+        return jsonify({'error': 'No selected file.'}), 400
+
+    ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
+    if ext not in Config.ALLOWED_EXTENSIONS:
+        return jsonify({
+            'error': f'Unsupported file extension .{ext}. Allowed: {", ".join(Config.ALLOWED_EXTENSIONS)}'
+        }), 400
+
+    session_id = str(uuid.uuid4().hex[:12])
+    upload_dir = SessionManager.get_session_upload_dir(session_id)
+    SessionManager.get_session_output_dir(session_id)
+
+    display_name = os.path.basename(file.filename)
+    safe_filename = f"inspect_{uuid.uuid4().hex[:8]}.{ext}"
+    target_path = os.path.join(upload_dir, safe_filename)
+    file.save(target_path)
+
+    # Validate file integrity and bounds
+    is_valid, val_err = validate_file_content(target_path, ext)
+    if not is_valid:
+        SessionManager.purge_session(session_id)
+        return jsonify({'error': val_err}), 400
+
+    sharing_context = request.form.get('sharing_context', 'academic').lower()
+    if sharing_context not in ['academic', 'professional', 'private', 'public']:
+        sharing_context = 'academic'
+
+    try:
+        scan_result = scanner.scan_file(
+            target_path,
+            upload_dir,
+            sharing_context=sharing_context,
+            original_filename=display_name
+        )
+        meta_result = MetadataCleaner.inspect_file(target_path)
+
+        session_info = {
+            'session_id': session_id,
+            'file_name': scan_result['file_name'],
+            'sample_id': None,
+            'is_pdf': scan_result['is_pdf'],
+            'page_count': scan_result.get('page_count', len(scan_result.get('pages', []))),
+            'sharing_context': sharing_context,
+            'original_path': target_path,
+            'pages': scan_result['pages'],
+            'detections': scan_result['detections'],
+            'risk_summary': scan_result['risk_summary'],
+            'metadata': meta_result,
+            'assistant': scan_result.get('assistant', {}),
+            'warnings': scan_result.get('warnings', [])
+        }
+
+        with open(os.path.join(upload_dir, 'session_info.json'), 'w', encoding='utf-8') as f:
+            json.dump(session_info, f, indent=2)
+
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'workbench_url': url_for('workbench', session_id=session_id),
+            'file_name': display_name,
+            'file_size': os.path.getsize(target_path),
+            'is_pdf': scan_result['is_pdf'],
+            'total_findings': len(scan_result['detections']),
+            'detections': scan_result['detections'],
+            'risk_summary': scan_result['risk_summary'],
+            'assistant': scan_result.get('assistant', {}),
+            'can_share_safely': scan_result['risk_summary'].get('can_share_safely', False)
+        })
+
+    except Exception as e:
+        SessionManager.purge_session(session_id)
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Failed to process file: {str(e)}'}), 500
+
 if __name__ == '__main__':
     print("================================================================")
     print(" ShareSafe - Zero-Leak PII & QR Privacy Redaction Server Running")
