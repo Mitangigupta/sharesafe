@@ -25,28 +25,45 @@
   "permissions": [
     "contextMenus",
     "storage",
-    "activeTab"
+    "activeTab",
+    "tabs"
   ],
   "host_permissions": [
-    "http://127.0.0.1:5000/*",
-    "http://localhost:5000/*",
+    "http://127.0.0.1:*/*",
+    "http://localhost:*/*",
+    "https://*.vercel.app/*",
     "https://mail.google.com/*",
     "https://web.whatsapp.com/*"
   ],
   "content_scripts": [
     {
-      "matches": ["https://mail.google.com/*"],
-      "js": ["content/file-shield.js", "content/gmail-adapter.js"],
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "js": [
+        "content/file-shield.js",
+        "content/gmail-adapter.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://web.whatsapp.com/*"],
-      "js": ["content/file-shield.js", "content/whatsapp-adapter.js"],
+      "matches": [
+        "https://web.whatsapp.com/*"
+      ],
+      "js": [
+        "content/file-shield.js",
+        "content/whatsapp-adapter.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["<all_urls>"],
-      "js": ["content/selection-helper.js"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content/selection-helper.js"
+      ],
       "run_at": "document_idle"
     }
   ]

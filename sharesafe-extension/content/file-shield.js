@@ -193,25 +193,43 @@
     });
   }
 
-  // File Inspection via Core Endpoint
+  // File Inspection via Background Service Worker (Bypasses Mixed Content & CORS)
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function inspectFile(file) {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("sharing_context", "academic");
-
     try {
-      const res = await fetch(`${SERVER_URL}/api/inspect-file`, {
-        method: "POST",
-        body: formData
+      const base64Data = await fileToBase64(file);
+      return new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+          {
+            action: "INSPECT_FILE",
+            filename: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            base64Data: base64Data
+          },
+          (response) => {
+            if (chrome.runtime.lastError || !response || !response.success) {
+              console.warn(
+                "[ShareSafe] Inspection background delegation failed:",
+                chrome.runtime.lastError?.message || response?.error
+              );
+              resolve(null);
+            } else {
+              resolve(response.data);
+            }
+          }
+        );
       });
-
-      if (!res.ok) {
-        throw new Error(`Server returned status ${res.status}`);
-      }
-
-      return await res.json();
     } catch (err) {
-      console.warn("[ShareSafe] Inspection endpoint unreachable or error:", err);
+      console.warn("[ShareSafe] Unable to encode file for inspection:", err);
       return null;
     }
   }

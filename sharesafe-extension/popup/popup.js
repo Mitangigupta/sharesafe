@@ -51,8 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
         serverStatus.title = `Connected to ShareSafe Engine v${response.data.version || "1.0"}`;
       } else {
         statusDot.className = "status-dot offline";
-        statusLabel.textContent = "Offline";
-        serverStatus.title = "ShareSafe Flask server is not responding at http://127.0.0.1:5000";
+        statusLabel.textContent = "Offline Mode";
+        serverStatus.title = "ShareSafe local server is offline; client-side privacy scanner is active.";
       }
     });
   }

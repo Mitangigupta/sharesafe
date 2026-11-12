@@ -751,7 +751,7 @@ def download_extension_zip():
             for file in files:
                 abs_p = os.path.join(root, file)
                 rel_p = os.path.relpath(abs_p, extension_dir)
-                zf.write(abs_p, os.path.join('sharesafe-extension', rel_p))
+                zf.write(abs_p, rel_p)
     mem_zip.seek(0)
     return send_file(mem_zip, mimetype='application/zip', as_attachment=True, download_name='sharesafe-extension-v3.zip')
 

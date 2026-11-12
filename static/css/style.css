@@ -10359,6 +10359,18 @@ input:checked + .toggle-slider::before {
     border: 1px solid #E8B4B2;
 }
 
+.ext-risk-pill-clean {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 2px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--sage-soft);
+    color: var(--sage-primary);
+    border: 1px solid var(--sage-border);
+}
+
 .ext-risk-score-mono {
     font-family: var(--font-mono);
     font-size: 0.75rem;
@@ -10438,6 +10450,8 @@ input:checked + .toggle-slider::before {
 
 .ext-finding-entry.critical { border-left-color: #A74440; }
 .ext-finding-entry.high { border-left-color: var(--coral-primary); }
+.ext-finding-entry.medium { border-left-color: var(--amber-primary); }
+.ext-finding-entry.low { border-left-color: var(--sage-primary); }
 
 .ext-finding-top {
     display: flex;
@@ -10468,6 +10482,16 @@ input:checked + .toggle-slider::before {
 .ext-badge-high {
     background: var(--coral-soft);
     color: var(--coral-primary);
+}
+
+.ext-badge-medium {
+    background: var(--amber-soft);
+    color: var(--amber-primary);
+}
+
+.ext-badge-low {
+    background: var(--sage-soft);
+    color: var(--sage-primary);
 }
 
 .ext-finding-masked {
