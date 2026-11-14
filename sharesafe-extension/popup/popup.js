@@ -509,14 +509,27 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         (res) => {
           if (!res || !res.success) {
+            const isOffline = res?.isOffline || (res?.error && (res.error.includes("offline") || res.error.includes("Failed to fetch")));
+            const title = isOffline ? "ShareSafe Engine Offline" : "Scan Failed / Unsupported";
+            const sub = isOffline
+              ? "Start the engine in terminal: <code>python app.py</code> (:5000)"
+              : escapeHtml(res?.error || "Make sure ShareSafe server is running (:5000)");
+
             dropzonePrompt.innerHTML = `
-              <div class="dropzone-icon">⚠️</div>
-              <div class="dropzone-text" style="color: #A74440;">Scan Failed / Unsupported</div>
-              <div class="dropzone-sub">${escapeHtml(res?.error || "Make sure ShareSafe server is running (:5000)")}</div>
-              <button type="button" class="btn-choose-file" id="btnRetryPopupFile" style="margin-top: 8px;">Try Another File</button>
+              <div class="dropzone-icon">${isOffline ? "🛑" : "⚠️"}</div>
+              <div class="dropzone-text" style="color: #A74440;">${title}</div>
+              <div class="dropzone-sub">${sub}</div>
+              <div style="display: flex; gap: 8px; margin-top: 8px; justify-content: center;">
+                <button type="button" class="btn-choose-file" id="btnRetryPopupFile">${isOffline ? "Retry Connection" : "Try Another File"}</button>
+              </div>
             `;
             document.getElementById("btnRetryPopupFile")?.addEventListener("click", () => {
-              popupFileInput.click();
+              if (isOffline) {
+                checkServer();
+                handlePopupAttachment(file);
+              } else {
+                popupFileInput.click();
+              }
             });
             return;
           }

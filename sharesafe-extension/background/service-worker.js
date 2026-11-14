@@ -36,6 +36,29 @@ async function getConfig() {
   });
 }
 
+// Robust fetch helper with loopback fallback (127.0.0.1 <-> localhost)
+async function fetchWithLoopbackFallback(apiUrl, endpointPath, options = {}) {
+  const primaryUrl = `${apiUrl}${endpointPath}`;
+  try {
+    return await fetch(primaryUrl, options);
+  } catch (err1) {
+    let altApiUrl = null;
+    if (apiUrl.includes("127.0.0.1")) {
+      altApiUrl = apiUrl.replace("127.0.0.1", "localhost");
+    } else if (apiUrl.includes("localhost")) {
+      altApiUrl = apiUrl.replace("localhost", "127.0.0.1");
+    }
+
+    if (altApiUrl && altApiUrl !== apiUrl) {
+      try {
+        const fallbackUrl = `${altApiUrl}${endpointPath}`;
+        return await fetch(fallbackUrl, options);
+      } catch (_) {}
+    }
+    throw err1;
+  }
+}
+
 // Update extension icon badge based on risk level
 function updateBadge(riskLevel, count) {
   if (count === 0 || riskLevel === "CLEAN") {
@@ -289,7 +312,7 @@ async function executeScan(text, forcedContext = null) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-    const res = await fetch(`${config.apiUrl}/api/scan-text`, {
+    const res = await fetchWithLoopbackFallback(config.apiUrl, "/api/scan-text", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -390,20 +413,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === "CHECK_HEALTH") {
-    getConfig().then((config) => {
+    getConfig().then(async (config) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-      fetch(`${config.apiUrl}/api/health`, { signal: controller.signal })
-        .then((r) => r.json())
-        .then((data) => {
-          clearTimeout(timeoutId);
-          sendResponse({ success: true, data: data, apiUrl: config.apiUrl });
-        })
-        .catch((err) => {
-          clearTimeout(timeoutId);
-          sendResponse({ success: false, error: err.message, apiUrl: config.apiUrl });
-        });
+      try {
+        const res = await fetchWithLoopbackFallback(config.apiUrl, "/api/health", { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        sendResponse({ success: true, data: data, apiUrl: config.apiUrl });
+      } catch (err) {
+        clearTimeout(timeoutId);
+        sendResponse({ success: false, error: err.message, apiUrl: config.apiUrl });
+      }
     });
     return true;
   }
@@ -421,20 +444,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         formData.append("file", blob, message.filename || "file");
         formData.append("sharing_context", message.sharingContext || config.sharingContext);
 
-        const res = await fetch(`${config.apiUrl}/api/inspect-file`, {
+        const res = await fetchWithLoopbackFallback(config.apiUrl, "/api/inspect-file", {
           method: "POST",
           body: formData
         });
 
         if (!res.ok) {
-          throw new Error(`Server returned HTTP ${res.status}`);
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Server returned HTTP ${res.status}`);
         }
 
         const data = await res.json();
         sendResponse({ success: true, data: data });
       } catch (err) {
         console.warn("[ShareSafe] File inspection failed or server offline:", err.message);
-        sendResponse({ success: false, error: err.message });
+        const isOffline = err.message && (err.message.includes("Failed to fetch") || err.message.includes("NetworkError"));
+        const displayErr = isOffline
+          ? "ShareSafe local server is offline at http://127.0.0.1:5000. Run 'python app.py' in terminal."
+          : err.message;
+        sendResponse({ success: false, error: displayErr, isOffline: isOffline });
       }
     });
     return true;
@@ -456,16 +484,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           formData.append("default_style", message.defaultStyle);
         }
 
-        const res = await fetch(`${config.apiUrl}/api/auto-redact-attachment`, {
+        const res = await fetchWithLoopbackFallback(config.apiUrl, "/api/auto-redact-attachment", {
           method: "POST",
           body: formData
         });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Server returned HTTP ${res.status}`);
+        }
 
         const data = await res.json();
         sendResponse(data);
       } catch (err) {
         console.warn("[ShareSafe] Auto-redaction attachment failed:", err.message);
-        sendResponse({ success: false, error: err.message });
+        const isOffline = err.message && (err.message.includes("Failed to fetch") || err.message.includes("NetworkError"));
+        const displayErr = isOffline
+          ? "ShareSafe local server is offline at http://127.0.0.1:5000. Run 'python app.py' in terminal."
+          : err.message;
+        sendResponse({ success: false, error: displayErr, isOffline: isOffline });
       }
     });
     return true;
@@ -475,7 +512,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "UPDATE_ATTACHMENT_REDACTIONS") {
     getConfig().then(async (config) => {
       try {
-        const res = await fetch(`${config.apiUrl}/api/update-attachment-redactions/${message.sessionId}`, {
+        const res = await fetchWithLoopbackFallback(config.apiUrl, `/api/update-attachment-redactions/${message.sessionId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -483,6 +520,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             custom_styles: message.customStyles || {}
           })
         });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Server returned HTTP ${res.status}`);
+        }
 
         const data = await res.json();
         sendResponse(data);
