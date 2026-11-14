@@ -41,9 +41,9 @@
                 <i class="fa-solid fa-terminal"></i>
                 <span>Installation Guide</span>
             </button>
-            <button type="button" class="btn-extension-secondary" onclick="simulateShieldModal()" style="padding: 9px 14px; font-size: 0.85rem; border-color: var(--coral-border); color: var(--coral-primary) !important;">
+            <button type="button" class="btn-extension-secondary" onclick="simulateShieldModal()" id="btnTestShieldModal" style="padding: 9px 14px; font-size: 0.85rem; border-color: var(--coral-border); color: var(--coral-primary) !important;">
                 <i class="fa-solid fa-shield-virus"></i>
-                <span>Test Pre-Upload File Shield Demo</span>
+                <span>Test Attachment Redaction &amp; Review Demo</span>
             </button>
             <a href="/architecture-design" class="btn-extension-secondary" style="padding: 9px 14px; font-size: 0.85rem; text-decoration: none;" title="View technical architecture">
                 <i class="fa-solid fa-network-wired"></i>
@@ -311,31 +311,36 @@
                             </div>
                         </div>
 
-                        <!-- 3-Step In-Situ Sequence -->
+                        <!-- Automatic Attachment Redaction Workflow Track -->
                         <div style="background: var(--bg-surface); border: 1px solid var(--border-stone); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px;">
-                            <h4 style="font-size: 0.92rem; font-weight: 700; color: var(--ink-primary); margin: 0 0 10px 0;">
-                                <i class="fa-solid fa-route" style="color: var(--sage-primary); margin-right: 6px;"></i>In-Situ Workflow in 3 Steps
-                            </h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h4 style="font-size: 0.92rem; font-weight: 700; color: var(--ink-primary); margin: 0;">
+                                    <i class="fa-solid fa-file-shield" style="color: var(--sage-primary); margin-right: 6px;"></i>Attachment Redaction Workflow
+                                </h4>
+                                <span style="font-size: 0.7rem; font-weight: 700; background: var(--sage-soft); color: var(--sage-primary); padding: 2px 7px; border-radius: 999px;">
+                                    WhatsApp &bull; Gmail
+                                </span>
+                            </div>
                             <div class="ext-workflow-track" style="margin: 0; padding: 0;">
                                 <div class="ext-workflow-step" style="padding-bottom: 12px;">
                                     <div class="ext-step-bubble" style="width: 24px; height: 24px; font-size: 0.75rem;">1</div>
                                     <div class="ext-step-info">
-                                        <h4 style="font-size: 0.85rem; margin-bottom: 2px;">Highlight or Focus Compose Box</h4>
-                                        <p style="font-size: 0.78rem; margin: 0;">Select text on any webpage or click into an email / chat compose box in Gmail or WhatsApp Web.</p>
+                                        <h4 style="font-size: 0.85rem; margin-bottom: 2px;">Capture-Phase Interception</h4>
+                                        <p style="font-size: 0.78rem; margin: 0;">User attaches a photo, image, or PDF on WhatsApp Web or Gmail. The extension intercepts the file input in the capture phase before the platform can transmit it.</p>
                                     </div>
                                 </div>
                                 <div class="ext-workflow-step" style="padding-bottom: 12px;">
                                     <div class="ext-step-bubble" style="width: 24px; height: 24px; font-size: 0.75rem;">2</div>
                                     <div class="ext-step-info">
-                                        <h4 style="font-size: 0.85rem; margin-bottom: 2px;">Algorithmic Validation in &lt;15ms</h4>
-                                        <p style="font-size: 0.78rem; margin: 0;">Right-click <strong>"Scan with ShareSafe"</strong> or click popup to verify Verhoeff/Luhn checksums and context multipliers.</p>
+                                        <h4 style="font-size: 0.85rem; margin-bottom: 2px;">Local OCR &amp; Auto-Redaction by Default</h4>
+                                        <p style="font-size: 0.78rem; margin: 0;">Extracted text is scanned via Verhoeff/Luhn checksum algorithms. All sensitive entities are automatically queued for blackout redaction with 0 text stream leakage.</p>
                                     </div>
                                 </div>
                                 <div class="ext-workflow-step" style="padding-bottom: 0;">
                                     <div class="ext-step-bubble" style="width: 24px; height: 24px; font-size: 0.75rem;">3</div>
                                     <div class="ext-step-info">
-                                        <h4 style="font-size: 0.85rem; margin-bottom: 2px;">1-Click Redact or Pre-Upload Shield</h4>
-                                        <p style="font-size: 0.78rem; margin: 0;">Click <strong>"Replace in Draft"</strong> to sanitize message in-place, or let the pre-upload shield intercept attachments before sending.</p>
+                                        <h4 style="font-size: 0.85rem; margin-bottom: 2px;">In-Situ Review, Selective Undo &amp; File Swap</h4>
+                                        <p style="font-size: 0.78rem; margin: 0;">Review detected items with 1-click selective undo. The sanitized copy is verified non-recoverable and injected via <code>DataTransfer</code> while the raw original is discarded.</p>
                                     </div>
                                 </div>
                             </div>
@@ -752,93 +757,346 @@
         });
     }
 
-    // Pre-Upload Shield Modal Simulator
+    // Interactive Toast Notification
+    function showExtensionToast(msg, type = 'info') {
+        const existing = document.getElementById('extDemoToast');
+        if (existing) existing.remove();
+        const t = document.createElement('div');
+        t.id = 'extDemoToast';
+        const bg = type === 'success' ? 'var(--sage-primary)' : type === 'warning' ? '#A74440' : '#252522';
+        t.style.cssText = `
+            position: fixed; bottom: 24px; right: 24px; z-index: 999999;
+            background: ${bg}; color: #FFFFFF; padding: 12px 18px;
+            border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.22); display: flex;
+            align-items: center; gap: 10px; animation: fadeIn 0.3s ease;
+            max-width: 440px; line-height: 1.4;
+        `;
+        const icon = type === 'success' ? 'fa-circle-check' : type === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-info';
+        t.innerHTML = `<i class="fa-solid ${icon}" style="font-size: 1.1rem;"></i><span>${msg}</span>`;
+        document.body.appendChild(t);
+        setTimeout(() => { if (t && t.parentNode) t.remove(); }, 4200);
+    }
+
+    // Attachment Redaction & Review Modal Simulator
     function simulateShieldModal() {
         const existing = document.getElementById('demoShieldModalOverlay');
         if (existing) { existing.remove(); return; }
 
+        const items = [
+            { id: 'd-1', label: 'Indian Aadhaar UID', masked: 'XXXX XXXX 0123', raw: '2345 6789 0123', details: 'Verhoeff Checksum Validated (Mod-10 Dihedral D5)', level: 'CRITICAL', redacted: true },
+            { id: 'd-2', label: 'Indian PAN Card', masked: 'ABCDE****F', raw: 'ABCDE1234F', details: 'Income Tax Entity: Individual (P) Validated', level: 'HIGH', redacted: true },
+            { id: 'd-3', label: 'Visa Credit Card', masked: '4111 **** **** 1111', raw: '4111 2222 3333 1111', details: 'Luhn Mod-10 Checksum Algorithm Verified', level: 'CRITICAL', redacted: true }
+        ];
+
         const overlay = document.createElement('div');
         overlay.id = 'demoShieldModalOverlay';
         overlay.style.cssText = `
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(37, 37, 34, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            animation: fadeIn 0.25s ease;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(37, 37, 34, 0.72); backdrop-filter: blur(5px);
+            z-index: 99999; display: flex; align-items: center; justify-content: center;
+            padding: 16px; animation: fadeIn 0.25s ease;
         `;
 
         overlay.innerHTML = `
-            <div style="background: var(--bg-surface); border-radius: var(--radius-md); max-width: 520px; width: 100%; border: 1px solid var(--border-stone); box-shadow: 0 16px 48px rgba(0,0,0,0.25); overflow: hidden;">
-                <div style="padding: 16px 20px; background: var(--bg-stone-subtle); border-bottom: 1px solid var(--border-stone); display: flex; align-items: center; justify-content: space-between;">
+            <div style="background: var(--bg-surface); border-radius: 12px; width: 100%; max-width: 740px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid var(--border-stone);">
+                <!-- Modal Header -->
+                <div style="padding: 14px 20px; background: var(--bg-stone-subtle); border-bottom: 1px solid var(--border-stone); display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 32px; height: 32px; border-radius: 6px; background: var(--coral-soft); color: var(--coral-primary); display: flex; align-items: center; justify-content: center; font-size: 15px;">
+                        <div style="width: 34px; height: 34px; border-radius: 6px; background: var(--coral-soft); border: 1px solid var(--coral-border); display: flex; align-items: center; justify-content: center; color: var(--coral-primary); font-size: 16px;">
                             🛡️
                         </div>
                         <div>
-                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--ink-primary);">ShareSafe Pre-Upload Privacy Shield</div>
-                            <div style="font-size: 0.72rem; color: var(--ink-muted);">Automated File Interception &bull; WhatsApp Web &amp; Gmail</div>
+                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--ink-primary);">Attachment Redaction &amp; Review</div>
+                            <div style="font-size: 0.72rem; color: var(--ink-muted);">Automatic In-Situ Protection &bull; WhatsApp Web &amp; Gmail</div>
                         </div>
                     </div>
-                    <span style="font-size: 0.7rem; font-weight: 700; background: #FCE8E7; color: #A74440; padding: 2px 8px; border-radius: 999px;">
+                    <span style="font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #FCE8E7; color: #A74440;">
                         CRITICAL RISK (94/100)
                     </span>
                 </div>
 
-                <div style="padding: 20px;">
-                    <div style="background: var(--bg-canvas); border: 1px solid var(--border-stone); border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 600; color: var(--ink-primary);"><i class="fa-solid fa-file-pdf" style="color: var(--coral-primary); margin-right: 6px;"></i> medical_invoice_aadhaar.pdf</div>
-                            <div style="font-size: 0.74rem; color: var(--ink-muted);">124.6 KB &bull; Upload paused before sending</div>
+                <!-- Verification Seal Banner -->
+                <div style="background: var(--sage-soft); border-bottom: 1px solid var(--sage-border); padding: 8px 20px; font-size: 0.78rem; color: var(--sage-primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-lock"></i>
+                    <span><strong>Verified Non-Recoverable:</strong> Output file undergoes permanent raster flattening &bull; 0 text streams remain &bull; Metadata stripped.</span>
+                </div>
+
+                <!-- Main Body: Two-Column Review Layout -->
+                <div style="padding: 16px 20px; overflow-y: auto; flex: 1; display: grid; grid-template-columns: 260px 1fr; gap: 16px;">
+                    <!-- Left: Document Preview Canvas -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted);">
+                            Sanitized Document Preview
                         </div>
-                        <span style="font-size: 0.74rem; font-weight: 600; color: #A74440;">Intercepted</span>
+                        <div style="background: #FDFCF9; border: 1px solid var(--border-stone); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);">
+                            <canvas id="demoDocCanvas" width="260" height="280" style="width: 100%; height: auto; display: block;"></canvas>
+                        </div>
+                        <div style="font-size: 0.74rem; color: var(--ink-muted); line-height: 1.4;">
+                            <strong style="color: var(--ink-primary);">medical_invoice_aadhaar.pdf</strong><br/>
+                            124.6 KB &bull; PDF Document &bull; Intercepted
+                        </div>
                     </div>
 
-                    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--ink-muted); margin-bottom: 8px;">
-                        Protected Items Detected Inside File:
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
-                        <div style="background: var(--bg-surface); border: 1px solid var(--border-stone); border-left: 3px solid #A74440; border-radius: 4px; padding: 7px 10px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--ink-primary);">
-                                <span>Indian Aadhaar UID</span>
-                                <span style="font-size: 0.68rem; color: #A74440;">CRITICAL</span>
+                    <!-- Right: Detections & Selective Undo List -->
+                    <div style="display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted);">
+                                Detected Items (Redacted by Default):
                             </div>
-                            <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-secondary);">XXXX XXXX 0123 &bull; Verhoeff Checksum Validated</div>
+                            <span id="demoModalActiveCount" style="font-size: 0.72rem; font-weight: 700; color: var(--sage-primary);">
+                                3 of 3 Redacted
+                            </span>
                         </div>
-                        <div style="background: var(--bg-surface); border: 1px solid var(--border-stone); border-left: 3px solid #A74440; border-radius: 4px; padding: 7px 10px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--ink-primary);">
-                                <span>Visa Credit Card</span>
-                                <span style="font-size: 0.68rem; color: #A74440;">CRITICAL</span>
-                            </div>
-                            <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-secondary);">4111 **** **** 1111 &bull; Luhn Mod-10 Checksum Verified</div>
+
+                        <div id="demoModalDetectionsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px; margin-bottom: 10px;">
+                            <!-- Items injected dynamically -->
+                        </div>
+
+                        <div style="font-size: 0.74rem; color: var(--ink-secondary); background: var(--bg-canvas); border: 1px solid var(--border-stone); border-radius: 6px; padding: 8px 10px; line-height: 1.45;">
+                            💡 <em>Click <strong>Undo</strong> or <strong>Redact</strong> to customize individual redactions. The preview canvas flattens changes in real time.</em>
                         </div>
                     </div>
+                </div>
 
-                    <div style="background: var(--coral-soft); border: 1px solid var(--coral-border); border-radius: 6px; padding: 9px 12px; font-size: 0.76rem; color: #A74440; line-height: 1.45; margin-bottom: 16px;">
-                        <strong>Defensive Privacy Alert:</strong> This file contains unmasked sovereign personal identity numbers and payment credentials. Sending this document unredacted compromises compliance under India DPDP Act and PCI-DSS.
+                <!-- Footer Actions -->
+                <div style="padding: 14px 20px; background: var(--bg-stone-subtle); border-top: 1px solid var(--border-stone); display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" id="btnModalSendSanitized" style="flex: 2; min-width: 180px; padding: 10px 16px; background: var(--sage-primary); color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Send Sanitized Attachment</span>
+                        </button>
+                        <button type="button" id="btnModalDownloadClean" style="flex: 1; min-width: 140px; padding: 10px 14px; background: #FFFFFF; color: var(--ink-primary); border: 1px solid var(--border-stone); border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download Clean Copy</span>
+                        </button>
+                        <button type="button" id="btnModalCancel" style="padding: 10px 14px; background: #FFFFFF; color: #A74440; border: 1px solid var(--coral-border); border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                            <i class="fa-solid fa-xmark"></i>
+                            <span>Cancel</span>
+                        </button>
                     </div>
-
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <button type="button" onclick="document.getElementById('demoShieldModalOverlay').remove()" style="flex: 1; min-width: 140px; padding: 8px 12px; background: #A74440; color: #fff; border: none; border-radius: 4px; font-size: 0.82rem; font-weight: 600; cursor: pointer;">
-                            🛑 Cancel Upload
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+                        <button type="button" id="btnModalOverride" style="background: none; border: none; color: var(--ink-muted); font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0;">
+                            I understand the risks; send original unredacted file (Override)
                         </button>
-                        <a href="/" target="_blank" style="flex: 1; min-width: 140px; padding: 8px 12px; background: var(--sage-primary); color: #fff; border: none; border-radius: 4px; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
-                            <span>✏️ Redact in Studio ↗</span>
-                        </a>
-                        <button type="button" onclick="document.getElementById('demoShieldModalOverlay').remove()" style="width: 100%; background: none; border: none; font-size: 0.72rem; color: var(--ink-muted); text-decoration: underline; cursor: pointer; padding: 4px;">
-                            I understand the risks; send file unredacted (Override)
-                        </button>
+                        <span style="font-size: 0.72rem; color: var(--ink-muted);"><i class="fa-solid fa-shield"></i> Original file is never altered on disk</span>
                     </div>
                 </div>
             </div>
         `;
 
         document.body.appendChild(overlay);
+
+        const canvas = overlay.querySelector('#demoDocCanvas');
+        const listContainer = overlay.querySelector('#demoModalDetectionsList');
+        const countElem = overlay.querySelector('#demoModalActiveCount');
+
+        // Draw Simulated Document on Canvas
+        function drawCanvas() {
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Background paper
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+
+            // Document border
+            ctx.strokeStyle = '#EAE5DD';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(4, 4, w - 8, h - 8);
+
+            // Hospital Header
+            ctx.fillStyle = '#647C70';
+            ctx.fillRect(12, 12, w - 24, 26);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText('CITY HOSPITAL & CLINIC — INVOICE', 20, 29);
+
+            // Document Metadata
+            ctx.fillStyle = '#252522';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillText('Patient: Ananya Sharma', 16, 54);
+            ctx.fillStyle = '#77736D';
+            ctx.font = '8px sans-serif';
+            ctx.fillText('Date: 14-Nov-2026  •  Ref: #INV-9842', 16, 68);
+
+            // Divider
+            ctx.strokeStyle = '#EAE5DD';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(16, 76);
+            ctx.lineTo(w - 16, 76);
+            ctx.stroke();
+
+            // Field 1: Aadhaar UID
+            ctx.fillStyle = '#77736D';
+            ctx.font = 'bold 8px sans-serif';
+            ctx.fillText('AADHAAR UID (GOVT ID):', 16, 94);
+            if (items[0].redacted) {
+                // Blackout redaction block
+                ctx.fillStyle = '#1A1A18';
+                ctx.fillRect(16, 98, 140, 16);
+                ctx.fillStyle = '#647C70';
+                ctx.font = 'bold 8px monospace';
+                ctx.fillText('[REDACTED]', 165, 110);
+            } else {
+                ctx.fillStyle = '#A74440';
+                ctx.font = 'bold 9px monospace';
+                ctx.fillText('2345 6789 0123', 16, 110);
+                ctx.fillStyle = '#B27329';
+                ctx.font = '8px sans-serif';
+                ctx.fillText('(UNMASKED)', 165, 110);
+            }
+
+            // Field 2: PAN Card
+            ctx.fillStyle = '#77736D';
+            ctx.font = 'bold 8px sans-serif';
+            ctx.fillText('INCOME TAX PAN:', 16, 134);
+            if (items[1].redacted) {
+                ctx.fillStyle = '#1A1A18';
+                ctx.fillRect(16, 138, 120, 16);
+                ctx.fillStyle = '#647C70';
+                ctx.font = 'bold 8px monospace';
+                ctx.fillText('[REDACTED]', 145, 150);
+            } else {
+                ctx.fillStyle = '#A74440';
+                ctx.font = 'bold 9px monospace';
+                ctx.fillText('ABCDE1234F', 16, 150);
+                ctx.fillStyle = '#B27329';
+                ctx.font = '8px sans-serif';
+                ctx.fillText('(UNMASKED)', 145, 150);
+            }
+
+            // Field 3: Credit Card
+            ctx.fillStyle = '#77736D';
+            ctx.font = 'bold 8px sans-serif';
+            ctx.fillText('PAYMENT METHOD (VISA CARD):', 16, 174);
+            if (items[2].redacted) {
+                ctx.fillStyle = '#1A1A18';
+                ctx.fillRect(16, 178, 160, 16);
+                ctx.fillStyle = '#647C70';
+                ctx.font = 'bold 8px monospace';
+                ctx.fillText('[REDACTED]', 185, 190);
+            } else {
+                ctx.fillStyle = '#A74440';
+                ctx.font = 'bold 9px monospace';
+                ctx.fillText('4111 2222 3333 1111', 16, 190);
+                ctx.fillStyle = '#B27329';
+                ctx.font = '8px sans-serif';
+                ctx.fillText('(UNMASKED)', 185, 190);
+            }
+
+            // Summary Table
+            ctx.fillStyle = '#F8F6F2';
+            ctx.fillRect(16, 206, w - 32, 42);
+            ctx.strokeStyle = '#EAE5DD';
+            ctx.strokeRect(16, 206, w - 32, 42);
+
+            ctx.fillStyle = '#252522';
+            ctx.font = '8px sans-serif';
+            ctx.fillText('Consultation & Diagnostic Lab', 22, 222);
+            ctx.fillText('Total Paid:', 22, 238);
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillText('INR 14,500.00', w - 90, 238);
+
+            // Sovereign Non-Recoverable Seal watermark
+            ctx.fillStyle = 'rgba(100, 124, 112, 0.12)';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText('SHA-256 ZERO STREAM VERIFIED', 42, 268);
+        }
+
+        // Render Detections List
+        function renderItems() {
+            if (!listContainer) return;
+            listContainer.innerHTML = '';
+            const active = items.filter(i => i.redacted).length;
+            countElem.textContent = `${active} of ${items.length} Redacted`;
+
+            items.forEach((item, idx) => {
+                const isRedacted = item.redacted;
+                const row = document.createElement('div');
+                row.style.cssText = `
+                    background: var(--bg-surface);
+                    border: 1px solid ${isRedacted ? 'var(--border-stone)' : 'var(--amber-border, #E8D7BF)'};
+                    border-left: 3px solid ${isRedacted ? 'var(--sage-primary)' : 'var(--amber-primary, #B27329)'};
+                    border-radius: 6px;
+                    padding: 8px 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 10px;
+                    transition: all 0.15s ease;
+                `;
+
+                row.innerHTML = `
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+                            <span style="font-size: 0.78rem; font-weight: 700; color: var(--ink-primary);">${item.label}</span>
+                            <span style="font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: ${isRedacted ? 'var(--sage-soft)' : '#F5EBDD'}; color: ${isRedacted ? 'var(--sage-primary)' : '#B27329'};">
+                                ${isRedacted ? 'REDACTED' : 'KEPT'}
+                            </span>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-primary); background: var(--bg-canvas); padding: 2px 6px; border-radius: 3px; margin: 2px 0;">
+                            ${isRedacted ? item.masked : '<span style="color: #A74440; font-weight: 700;">' + item.raw + '</span>'}
+                        </div>
+                        <div style="font-size: 0.68rem; color: var(--ink-muted);">${item.details}</div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-toggle-demo" style="
+                            padding: 5px 8px;
+                            font-size: 0.72rem;
+                            font-weight: 600;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            border: 1px solid ${isRedacted ? 'var(--sage-primary)' : 'var(--amber-primary, #B27329)'};
+                            background: ${isRedacted ? 'var(--sage-soft)' : '#FDF1E3'};
+                            color: ${isRedacted ? 'var(--sage-primary)' : '#B27329'};
+                        ">
+                            ${isRedacted ? '✕ Undo' : '↩ Redact'}
+                        </button>
+                    </div>
+                `;
+
+                row.querySelector('.btn-toggle-demo').addEventListener('click', () => {
+                    item.redacted = !item.redacted;
+                    renderItems();
+                    drawCanvas();
+                });
+
+                listContainer.appendChild(row);
+            });
+        }
+
+        renderItems();
+        drawCanvas();
+
+        // Button Actions
+        overlay.querySelector('#btnModalSendSanitized').addEventListener('click', () => {
+            overlay.remove();
+            showExtensionToast('Sanitized attachment dispatched! DataTransfer file swap executed. Original raw file was never sent.', 'success');
+        });
+
+        overlay.querySelector('#btnModalDownloadClean').addEventListener('click', () => {
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'medical_invoice_sanitized.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+            showExtensionToast('Clean non-recoverable copy generated and downloaded.', 'info');
+        });
+
+        overlay.querySelector('#btnModalCancel').addEventListener('click', () => {
+            overlay.remove();
+            showExtensionToast('Attachment cancelled. Original file discarded.', 'warning');
+        });
+
+        overlay.querySelector('#btnModalOverride').addEventListener('click', () => {
+            overlay.remove();
+            showExtensionToast('Upload override granted. Sending uninspected file.', 'warning');
+        });
     }
 
     // Real-Time Live Scan Execution calling actual /api/scan-text

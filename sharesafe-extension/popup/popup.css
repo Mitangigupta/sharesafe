@@ -882,3 +882,249 @@ body {
   width: 13px;
   height: 13px;
 }
+
+
+/* ==========================================================================
+   ShareSafe — Prioritized Attachment Shield Styles (Phase 4 Workflow)
+   ========================================================================== */
+.attachment-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.platform-shield-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.shield-status-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shield-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sage-primary);
+  box-shadow: 0 0 0 2px var(--sage-border);
+}
+
+.shield-status-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.shield-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--sage-soft);
+  color: var(--sage-primary);
+  border: 1px solid var(--sage-border);
+}
+
+.platform-chips-row {
+  display: flex;
+  gap: 8px;
+}
+
+.platform-chip {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sage-primary);
+}
+
+.popup-dropzone {
+  background: var(--bg-surface);
+  border: 1px dashed var(--coral-primary);
+  border-radius: var(--radius-md);
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.popup-dropzone:hover {
+  background: var(--coral-soft);
+}
+
+.dropzone-icon {
+  font-size: 26px;
+  margin-bottom: 4px;
+}
+
+.dropzone-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-primary);
+  margin-bottom: 8px;
+}
+
+.btn-choose-file {
+  background: var(--coral-primary);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dropzone-sub {
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-top: 6px;
+}
+
+.attachment-result-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.result-filename {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.result-meta {
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+
+.result-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--red-finding-soft);
+  color: var(--red-finding);
+}
+
+.result-preview-box {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-stone);
+  border-radius: var(--radius-xs);
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.result-preview-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.non-recoverable-seal {
+  background: var(--sage-soft);
+  border: 1px solid var(--sage-border);
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  color: var(--sage-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.result-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 110px;
+  overflow-y: auto;
+}
+
+.result-item-row {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-stone);
+  border-radius: var(--radius-xs);
+  padding: 5px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.result-item-btn {
+  background: none;
+  border: 1px solid var(--sage-primary);
+  color: var(--sage-primary);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.result-item-btn.undone {
+  border-color: var(--amber-primary);
+  color: var(--amber-primary);
+}
+
+.result-actions-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-download-sanitized {
+  flex: 1;
+  background: var(--sage-primary);
+  color: #fff;
+  border: none;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-clear-attachment {
+  background: none;
+  border: 1px solid var(--border-stone);
+  color: var(--ink-secondary);
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+}

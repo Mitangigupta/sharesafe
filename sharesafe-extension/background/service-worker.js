@@ -440,6 +440,60 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  // Automatic Attachment Redaction Workflow (Prioritized File Scanning)
+  if (message.action === "AUTO_REDACT_ATTACHMENT") {
+    getConfig().then(async (config) => {
+      try {
+        const blob = base64ToBlob(message.base64Data, message.fileType);
+        if (!blob) {
+          throw new Error("Unable to parse file stream");
+        }
+
+        const formData = new FormData();
+        formData.append("file", blob, message.filename || "attachment");
+        formData.append("sharing_context", message.sharingContext || config.sharingContext);
+        if (message.defaultStyle) {
+          formData.append("default_style", message.defaultStyle);
+        }
+
+        const res = await fetch(`${config.apiUrl}/api/auto-redact-attachment`, {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        sendResponse(data);
+      } catch (err) {
+        console.warn("[ShareSafe] Auto-redaction attachment failed:", err.message);
+        sendResponse({ success: false, error: err.message });
+      }
+    });
+    return true;
+  }
+
+  // Selective Undo / Edit Redaction Update for Active Attachment
+  if (message.action === "UPDATE_ATTACHMENT_REDACTIONS") {
+    getConfig().then(async (config) => {
+      try {
+        const res = await fetch(`${config.apiUrl}/api/update-attachment-redactions/${message.sessionId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            excluded_detection_ids: message.excludedDetectionIds || [],
+            custom_styles: message.customStyles || {}
+          })
+        });
+
+        const data = await res.json();
+        sendResponse(data);
+      } catch (err) {
+        console.warn("[ShareSafe] Update attachment redactions failed:", err.message);
+        sendResponse({ success: false, error: err.message });
+      }
+    });
+    return true;
+  }
+
   if (message.action === "CLEAR_SCAN") {
     chrome.storage.session.remove("sharesafe_last_scan", () => {
       chrome.action.setBadgeText({ text: "" });

@@ -19,7 +19,7 @@
         </div>
         <div class="brand-text">
           <h1 class="brand-title">ShareSafe</h1>
-          <span class="brand-sub">Privacy & PII Guard</span>
+          <span class="brand-sub">Attachment Privacy Shield</span>
         </div>
       </div>
       <div class="server-status" id="serverStatus" title="Connecting to ShareSafe local engine...">
@@ -43,14 +43,14 @@
     <section class="platform-banner" id="platformBanner" style="display: none;">
       <div class="platform-meta">
         <span class="platform-pill" id="platformPill">Platform</span>
-        <span class="platform-desc" id="platformDesc">Draft detected</span>
+        <span class="platform-desc" id="platformDesc">Attachment shield active</span>
       </div>
       <button class="btn-platform-scan" id="btnPlatformScan" title="Scan draft currently in compose box">
         <svg class="scan-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           <path d="m9 12 2 2 4-4"/>
         </svg>
-        <span id="platformScanLabel">Scan Compose Box</span>
+        <span id="platformScanLabel">Scan Compose</span>
       </button>
     </section>
 
@@ -58,30 +58,96 @@
     <section class="risk-card" id="riskCard">
       <div class="risk-header">
         <div class="risk-pill-wrapper">
-          <span class="risk-pill pill-neutral" id="riskBadge">NO SCAN YET</span>
+          <span class="risk-pill pill-neutral" id="riskBadge">SHIELD READY</span>
           <span class="risk-score" id="riskScore">Score: --</span>
         </div>
         <span class="findings-count" id="findingsCount">0 Findings</span>
       </div>
       <p class="risk-message" id="riskMessage">
-        Select text on any webpage and right-click <strong>"Scan with ShareSafe"</strong>, or paste text below.
+        Drop an attachment below or select files on WhatsApp Web / Gmail to auto-redact before sending.
       </p>
     </section>
 
-    <!-- Tab Navigation -->
+    <!-- Tab Navigation: Prioritizing Attachment Shield -->
     <nav class="tab-nav">
-      <button class="tab-btn active" data-tab="tab-findings" id="btnTabFindings">
+      <button class="tab-btn active" data-tab="tab-attachment" id="btnTabAttachment">
+        📎 Attachments <span class="tab-badge" id="tabBadgeShield">Active</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-findings" id="btnTabFindings">
         Findings <span class="tab-badge" id="tabBadgeFindings">0</span>
       </button>
       <button class="tab-btn" data-tab="tab-sanitized" id="btnTabSanitized">Sanitized Text</button>
       <button class="tab-btn" data-tab="tab-assistant" id="btnTabAssistant">Assistant</button>
-      <button class="tab-btn" data-tab="tab-manual" id="btnTabManual">Quick Input</button>
+      <button class="tab-btn" data-tab="tab-manual" id="btnTabManual">Text Scan</button>
     </nav>
 
     <!-- Tab Contents -->
     <main class="tab-panels">
+      <!-- 0. Attachment Shield Tab (Primary Priority) -->
+      <div class="tab-panel active" id="tab-attachment">
+        <div class="attachment-panel">
+          <!-- In-Situ Platform Status -->
+          <div class="platform-shield-status">
+            <div class="shield-status-left">
+              <span class="shield-indicator-dot"></span>
+              <span class="shield-status-title">In-Situ Attachment Shield</span>
+            </div>
+            <span class="shield-status-badge">AUTO-REDACT</span>
+          </div>
+
+          <div class="platform-chips-row">
+            <span class="platform-chip"><span class="chip-dot"></span> WhatsApp Web</span>
+            <span class="platform-chip"><span class="chip-dot"></span> Gmail Attachments</span>
+          </div>
+
+          <!-- Popup File Dropzone -->
+          <div class="popup-dropzone" id="popupDropzone">
+            <input type="file" id="popupFileInput" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp" style="display: none;" />
+            <div class="dropzone-content" id="dropzonePrompt">
+              <div class="dropzone-icon">🛡️</div>
+              <div class="dropzone-text">Drop photo, image or PDF to auto-redact</div>
+              <button type="button" class="btn-choose-file" id="btnPopupChooseFile">Choose File</button>
+              <div class="dropzone-sub">PDF, PNG, JPG, WEBP &bull; 0 text streams remain</div>
+            </div>
+          </div>
+
+          <!-- Active Redacted Attachment Result Card (Hidden until file selected) -->
+          <div class="attachment-result-card" id="attachmentResultCard" style="display: none;">
+            <div class="result-header">
+              <div>
+                <div class="result-filename" id="resultFileName">document.pdf</div>
+                <div class="result-meta" id="resultMeta">3 findings auto-redacted &bull; PDF</div>
+              </div>
+              <span class="result-badge" id="resultRiskBadge">CRITICAL</span>
+            </div>
+
+            <!-- Preview & Non-recoverability Verification -->
+            <div class="result-preview-box">
+              <img id="resultPreviewImg" src="" alt="Redacted preview" />
+            </div>
+
+            <div class="non-recoverable-seal">
+              <span class="seal-icon">🔒</span>
+              <span id="sealText">Non-recoverability verified: underlying text streams permanently flattened (0 characters).</span>
+            </div>
+
+            <!-- Redactions List with Toggles -->
+            <div class="result-items-list" id="resultItemsList"></div>
+
+            <div class="result-actions-row">
+              <button type="button" class="btn-download-sanitized" id="btnDownloadPopupSanitized">
+                ⬇️ Download Clean Copy
+              </button>
+              <button type="button" class="btn-clear-attachment" id="btnClearPopupAttachment">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 1. Findings Tab -->
-      <div class="tab-panel active" id="tab-findings">
+      <div class="tab-panel" id="tab-findings">
         <div class="findings-list" id="findingsList">
           <div class="empty-state">
             <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -89,7 +155,7 @@
               <path d="M12 16v-4M12 8h.01"/>
             </svg>
             <p class="empty-title">No scanned findings to display</p>
-            <p class="empty-desc">Right-click selected text on a webpage or paste text in the Quick Input tab.</p>
+            <p class="empty-desc">Drop an attachment in the Attachments tab, or highlight text on a webpage.</p>
           </div>
         </div>
       </div>
@@ -128,7 +194,7 @@
         </div>
       </div>
 
-      <!-- 4. Quick Input Tab -->
+      <!-- 4. Quick Input / Text Scan Tab -->
       <div class="tab-panel" id="tab-manual">
         <div class="manual-panel">
           <label for="manualInput" class="manual-label">Paste or type text to scan:</label>

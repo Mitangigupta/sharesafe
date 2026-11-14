@@ -438,6 +438,227 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // 9. Popup Attachment Shield & Auto-Redaction (Prioritized Attachment Workflow)
+  const popupFileInput = document.getElementById("popupFileInput");
+  const btnPopupChooseFile = document.getElementById("btnPopupChooseFile");
+  const popupDropzone = document.getElementById("popupDropzone");
+  const dropzonePrompt = document.getElementById("dropzonePrompt");
+  const attachmentResultCard = document.getElementById("attachmentResultCard");
+  const resultFileName = document.getElementById("resultFileName");
+  const resultMeta = document.getElementById("resultMeta");
+  const resultRiskBadge = document.getElementById("resultRiskBadge");
+  const resultPreviewImg = document.getElementById("resultPreviewImg");
+  const resultItemsList = document.getElementById("resultItemsList");
+  const btnDownloadPopupSanitized = document.getElementById("btnDownloadPopupSanitized");
+  const btnClearPopupAttachment = document.getElementById("btnClearPopupAttachment");
+
+  let activeAttachmentScan = null;
+  const popupExcludedDetectionIds = new Set();
+
+  if (btnPopupChooseFile && popupFileInput) {
+    btnPopupChooseFile.addEventListener("click", () => {
+      popupFileInput.click();
+    });
+  }
+
+  if (popupDropzone && popupFileInput) {
+    popupDropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      popupDropzone.style.background = "var(--coral-soft)";
+    });
+
+    popupDropzone.addEventListener("dragleave", () => {
+      popupDropzone.style.background = "";
+    });
+
+    popupDropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      popupDropzone.style.background = "";
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        handlePopupAttachment(e.dataTransfer.files[0]);
+      }
+    });
+
+    popupFileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length) {
+        handlePopupAttachment(e.target.files[0]);
+      }
+    });
+  }
+
+  function handlePopupAttachment(file) {
+    if (!file) return;
+
+    dropzonePrompt.innerHTML = `
+      <div class="dropzone-icon">⏳</div>
+      <div class="dropzone-text">Scanning & auto-redacting "${escapeHtml(file.name)}"...</div>
+      <div class="dropzone-sub">Extracting text & applying Verhoeff/Luhn checksums</div>
+    `;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = reader.result;
+      chrome.runtime.sendMessage(
+        {
+          action: "AUTO_REDACT_ATTACHMENT",
+          filename: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          base64Data: base64Data,
+          sharingContext: contextSelect.value
+        },
+        (res) => {
+          if (!res || !res.success) {
+            dropzonePrompt.innerHTML = `
+              <div class="dropzone-icon">⚠️</div>
+              <div class="dropzone-text" style="color: #A74440;">Scan Failed / Unsupported</div>
+              <div class="dropzone-sub">${escapeHtml(res?.error || "Make sure ShareSafe server is running (:5000)")}</div>
+              <button type="button" class="btn-choose-file" id="btnRetryPopupFile" style="margin-top: 8px;">Try Another File</button>
+            `;
+            document.getElementById("btnRetryPopupFile")?.addEventListener("click", () => {
+              popupFileInput.click();
+            });
+            return;
+          }
+
+          activeAttachmentScan = res;
+          popupExcludedDetectionIds.clear();
+          renderPopupAttachmentResult(file, res);
+        }
+      );
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderPopupAttachmentResult(file, scan) {
+    popupDropzone.style.display = "none";
+    attachmentResultCard.style.display = "flex";
+
+    resultFileName.textContent = scan.file_name || file.name;
+    const isClean = scan.is_clean || scan.total_findings === 0;
+
+    if (isClean) {
+      resultRiskBadge.textContent = "CLEAN";
+      resultRiskBadge.className = "result-badge";
+      resultRiskBadge.style.background = "#EAF0EB";
+      resultRiskBadge.style.color = "#647C70";
+      resultMeta.textContent = `0 sensitive items &bull; Clean to share`;
+      resultItemsList.innerHTML = `
+        <div style="font-size: 11px; color: #647C70; padding: 8px; text-align: center;">
+          ✅ No sensitive PII or credentials detected.
+        </div>
+      `;
+      btnDownloadPopupSanitized.style.display = "none";
+    } else {
+      const riskLevel = scan.risk_summary?.level || "CRITICAL";
+      resultRiskBadge.textContent = riskLevel;
+      resultRiskBadge.className = "result-badge";
+      resultRiskBadge.style.background = "#FCE8E7";
+      resultRiskBadge.style.color = "#A74440";
+      resultMeta.textContent = `${scan.total_findings} findings auto-redacted &bull; ${scan.is_pdf ? "PDF" : "Image"}`;
+      btnDownloadPopupSanitized.style.display = "block";
+      renderPopupDetectionRows(scan.detections || []);
+    }
+
+    if (scan.preview_data_url) {
+      resultPreviewImg.src = scan.preview_data_url;
+      resultPreviewImg.style.display = "block";
+    } else {
+      resultPreviewImg.style.display = "none";
+    }
+  }
+
+  function renderPopupDetectionRows(detections) {
+    resultItemsList.innerHTML = "";
+    detections.forEach((d) => {
+      const isExcluded = popupExcludedDetectionIds.has(d.id);
+      const row = document.createElement("div");
+      row.className = "result-item-row";
+      row.innerHTML = `
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 700; color: #252522; font-size: 11px;">${escapeHtml(d.label || d.type)}</div>
+          <div style="font-family: monospace; font-size: 10px; color: #77736D;">${escapeHtml(d.masked || d.value || "Sensitive Value")}</div>
+        </div>
+        <button type="button" class="result-item-btn ${isExcluded ? "undone" : ""}">
+          ${isExcluded ? "Undo (Kept)" : "Redacted ✓"}
+        </button>
+      `;
+
+      row.querySelector(".result-item-btn").addEventListener("click", () => {
+        if (popupExcludedDetectionIds.has(d.id)) {
+          popupExcludedDetectionIds.delete(d.id);
+        } else {
+          popupExcludedDetectionIds.add(d.id);
+        }
+        renderPopupDetectionRows(detections);
+
+        // Update on backend
+        chrome.runtime.sendMessage(
+          {
+            action: "UPDATE_ATTACHMENT_REDACTIONS",
+            sessionId: activeAttachmentScan.session_id,
+            excludedDetectionIds: Array.from(popupExcludedDetectionIds)
+          },
+          (res) => {
+            if (res && res.success) {
+              activeAttachmentScan.sanitized_base64 = res.sanitized_base64;
+              activeAttachmentScan.preview_data_url = res.preview_data_url;
+              activeAttachmentScan.sanitized_filename = res.sanitized_filename;
+              if (res.preview_data_url) {
+                resultPreviewImg.src = res.preview_data_url;
+              }
+            }
+          }
+        );
+      });
+
+      resultItemsList.appendChild(row);
+    });
+  }
+
+  if (btnDownloadPopupSanitized) {
+    btnDownloadPopupSanitized.addEventListener("click", () => {
+      if (!activeAttachmentScan || !activeAttachmentScan.sanitized_base64) return;
+      try {
+        const parts = activeAttachmentScan.sanitized_base64.split(",");
+        const raw = parts.length > 1 ? parts[1] : parts[0];
+        const bytes = atob(raw);
+        const u8 = new Uint8Array(bytes.length);
+        for (let i = 0; i < bytes.length; i++) u8[i] = bytes.charCodeAt(i);
+        const blob = new Blob([u8], { type: activeAttachmentScan.sanitized_mime || "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = activeAttachmentScan.sanitized_filename || "safe_attachment";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error("Popup download failed:", err);
+      }
+    });
+  }
+
+  if (btnClearPopupAttachment) {
+    btnClearPopupAttachment.addEventListener("click", () => {
+      activeAttachmentScan = null;
+      popupExcludedDetectionIds.clear();
+      popupFileInput.value = "";
+      attachmentResultCard.style.display = "none";
+      popupDropzone.style.display = "block";
+      dropzonePrompt.innerHTML = `
+        <div class="dropzone-icon">🛡️</div>
+        <div class="dropzone-text">Drop photo, image or PDF to auto-redact</div>
+        <button type="button" class="btn-choose-file" id="btnPopupChooseFileAgain">Choose File</button>
+        <div class="dropzone-sub">PDF, PNG, JPG, WEBP &bull; 0 text streams remain</div>
+      `;
+      document.getElementById("btnPopupChooseFileAgain")?.addEventListener("click", () => {
+        popupFileInput.click();
+      });
+    });
+  }
+
   checkServer();
 
   function escapeHtml(str) {

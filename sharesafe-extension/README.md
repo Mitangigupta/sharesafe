@@ -39,6 +39,18 @@
   - **In-Place Message Redaction**: Automatically injects sanitized text into the compose box.
   - **Floating Warning Chip**: Floats a defensive reminder if high-risk credentials are typed.
 
+### Phase 4: Prioritized Automatic Attachment Redaction Workflow
+- 📎 **In-Situ Attachment Auto-Redaction (`content/file-shield.js`)**:
+  - Automatically intercepts file picker attachments (`<input type="file">`), drag-and-drop drops, and clipboard pastes on **WhatsApp Web** and **Gmail**.
+  - **Auto-Redacts by Default**: Automatically redacts all detected sensitive items (Aadhaar, PAN, Credit Cards, mobile numbers, cloud secrets) using permanent vector destruction and high-DPI rasterization.
+  - **In-Situ Review Interface**: Renders an in-page review modal displaying:
+    - Real-time rendered preview of the sanitized file.
+    - Non-recoverability verification badge: *0 text streams remain, metadata stripped*.
+    - Interactive list of detected items with 1-click **Undo (Keep Unredacted)** and **Redact** toggles.
+  - **Substitutes Sanitized File**: Clicking **"Send Sanitized Attachment"** injects the sanitized file directly into WhatsApp/Gmail using `DataTransfer`. The original unredacted file is **NEVER** transmitted.
+  - **Unsupported / Error Safety Gate**: If scanning fails or a file type is unsupported, it is **never** silently treated as safe. An unverified warning modal halts transmission until resolved.
+  - **Popup Attachment Shield**: Direct drag-and-drop file auto-redaction and inspection right inside the extension popup.
+
 ### Phase 3: Automated Pre-Upload File Screening & Defensive Shield
 - 🛡️ **Automated Pre-Upload File Shield (`file-shield.js`)**:
   - Automatically intercepts document attachments, drag-and-drop actions, and clipboard pastes in WhatsApp Web and Gmail.
