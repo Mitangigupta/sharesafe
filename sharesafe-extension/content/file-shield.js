@@ -228,7 +228,7 @@
     overlay.id = "sharesafe-shield-overlay";
     overlay.style.cssText = `
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(37, 37, 34, 0.72); backdrop-filter: blur(5px);
+      background: rgba(42, 42, 42, 0.65); backdrop-filter: blur(4px);
       z-index: 2147483647; display: flex; align-items: center; justify-content: center;
       padding: 16px; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     `;
@@ -240,98 +240,98 @@
     const riskScore = risk.score || 0;
     const isPdf = currentScan.is_pdf;
 
-    const riskColor = riskLevel === "CRITICAL" ? "#A74440" : riskLevel === "HIGH" ? "#C96D67" : "#B27329";
-    const riskBg = riskLevel === "CRITICAL" ? "#FCE8E7" : riskLevel === "HIGH" ? "#F9ECEB" : "#F5EBDD";
-
     overlay.innerHTML = `
-      <div style="background: #FFFFFF; border-radius: 12px; width: 100%; max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid #EAE5DD;">
+      <div style="background: #FFFBF3; border-radius: 16px; width: 100%; max-width: 720px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(198, 90, 74, 0.12), 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid #F1E8E0;">
         <!-- Header -->
-        <div style="padding: 14px 20px; background: #F8F6F2; border-bottom: 1px solid #EAE5DD; display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 34px; height: 34px; border-radius: 6px; background: #F9ECEB; border: 1px solid #F0CAC7; display: flex; align-items: center; justify-content: center; color: #C96D67; font-size: 16px;">
+        <div style="padding: 16px 20px; background: #FFFFFF; border-bottom: 1px solid #F1E8E0; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: #FDF1EE; border: 1px solid #F8DCD6; display: flex; align-items: center; justify-content: center; color: #C65A4A; font-size: 16px;">
               🛡️
             </div>
             <div>
-              <div style="font-size: 15px; font-weight: 700; color: #252522;">Attachment Redaction &amp; Review</div>
-              <div style="font-size: 11px; color: #77736D;">Automatic In-Situ Protection &bull; Pre-Send Screening</div>
+              <div style="font-family: 'Newsreader', Georgia, serif; font-size: 17px; font-weight: 600; color: #2A2A2A; letter-spacing: -0.01em;">Attachment Redaction &amp; Review</div>
+              <div style="font-size: 12px; font-weight: 500; color: #C65A4A; display: flex; align-items: center; gap: 4px;">
+                <span>&bull;</span>
+                <span>Privacy, Before Sharing</span>
+              </div>
             </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: ${riskBg}; color: ${riskColor}; text-transform: uppercase;">
-              ${riskLevel} RISK (${riskScore}/100)
-            </span>
-          </div>
+          <span style="font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; background: #C65A4A; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.4px;">
+            ${riskLevel} RISK (${riskScore}/100)
+          </span>
         </div>
 
         <!-- Verification Seal Banner -->
-        <div style="background: #EAF0EB; border-bottom: 1px solid #CDDDD3; padding: 8px 20px; font-size: 12px; color: #647C70; display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 14px;">🔒</span>
-          <span><strong>Verified Non-Recoverable:</strong> Output file undergoes permanent raster flattening &bull; 0 text streams remain &bull; Metadata stripped.</span>
+        <div style="background: #EAF3EE; border-bottom: 1px solid #D5E7DC; padding: 8px 20px; font-size: 11px; font-weight: 600; color: #2E7D5B; display: flex; align-items: center; gap: 8px;">
+          <span>✓</span>
+          <span><strong>Preview &mdash; Safe to Send:</strong> Underlying text streams permanently flattened (0 characters) &bull; Metadata stripped.</span>
         </div>
 
         <!-- Main Body: Two-Column Review Layout -->
-        <div style="padding: 16px 20px; overflow-y: auto; flex: 1; display: grid; grid-template-columns: 240px 1fr; gap: 16px;">
+        <div style="padding: 16px 20px; overflow-y: auto; flex: 1; display: grid; grid-template-columns: 260px 1fr; gap: 16px;">
           
-          <!-- Left Column: Visual Preview -->
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #77736D;">
-              Sanitized Preview
+          <!-- Card 1: Visual Preview -->
+          <div style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #2A2A2A;">
+                Sanitized Preview
+              </span>
+              <span style="background: #EAF3EE; color: #2E7D5B; border: 1px solid #D5E7DC; border-radius: 9999px; padding: 2px 7px; font-size: 10px; font-weight: 600;">
+                ✓ Safe to Send
+              </span>
             </div>
-            <div style="background: #F8F6F2; border: 1px solid #EAE5DD; border-radius: 8px; overflow: hidden; min-height: 220px; max-height: 280px; display: flex; align-items: center; justify-content: center; position: relative;">
+            <div style="background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 10px; overflow: hidden; min-height: 200px; max-height: 240px; display: flex; align-items: center; justify-content: center; position: relative;">
               <img id="ssPreviewImg" src="${currentScan.preview_data_url || ''}" alt="Redacted Preview" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
-              <div id="ssPreviewLoading" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); align-items: center; justify-content: center; font-size: 12px; color: #252522; font-weight: 600;">
+              <div id="ssPreviewLoading" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,251,243,0.85); align-items: center; justify-content: center; font-size: 12px; color: #2A2A2A; font-weight: 600;">
                 Updating redaction...
               </div>
             </div>
-            <div style="font-size: 11px; color: #77736D; line-height: 1.4;">
-              <strong>${escapeHtml(file.name)}</strong><br/>
+            <div style="font-size: 11px; color: #6B7280; line-height: 1.4; margin-top: 4px;">
+              <strong style="color: #2A2A2A;">${escapeHtml(file.name)}</strong><br/>
               ${formatBytes(file.size)} &bull; ${isPdf ? "PDF Document" : "Image"}
             </div>
           </div>
 
-          <!-- Right Column: Interactive Detection List & Selective Undo -->
-          <div style="display: flex; flex-direction: column;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #77736D;">
-                Detected Items (Redacted by Default):
-              </div>
-              <span id="ssActiveCount" style="font-size: 11px; font-weight: 600; color: #647C70;">
-                ${currentScan.detections.length} of ${currentScan.detections.length} Redacted
+          <!-- Card 2: Interactive Detection List & Selective Undo -->
+          <div style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span id="ssActiveCount" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #2A2A2A;">
+                Detected &mdash; ${currentScan.detections.length} items redacted
               </span>
             </div>
 
-            <div id="ssDetectionsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px; margin-bottom: 12px;">
+            <div id="ssDetectionsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 230px; overflow-y: auto; padding-right: 4px; margin-bottom: 10px;">
               <!-- Dynamic detections rendered here -->
             </div>
 
-            <div style="font-size: 11px; color: #77736D; background: #F8F6F2; border: 1px solid #EAE5DD; border-radius: 6px; padding: 6px 10px;">
-              💡 <em>Click any toggle button to selectively undo or re-apply individual redactions. The preview updates automatically.</em>
+            <div style="font-size: 11px; color: #6B7280; background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 8px; padding: 6px 10px;">
+              💡 <em>Click any toggle button to selectively undo or re-apply individual redactions.</em>
             </div>
           </div>
 
         </div>
 
         <!-- Actions Footer -->
-        <div style="padding: 14px 20px; background: #F8F6F2; border-top: 1px solid #EAE5DD; display: flex; flex-direction: column; gap: 8px;">
+        <div style="padding: 14px 20px; background: #FFFFFF; border-top: 1px solid #F1E8E0; display: flex; flex-direction: column; gap: 8px;">
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <!-- Primary Action: Send Sanitized -->
-            <button id="ssBtnSendSanitized" style="flex: 2; min-width: 180px; padding: 10px 16px; background: #647C70; color: #FFFFFF; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <button id="ssBtnSendSanitized" style="flex: 2; min-width: 180px; padding: 10px 18px; background: #C65A4A; color: #FFFFFF; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 8px rgba(198, 90, 74, 0.22); transition: all 0.18s ease;">
               <span>✅ Send Sanitized Attachment</span>
             </button>
             <!-- Secondary: Download Clean Copy -->
-            <button id="ssBtnDownloadClean" style="flex: 1; min-width: 140px; padding: 10px 14px; background: #FFFFFF; color: #252522; border: 1px solid #EAE5DD; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <button id="ssBtnDownloadClean" style="flex: 1; min-width: 140px; padding: 10px 14px; background: #FFFFFF; color: #2A2A2A; border: 1px solid #F1E8E0; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
               <span>⬇️ Download Clean Copy</span>
             </button>
-            <!-- Danger: Cancel -->
-            <button id="ssBtnCancel" style="padding: 10px 14px; background: #FFFFFF; color: #A74440; border: 1px solid #E8B4B2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
-              🛑 Cancel
+            <!-- Cancel -->
+            <button id="ssBtnCancel" style="padding: 10px 14px; background: #FFFFFF; color: #6B7280; border: 1px solid #F1E8E0; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer;">
+              Cancel
             </button>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 4px;">
-            <button id="ssBtnOverride" style="background: none; border: none; color: #77736D; font-size: 11px; cursor: pointer; text-decoration: underline; padding: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+            <button id="ssBtnOverride" style="background: none; border: none; color: #6B7280; font-size: 11px; cursor: pointer; text-decoration: underline; padding: 0;">
               I understand the risks; send original unredacted file (Override)
             </button>
-            <span style="font-size: 11px; color: #77736D;">Original file is never altered on disk</span>
+            <span style="font-size: 11px; color: #6B7280;">Original file is never altered on disk</span>
           </div>
         </div>
       </div>
@@ -348,49 +348,50 @@
       detectionsContainer.innerHTML = "";
       const total = currentScan.detections.length;
       const active = total - excludedDetectionIds.size;
-      activeCountElem.textContent = `${active} of ${total} Redacted`;
+      activeCountElem.textContent = `Detected — ${active} item${active === 1 ? '' : 's'} redacted`;
 
       currentScan.detections.forEach((d) => {
         const isExcluded = excludedDetectionIds.has(d.id);
         const itemDiv = document.createElement("div");
         itemDiv.style.cssText = `
           background: #FFFFFF;
-          border: 1px solid ${isExcluded ? "#E8D7BF" : "#EAE5DD"};
-          border-left: 3px solid ${isExcluded ? "#B27329" : "#647C70"};
-          border-radius: 6px;
-          padding: 8px 10px;
+          border: 1px solid #F1E8E0;
+          border-radius: 12px;
+          padding: 10px 12px;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 10px;
+          gap: 12px;
           transition: all 0.15s ease;
         `;
 
         itemDiv.innerHTML = `
+          <div style="width: 34px; height: 34px; border-radius: 50%; background: #FDF1EE; border: 1px solid #F8DCD6; color: #C65A4A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            🛡️
+          </div>
           <div style="flex: 1; min-width: 0;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
-              <span style="font-size: 12px; font-weight: 700; color: #252522; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+              <span style="font-size: 13px; font-weight: 700; color: #2A2A2A; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
                 ${escapeHtml(d.label || d.type)}
               </span>
-              <span style="font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: ${isExcluded ? "#F5EBDD" : "#EAF0EB"}; color: ${isExcluded ? "#B27329" : "#647C70"};">
+              <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background: ${isExcluded ? "#FBF4EA" : "#FDF1EE"}; color: ${isExcluded ? "#B27329" : "#C65A4A"}; border: 1px solid ${isExcluded ? "#F0DFCA" : "#F8DCD6"}; text-transform: uppercase;">
                 ${isExcluded ? "KEPT" : "REDACTED"}
               </span>
             </div>
-            <div style="font-family: monospace; font-size: 11px; color: #252522; background: #F8F6F2; padding: 2px 6px; border-radius: 3px; margin: 2px 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-              ${escapeHtml(d.masked || d.value || "Sensitive Value")}
+            <div style="font-size: 12px; color: #6B7280; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+              ${escapeHtml(d.masked || d.value || "Sensitive Value")} &bull; ${escapeHtml(d.details || "Verified pattern")}
             </div>
-            <div style="font-size: 10px; color: #77736D;">${escapeHtml(d.details || "Verified pattern")}</div>
           </div>
           <div>
             <button type="button" class="ss-toggle-btn" style="
-              padding: 5px 8px;
+              padding: 5px 9px;
               font-size: 11px;
               font-weight: 600;
-              border-radius: 4px;
+              border-radius: 6px;
               cursor: pointer;
-              border: 1px solid ${isExcluded ? "#B27329" : "#647C70"};
-              background: ${isExcluded ? "#FDF1E3" : "#EAF0EB"};
-              color: ${isExcluded ? "#B27329" : "#647C70"};
+              border: 1px solid #F1E8E0;
+              background: #FFFFFF;
+              color: #6B7280;
+              transition: all 0.15s ease;
             ">
               ${isExcluded ? "↩ Redact" : "✕ Undo"}
             </button>

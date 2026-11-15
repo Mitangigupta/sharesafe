@@ -793,93 +793,98 @@
         overlay.id = 'demoShieldModalOverlay';
         overlay.style.cssText = `
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(37, 37, 34, 0.72); backdrop-filter: blur(5px);
+            background: rgba(42, 42, 42, 0.65); backdrop-filter: blur(4px);
             z-index: 99999; display: flex; align-items: center; justify-content: center;
-            padding: 16px; animation: fadeIn 0.25s ease;
+            padding: 16px; animation: fadeIn 0.25s ease; font-family: 'DM Sans', -apple-system, sans-serif;
         `;
 
         overlay.innerHTML = `
-            <div style="background: var(--bg-surface); border-radius: 12px; width: 100%; max-width: 740px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid var(--border-stone);">
+            <div style="background: #FFFBF3; border-radius: 16px; width: 100%; max-width: 740px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(198, 90, 74, 0.12), 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid #F1E8E0;">
                 <!-- Modal Header -->
-                <div style="padding: 14px 20px; background: var(--bg-stone-subtle); border-bottom: 1px solid var(--border-stone); display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 34px; height: 34px; border-radius: 6px; background: var(--coral-soft); border: 1px solid var(--coral-border); display: flex; align-items: center; justify-content: center; color: var(--coral-primary); font-size: 16px;">
+                <div style="padding: 16px 20px; background: #FFFFFF; border-bottom: 1px solid #F1E8E0; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 36px; height: 36px; border-radius: 10px; background: #FDF1EE; border: 1px solid #F8DCD6; display: flex; align-items: center; justify-content: center; color: #C65A4A; font-size: 16px;">
                             🛡️
                         </div>
                         <div>
-                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--ink-primary);">Attachment Redaction &amp; Review</div>
-                            <div style="font-size: 0.72rem; color: var(--ink-muted);">Automatic In-Situ Protection &bull; WhatsApp Web &amp; Gmail</div>
+                            <div style="font-family: 'Newsreader', Georgia, serif; font-size: 17px; font-weight: 600; color: #2A2A2A; letter-spacing: -0.01em;">Attachment Redaction &amp; Review</div>
+                            <div style="font-size: 12px; font-weight: 500; color: #C65A4A; display: flex; align-items: center; gap: 4px;">
+                                <span>&bull;</span>
+                                <span>Privacy, Before Sharing</span>
+                            </div>
                         </div>
                     </div>
-                    <span style="font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #FCE8E7; color: #A74440;">
+                    <span style="font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; background: #C65A4A; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.4px;">
                         CRITICAL RISK (94/100)
                     </span>
                 </div>
 
                 <!-- Verification Seal Banner -->
-                <div style="background: var(--sage-soft); border-bottom: 1px solid var(--sage-border); padding: 8px 20px; font-size: 0.78rem; color: var(--sage-primary); display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-lock"></i>
-                    <span><strong>Verified Non-Recoverable:</strong> Output file undergoes permanent raster flattening &bull; 0 text streams remain &bull; Metadata stripped.</span>
+                <div style="background: #EAF3EE; border-bottom: 1px solid #D5E7DC; padding: 8px 20px; font-size: 11px; font-weight: 600; color: #2E7D5B; display: flex; align-items: center; gap: 8px;">
+                    <span>✓</span>
+                    <span><strong>Preview &mdash; Safe to Send:</strong> Underlying text streams permanently flattened (0 characters) &bull; Metadata stripped.</span>
                 </div>
 
                 <!-- Main Body: Two-Column Review Layout -->
                 <div style="padding: 16px 20px; overflow-y: auto; flex: 1; display: grid; grid-template-columns: 260px 1fr; gap: 16px;">
-                    <!-- Left: Document Preview Canvas -->
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted);">
-                            Sanitized Document Preview
+                    <!-- Card 1: Document Preview Canvas -->
+                    <div style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #2A2A2A;">
+                                Sanitized Preview
+                            </span>
+                            <span style="background: #EAF3EE; color: #2E7D5B; border: 1px solid #D5E7DC; border-radius: 9999px; padding: 2px 7px; font-size: 10px; font-weight: 600;">
+                                ✓ Safe to Send
+                            </span>
                         </div>
-                        <div style="background: #FDFCF9; border: 1px solid var(--border-stone); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);">
+                        <div style="background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                             <canvas id="demoDocCanvas" width="260" height="280" style="width: 100%; height: auto; display: block;"></canvas>
                         </div>
-                        <div style="font-size: 0.74rem; color: var(--ink-muted); line-height: 1.4;">
-                            <strong style="color: var(--ink-primary);">medical_invoice_aadhaar.pdf</strong><br/>
+                        <div style="font-size: 11px; color: #6B7280; line-height: 1.4; margin-top: 4px;">
+                            <strong style="color: #2A2A2A;">medical_invoice_aadhaar.pdf</strong><br/>
                             124.6 KB &bull; PDF Document &bull; Intercepted
                         </div>
                     </div>
 
-                    <!-- Right: Detections & Selective Undo List -->
-                    <div style="display: flex; flex-direction: column;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted);">
-                                Detected Items (Redacted by Default):
-                            </div>
-                            <span id="demoModalActiveCount" style="font-size: 0.72rem; font-weight: 700; color: var(--sage-primary);">
-                                3 of 3 Redacted
+                    <!-- Card 2: Detections & Selective Undo List -->
+                    <div style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span id="demoModalActiveCount" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #2A2A2A;">
+                                Detected &mdash; 3 items redacted
                             </span>
                         </div>
 
-                        <div id="demoModalDetectionsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 4px; margin-bottom: 10px;">
+                        <div id="demoModalDetectionsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 230px; overflow-y: auto; padding-right: 4px; margin-bottom: 10px;">
                             <!-- Items injected dynamically -->
                         </div>
 
-                        <div style="font-size: 0.74rem; color: var(--ink-secondary); background: var(--bg-canvas); border: 1px solid var(--border-stone); border-radius: 6px; padding: 8px 10px; line-height: 1.45;">
+                        <div style="font-size: 11px; color: #6B7280; background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 8px; padding: 6px 10px; line-height: 1.45;">
                             💡 <em>Click <strong>Undo</strong> or <strong>Redact</strong> to customize individual redactions. The preview canvas flattens changes in real time.</em>
                         </div>
                     </div>
                 </div>
 
                 <!-- Footer Actions -->
-                <div style="padding: 14px 20px; background: var(--bg-stone-subtle); border-top: 1px solid var(--border-stone); display: flex; flex-direction: column; gap: 8px;">
+                <div style="padding: 14px 20px; background: #FFFFFF; border-top: 1px solid #F1E8E0; display: flex; flex-direction: column; gap: 8px;">
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button type="button" id="btnModalSendSanitized" style="flex: 2; min-width: 180px; padding: 10px 16px; background: var(--sage-primary); color: #FFFFFF; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <button type="button" id="btnModalSendSanitized" style="flex: 2; min-width: 180px; padding: 10px 18px; background: #C65A4A; color: #FFFFFF; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 8px rgba(198, 90, 74, 0.22); transition: all 0.18s ease;">
                             <i class="fa-solid fa-check"></i>
                             <span>Send Sanitized Attachment</span>
                         </button>
-                        <button type="button" id="btnModalDownloadClean" style="flex: 1; min-width: 140px; padding: 10px 14px; background: #FFFFFF; color: var(--ink-primary); border: 1px solid var(--border-stone); border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <button type="button" id="btnModalDownloadClean" style="flex: 1; min-width: 140px; padding: 10px 14px; background: #FFFFFF; color: #2A2A2A; border: 1px solid #F1E8E0; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                             <i class="fa-solid fa-download"></i>
                             <span>Download Clean Copy</span>
                         </button>
-                        <button type="button" id="btnModalCancel" style="padding: 10px 14px; background: #FFFFFF; color: #A74440; border: 1px solid var(--coral-border); border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                        <button type="button" id="btnModalCancel" style="padding: 10px 14px; background: #FFFFFF; color: #6B7280; border: 1px solid #F1E8E0; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer;">
                             <i class="fa-solid fa-xmark"></i>
                             <span>Cancel</span>
                         </button>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
-                        <button type="button" id="btnModalOverride" style="background: none; border: none; color: var(--ink-muted); font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0;">
+                        <button type="button" id="btnModalOverride" style="background: none; border: none; color: #6B7280; font-size: 11px; cursor: pointer; text-decoration: underline; padding: 0;">
                             I understand the risks; send original unredacted file (Override)
                         </button>
-                        <span style="font-size: 0.72rem; color: var(--ink-muted);"><i class="fa-solid fa-shield"></i> Original file is never altered on disk</span>
+                        <span style="font-size: 11px; color: #6B7280;"><i class="fa-solid fa-shield"></i> Original file is never altered on disk</span>
                     </div>
                 </div>
             </div>
@@ -903,27 +908,27 @@
             ctx.fillRect(0, 0, w, h);
 
             // Document border
-            ctx.strokeStyle = '#EAE5DD';
+            ctx.strokeStyle = '#F1E8E0';
             ctx.lineWidth = 2;
             ctx.strokeRect(4, 4, w - 8, h - 8);
 
             // Hospital Header
-            ctx.fillStyle = '#647C70';
+            ctx.fillStyle = '#C65A4A';
             ctx.fillRect(12, 12, w - 24, 26);
             ctx.fillStyle = '#FFFFFF';
             ctx.font = 'bold 11px sans-serif';
             ctx.fillText('CITY HOSPITAL & CLINIC — INVOICE', 20, 29);
 
             // Document Metadata
-            ctx.fillStyle = '#252522';
+            ctx.fillStyle = '#2A2A2A';
             ctx.font = 'bold 9px sans-serif';
             ctx.fillText('Patient: Ananya Sharma', 16, 54);
-            ctx.fillStyle = '#77736D';
+            ctx.fillStyle = '#6B7280';
             ctx.font = '8px sans-serif';
             ctx.fillText('Date: 14-Nov-2026  •  Ref: #INV-9842', 16, 68);
 
             // Divider
-            ctx.strokeStyle = '#EAE5DD';
+            ctx.strokeStyle = '#F1E8E0';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(16, 76);
@@ -931,18 +936,18 @@
             ctx.stroke();
 
             // Field 1: Aadhaar UID
-            ctx.fillStyle = '#77736D';
+            ctx.fillStyle = '#6B7280';
             ctx.font = 'bold 8px sans-serif';
             ctx.fillText('AADHAAR UID (GOVT ID):', 16, 94);
             if (items[0].redacted) {
                 // Blackout redaction block
-                ctx.fillStyle = '#1A1A18';
+                ctx.fillStyle = '#2A2A2A';
                 ctx.fillRect(16, 98, 140, 16);
-                ctx.fillStyle = '#647C70';
+                ctx.fillStyle = '#2E7D5B';
                 ctx.font = 'bold 8px monospace';
                 ctx.fillText('[REDACTED]', 165, 110);
             } else {
-                ctx.fillStyle = '#A74440';
+                ctx.fillStyle = '#C65A4A';
                 ctx.font = 'bold 9px monospace';
                 ctx.fillText('2345 6789 0123', 16, 110);
                 ctx.fillStyle = '#B27329';
@@ -951,17 +956,17 @@
             }
 
             // Field 2: PAN Card
-            ctx.fillStyle = '#77736D';
+            ctx.fillStyle = '#6B7280';
             ctx.font = 'bold 8px sans-serif';
             ctx.fillText('INCOME TAX PAN:', 16, 134);
             if (items[1].redacted) {
-                ctx.fillStyle = '#1A1A18';
+                ctx.fillStyle = '#2A2A2A';
                 ctx.fillRect(16, 138, 120, 16);
-                ctx.fillStyle = '#647C70';
+                ctx.fillStyle = '#2E7D5B';
                 ctx.font = 'bold 8px monospace';
                 ctx.fillText('[REDACTED]', 145, 150);
             } else {
-                ctx.fillStyle = '#A74440';
+                ctx.fillStyle = '#C65A4A';
                 ctx.font = 'bold 9px monospace';
                 ctx.fillText('ABCDE1234F', 16, 150);
                 ctx.fillStyle = '#B27329';
@@ -970,17 +975,17 @@
             }
 
             // Field 3: Credit Card
-            ctx.fillStyle = '#77736D';
+            ctx.fillStyle = '#6B7280';
             ctx.font = 'bold 8px sans-serif';
             ctx.fillText('PAYMENT METHOD (VISA CARD):', 16, 174);
             if (items[2].redacted) {
-                ctx.fillStyle = '#1A1A18';
+                ctx.fillStyle = '#2A2A2A';
                 ctx.fillRect(16, 178, 160, 16);
-                ctx.fillStyle = '#647C70';
+                ctx.fillStyle = '#2E7D5B';
                 ctx.font = 'bold 8px monospace';
                 ctx.fillText('[REDACTED]', 185, 190);
             } else {
-                ctx.fillStyle = '#A74440';
+                ctx.fillStyle = '#C65A4A';
                 ctx.font = 'bold 9px monospace';
                 ctx.fillText('4111 2222 3333 1111', 16, 190);
                 ctx.fillStyle = '#B27329';
@@ -989,12 +994,12 @@
             }
 
             // Summary Table
-            ctx.fillStyle = '#F8F6F2';
+            ctx.fillStyle = '#FFFBF3';
             ctx.fillRect(16, 206, w - 32, 42);
-            ctx.strokeStyle = '#EAE5DD';
+            ctx.strokeStyle = '#F1E8E0';
             ctx.strokeRect(16, 206, w - 32, 42);
 
-            ctx.fillStyle = '#252522';
+            ctx.fillStyle = '#2A2A2A';
             ctx.font = '8px sans-serif';
             ctx.fillText('Consultation & Diagnostic Lab', 22, 222);
             ctx.fillText('Total Paid:', 22, 238);
@@ -1002,7 +1007,7 @@
             ctx.fillText('INR 14,500.00', w - 90, 238);
 
             // Sovereign Non-Recoverable Seal watermark
-            ctx.fillStyle = 'rgba(100, 124, 112, 0.12)';
+            ctx.fillStyle = 'rgba(46, 125, 91, 0.12)';
             ctx.font = 'bold 10px sans-serif';
             ctx.fillText('SHA-256 ZERO STREAM VERIFIED', 42, 268);
         }
@@ -1012,47 +1017,48 @@
             if (!listContainer) return;
             listContainer.innerHTML = '';
             const active = items.filter(i => i.redacted).length;
-            countElem.textContent = `${active} of ${items.length} Redacted`;
+            countElem.textContent = `Detected — ${active} items redacted`;
 
             items.forEach((item, idx) => {
                 const isRedacted = item.redacted;
                 const row = document.createElement('div');
                 row.style.cssText = `
-                    background: var(--bg-surface);
-                    border: 1px solid ${isRedacted ? 'var(--border-stone)' : 'var(--amber-border, #E8D7BF)'};
-                    border-left: 3px solid ${isRedacted ? 'var(--sage-primary)' : 'var(--amber-primary, #B27329)'};
-                    border-radius: 6px;
-                    padding: 8px 10px;
+                    background: #FFFFFF;
+                    border: 1px solid #F1E8E0;
+                    border-radius: 12px;
+                    padding: 10px 12px;
                     display: flex;
                     align-items: center;
-                    justify-content: space-between;
-                    gap: 10px;
+                    gap: 12px;
                     transition: all 0.15s ease;
                 `;
 
                 row.innerHTML = `
+                    <div style="width: 34px; height: 34px; border-radius: 50%; background: #FDF1EE; border: 1px solid #F8DCD6; color: #C65A4A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px;">
+                        🛡️
+                    </div>
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
-                            <span style="font-size: 0.78rem; font-weight: 700; color: var(--ink-primary);">${item.label}</span>
-                            <span style="font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: ${isRedacted ? 'var(--sage-soft)' : '#F5EBDD'}; color: ${isRedacted ? 'var(--sage-primary)' : '#B27329'};">
+                            <span style="font-size: 13px; font-weight: 700; color: #2A2A2A; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.label}</span>
+                            <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background: ${isRedacted ? '#FDF1EE' : '#FBF4EA'}; color: ${isRedacted ? '#C65A4A' : '#B27329'}; border: 1px solid ${isRedacted ? '#F8DCD6' : '#F0DFCA'}; text-transform: uppercase;">
                                 ${isRedacted ? 'REDACTED' : 'KEPT'}
                             </span>
                         </div>
-                        <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-primary); background: var(--bg-canvas); padding: 2px 6px; border-radius: 3px; margin: 2px 0;">
-                            ${isRedacted ? item.masked : '<span style="color: #A74440; font-weight: 700;">' + item.raw + '</span>'}
+                        <div style="font-size: 12px; color: #6B7280; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                            ${isRedacted ? item.masked : '<span style="color: #C65A4A; font-weight: 700;">' + item.raw + '</span>'} &bull; ${item.details}
                         </div>
-                        <div style="font-size: 0.68rem; color: var(--ink-muted);">${item.details}</div>
                     </div>
                     <div>
                         <button type="button" class="btn-toggle-demo" style="
-                            padding: 5px 8px;
-                            font-size: 0.72rem;
+                            padding: 5px 9px;
+                            font-size: 11px;
                             font-weight: 600;
-                            border-radius: 4px;
+                            border-radius: 6px;
                             cursor: pointer;
-                            border: 1px solid ${isRedacted ? 'var(--sage-primary)' : 'var(--amber-primary, #B27329)'};
-                            background: ${isRedacted ? 'var(--sage-soft)' : '#FDF1E3'};
-                            color: ${isRedacted ? 'var(--sage-primary)' : '#B27329'};
+                            border: 1px solid #F1E8E0;
+                            background: #FFFFFF;
+                            color: #6B7280;
+                            transition: all 0.15s ease;
                         ">
                             ${isRedacted ? '✕ Undo' : '↩ Redact'}
                         </button>

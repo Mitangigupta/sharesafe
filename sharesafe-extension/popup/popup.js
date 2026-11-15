@@ -543,33 +543,64 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsDataURL(file);
   }
 
+  function getFindingIconSvg(type, label) {
+    const t = ((type || "") + " " + (label || "")).toLowerCase();
+    if (t.includes("qr") || t.includes("upi")) {
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>`;
+    }
+    if (t.includes("card") || t.includes("visa") || t.includes("payment")) {
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`;
+    }
+    if (t.includes("aadhaar") || t.includes("pan") || t.includes("passport") || t.includes("ssn") || t.includes("identity")) {
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M15 9h2"/><path d="M15 13h2"/><path d="M5 19a4 4 0 0 1 8 0"/></svg>`;
+    }
+    if (t.includes("phone")) {
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+    }
+    if (t.includes("mail")) {
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`;
+    }
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+  }
+
+  function formatFindingData(d) {
+    if (d.data_line) return d.data_line;
+    const val = d.masked || d.value || "";
+    const det = d.details || d.detail || "";
+    if (val && det) return `${val} • ${det}`;
+    return val || det || "Verified sensitive pattern";
+  }
+
   function renderPopupAttachmentResult(file, scan) {
+    const previewWrap = document.getElementById("previewImageWrap");
+    const findingsLabel = document.getElementById("findingsSectionLabel");
+
     popupDropzone.style.display = "none";
-    attachmentResultCard.style.display = "flex";
+    if (previewWrap) previewWrap.style.display = "block";
+    attachmentResultCard.style.display = "block";
 
     resultFileName.textContent = scan.file_name || file.name;
     const isClean = scan.is_clean || scan.total_findings === 0;
 
     if (isClean) {
       resultRiskBadge.textContent = "CLEAN";
-      resultRiskBadge.className = "result-badge";
-      resultRiskBadge.style.background = "#EAF0EB";
-      resultRiskBadge.style.color = "#647C70";
-      resultMeta.textContent = `0 sensitive items &bull; Clean to share`;
+      resultRiskBadge.style.background = "#EAF3EE";
+      resultRiskBadge.style.color = "#2E7D5B";
+      resultMeta.textContent = `0 sensitive items • Clean to share`;
+      if (findingsLabel) findingsLabel.textContent = "Detected — 0 items";
       resultItemsList.innerHTML = `
-        <div style="font-size: 11px; color: #647C70; padding: 8px; text-align: center;">
-          ✅ No sensitive PII or credentials detected.
+        <div style="font-size: 12px; color: #2E7D5B; padding: 12px; text-align: center; background: #EAF3EE; border-radius: 8px;">
+          ✓ No sensitive PII or credentials detected. Safe to share!
         </div>
       `;
       btnDownloadPopupSanitized.style.display = "none";
     } else {
       const riskLevel = scan.risk_summary?.level || "CRITICAL";
-      resultRiskBadge.textContent = riskLevel;
-      resultRiskBadge.className = "result-badge";
-      resultRiskBadge.style.background = "#FCE8E7";
-      resultRiskBadge.style.color = "#A74440";
-      resultMeta.textContent = `${scan.total_findings} findings auto-redacted &bull; ${scan.is_pdf ? "PDF" : "Image"}`;
-      btnDownloadPopupSanitized.style.display = "block";
+      resultRiskBadge.textContent = `${riskLevel} RISK`;
+      resultRiskBadge.style.background = "#C65A4A";
+      resultRiskBadge.style.color = "#FFFFFF";
+      resultMeta.textContent = `${scan.total_findings} findings auto-redacted • ${scan.is_pdf ? "PDF" : "Image"}`;
+      btnDownloadPopupSanitized.style.display = "flex";
       renderPopupDetectionRows(scan.detections || []);
     }
 
@@ -583,21 +614,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderPopupDetectionRows(detections) {
     resultItemsList.innerHTML = "";
+    const activeCount = detections.filter((d) => !popupExcludedDetectionIds.has(d.id)).length;
+    const findingsLabel = document.getElementById("findingsSectionLabel");
+    if (findingsLabel) {
+      findingsLabel.textContent = `Detected — ${activeCount} item${activeCount === 1 ? '' : 's'} redacted`;
+    }
+
     detections.forEach((d) => {
       const isExcluded = popupExcludedDetectionIds.has(d.id);
       const row = document.createElement("div");
-      row.className = "result-item-row";
+      row.className = "finding-card-row";
       row.innerHTML = `
-        <div style="flex: 1; min-width: 0;">
-          <div style="font-weight: 700; color: #252522; font-size: 11px;">${escapeHtml(d.label || d.type)}</div>
-          <div style="font-family: monospace; font-size: 10px; color: #77736D;">${escapeHtml(d.masked || d.value || "Sensitive Value")}</div>
+        <div class="finding-icon-circle">
+          ${getFindingIconSvg(d.type, d.label)}
         </div>
-        <button type="button" class="result-item-btn ${isExcluded ? "undone" : ""}">
-          ${isExcluded ? "Undo (Kept)" : "Redacted ✓"}
+        <div class="finding-content">
+          <div class="finding-header-line">
+            <span class="finding-title">${escapeHtml(d.label || d.type)}</span>
+            <span class="finding-pill ${isExcluded ? 'kept' : 'redacted'}">${isExcluded ? 'KEPT' : 'REDACTED'}</span>
+          </div>
+          <div class="finding-data-line">${escapeHtml(formatFindingData(d))}</div>
+        </div>
+        <button type="button" class="finding-toggle-btn ${isExcluded ? 'btn-redact' : 'btn-undo'}" title="${isExcluded ? 'Re-apply redaction' : 'Undo redaction and keep'}">
+          ${isExcluded ? '↩ Redact' : '✕ Undo'}
         </button>
       `;
 
-      row.querySelector(".result-item-btn").addEventListener("click", () => {
+      row.querySelector(".finding-toggle-btn").addEventListener("click", () => {
         if (popupExcludedDetectionIds.has(d.id)) {
           popupExcludedDetectionIds.delete(d.id);
         } else {
@@ -658,13 +701,20 @@ document.addEventListener("DOMContentLoaded", () => {
       activeAttachmentScan = null;
       popupExcludedDetectionIds.clear();
       popupFileInput.value = "";
+      const previewWrap = document.getElementById("previewImageWrap");
+      if (previewWrap) previewWrap.style.display = "none";
       attachmentResultCard.style.display = "none";
       popupDropzone.style.display = "block";
       dropzonePrompt.innerHTML = `
-        <div class="dropzone-icon">🛡️</div>
-        <div class="dropzone-text">Drop photo, image or PDF to auto-redact</div>
-        <button type="button" class="btn-choose-file" id="btnPopupChooseFileAgain">Choose File</button>
-        <div class="dropzone-sub">PDF, PNG, JPG, WEBP &bull; 0 text streams remain</div>
+        <div class="dropzone-icon-peach">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C65A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="dropzone-title">Drop photo, image or PDF to redact</div>
+        <button type="button" class="btn-choose-file-terracotta" id="btnPopupChooseFileAgain">Choose File to Audit</button>
+        <div class="dropzone-subtext">PDF, PNG, JPG, WEBP &bull; Zero Text Stream Leakage</div>
       `;
       document.getElementById("btnPopupChooseFileAgain")?.addEventListener("click", () => {
         popupFileInput.click();
