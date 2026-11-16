@@ -784,9 +784,16 @@
         if (existing) { existing.remove(); return; }
 
         const items = [
-            { id: 'd-1', label: 'Indian Aadhaar UID', masked: 'XXXX XXXX 0123', raw: '2345 6789 0123', details: 'Verhoeff Checksum Validated (Mod-10 Dihedral D5)', level: 'CRITICAL', redacted: true },
-            { id: 'd-2', label: 'Indian PAN Card', masked: 'ABCDE****F', raw: 'ABCDE1234F', details: 'Income Tax Entity: Individual (P) Validated', level: 'HIGH', redacted: true },
-            { id: 'd-3', label: 'Visa Credit Card', masked: '4111 **** **** 1111', raw: '4111 2222 3333 1111', details: 'Luhn Mod-10 Checksum Algorithm Verified', level: 'CRITICAL', redacted: true }
+            { id: 'd-1', label: 'Patient Name', masked: 'A*** W***', raw: 'Alice Walker', details: 'Hospital Inpatient Demographic Record', level: 'HIGH', redacted: true, icon: '👤', canvasType: 'patient' },
+            { id: 'd-2', label: 'Email Address', masked: 'a***r@medicare-demo.org', raw: 'alice.walker@medicare-demo.org', details: 'Direct Billing Contact Email', level: 'LOW', redacted: true, icon: '✉️', canvasType: 'email' },
+            { id: 'd-3', label: 'Phone Number', masked: '***-***-5678', raw: '+1 (555) 234-5678', details: 'Direct Telephone Contact Line', level: 'MEDIUM', redacted: true, icon: '📞', canvasType: 'phone' },
+            { id: 'd-4', label: 'Identification Number', masked: 'IN****42', raw: 'INV-2026-9042', details: 'Hospital Invoice Tracking Token', level: 'MEDIUM', redacted: true, icon: '🏷️', canvasType: 'inv' },
+            { id: 'd-5', label: 'Social Security Number', masked: '***-**-6789', raw: '123-45-6789', details: '9-Digit US Identity SSN (Mod-10 Checked)', level: 'CRITICAL', redacted: true, icon: '🪪', canvasType: 'ssn' },
+            { id: 'd-6', label: 'Credit Card Number', masked: '**** **** **** 1239', raw: '4532 0156 7890 1239', details: 'Visa Card (Luhn Mod-10 Checksum Verified)', level: 'CRITICAL', redacted: true, icon: '💳', canvasType: 'cc' },
+            { id: 'd-7', label: 'Card Expiration Date', masked: '**/**', raw: '08/29', details: 'Payment Card Expiration Credential', level: 'HIGH', redacted: true, icon: '📅', canvasType: 'exp' },
+            { id: 'd-8', label: 'Residential Address', masked: '742 *** (Redacted Address)', raw: '742 Evergreen Terrace, Springfield, IL', details: 'Physical Billing / Postal Street Address', level: 'HIGH', redacted: true, icon: '📍', canvasType: 'addr' },
+            { id: 'd-9', label: 'Physician Name', masked: 'D*** J***', raw: 'Dr. Sarah Jenkins, MD', details: 'Attending Care Physician', level: 'HIGH', redacted: true, icon: '👤', canvasType: 'doc' },
+            { id: 'd-10', label: 'QR Code', masked: '[Protected Payment Link]', raw: 'https://medicare-demo.org/portal/pay?inv=9042', details: 'Digital Scannable Payment URL', level: 'LOW', redacted: true, icon: '📱', canvasType: 'qr' }
         ];
 
         const overlay = document.createElement('div');
@@ -796,12 +803,84 @@
             background: rgba(42, 42, 42, 0.65); backdrop-filter: blur(4px);
             z-index: 99999; display: flex; align-items: center; justify-content: center;
             padding: 16px; animation: fadeIn 0.25s ease; font-family: 'DM Sans', -apple-system, sans-serif;
+            box-sizing: border-box;
         `;
 
         overlay.innerHTML = `
-            <div style="background: #FFFBF3; border-radius: 16px; width: 100%; max-width: 740px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(198, 90, 74, 0.12), 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid #F1E8E0;">
-                <!-- Modal Header -->
-                <div style="padding: 16px 20px; background: #FFFFFF; border-bottom: 1px solid #F1E8E0; display: flex; align-items: center; justify-content: space-between;">
+            <style>
+                #demoModalDetectionsList::-webkit-scrollbar,
+                #demoManualList::-webkit-scrollbar {
+                    width: 6px;
+                }
+                #demoModalDetectionsList::-webkit-scrollbar-track,
+                #demoManualList::-webkit-scrollbar-track {
+                    background: #FFFBF3;
+                    border-radius: 4px;
+                }
+                #demoModalDetectionsList::-webkit-scrollbar-thumb,
+                #demoManualList::-webkit-scrollbar-thumb {
+                    background: #D9CFC7;
+                    border-radius: 4px;
+                }
+                #demoModalDetectionsList::-webkit-scrollbar-thumb:hover,
+                #demoManualList::-webkit-scrollbar-thumb:hover {
+                    background: #B3A8A0;
+                }
+                .demo-btn-choice {
+                    transition: all 0.15s ease;
+                    user-select: none;
+                }
+                .demo-btn-choice:hover {
+                    filter: brightness(0.95);
+                }
+                .demo-editor-btn {
+                    background: #FFFFFF;
+                    border: 1px solid #E6DCD5;
+                    border-radius: 6px;
+                    padding: 3px 8px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: #4A4A4A;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    transition: all 0.15s ease;
+                    user-select: none;
+                }
+                .demo-editor-btn:hover:not(:disabled) {
+                    background: #FDF1EE;
+                    border-color: #F8DCD6;
+                    color: #C65A4A;
+                }
+                .demo-editor-btn.active {
+                    background: #C65A4A !important;
+                    border-color: #C65A4A !important;
+                    color: #FFFFFF !important;
+                    box-shadow: 0 1px 3px rgba(198, 90, 74, 0.3);
+                }
+                .demo-editor-btn:disabled {
+                    opacity: 0.45;
+                    cursor: not-allowed;
+                }
+                @media (max-width: 768px) {
+                    #demoModalContainer {
+                        max-height: 96vh !important;
+                        height: 96vh !important;
+                    }
+                    #demoReviewBody {
+                        grid-template-columns: 1fr !important;
+                        overflow-y: auto !important;
+                    }
+                    #demoPreviewCard {
+                        max-height: 280px !important;
+                    }
+                }
+            </style>
+            <div id="demoModalContainer" style="background: #FFFBF3; border-radius: 16px; width: 100%; max-width: 860px; max-height: 90vh; height: min(740px, 90vh); display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(198, 90, 74, 0.12), 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid #F1E8E0; box-sizing: border-box;">
+                
+                <!-- Modal Header (Fixed top) -->
+                <div style="padding: 14px 20px; background: #FFFFFF; border-bottom: 1px solid #F1E8E0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="width: 36px; height: 36px; border-radius: 10px; background: #FDF1EE; border: 1px solid #F8DCD6; display: flex; align-items: center; justify-content: center; color: #C65A4A; font-size: 16px;">
                             🛡️
@@ -814,58 +893,162 @@
                             </div>
                         </div>
                     </div>
-                    <span style="font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; background: #C65A4A; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.4px;">
-                        CRITICAL RISK (94/100)
-                    </span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="demoManualBadge" style="display: none; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; background: #FDF1EE; color: #C65A4A; border: 1px solid #F8DCD6;">
+                            ✏️ MANUAL REDACT ACTIVE
+                        </span>
+                        <span style="font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 9999px; background: #C65A4A; color: #FFFFFF; text-transform: uppercase; letter-spacing: 0.4px;">
+                            CRITICAL RISK (96/100)
+                        </span>
+                    </div>
                 </div>
 
-                <!-- Verification Seal Banner -->
-                <div style="background: #EAF3EE; border-bottom: 1px solid #D5E7DC; padding: 8px 20px; font-size: 11px; font-weight: 600; color: #2E7D5B; display: flex; align-items: center; gap: 8px;">
+                <!-- Verification Seal Banner (Fixed) -->
+                <div style="background: #EAF3EE; border-bottom: 1px solid #D5E7DC; padding: 8px 20px; font-size: 11px; font-weight: 600; color: #2E7D5B; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
                     <span>✓</span>
                     <span><strong>Preview &mdash; Safe to Send:</strong> Underlying text streams permanently flattened (0 characters) &bull; Metadata stripped.</span>
                 </div>
 
-                <!-- Main Body: Two-Column Review Layout -->
-                <div style="padding: 16px 20px; overflow-y: auto; flex: 1; display: grid; grid-template-columns: 260px 1fr; gap: 16px;">
-                    <!-- Card 1: Document Preview Canvas -->
-                    <div style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <!-- Main Body: Two-Column Review Layout (Contained within viewport) -->
+                <div id="demoReviewBody" style="padding: 14px 20px; overflow: hidden; flex: 1; min-height: 0; display: grid; grid-template-columns: 310px 1fr; gap: 16px; box-sizing: border-box;">
+                    
+                    <!-- Column 1: Document Preview Canvas & Manual Redaction Editor -->
+                    <div id="demoPreviewCard" style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 12px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column; min-height: 0; overflow: hidden; box-sizing: border-box;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-shrink: 0;">
                             <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #2A2A2A;">
                                 Sanitized Preview
                             </span>
-                            <span style="background: #EAF3EE; color: #2E7D5B; border: 1px solid #D5E7DC; border-radius: 9999px; padding: 2px 7px; font-size: 10px; font-weight: 600;">
+                            <span id="demoPreviewBadge" style="background: #EAF3EE; color: #2E7D5B; border: 1px solid #D5E7DC; border-radius: 9999px; padding: 2px 8px; font-size: 10px; font-weight: 600;">
                                 ✓ Safe to Send
                             </span>
                         </div>
-                        <div style="background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                            <canvas id="demoDocCanvas" width="260" height="280" style="width: 100%; height: auto; display: block;"></canvas>
+
+                        <!-- Editor Toolbar: Manual Redact, Tools, Undo/Redo, Delete, Page Navigation -->
+                        <div id="demoEditorToolbar" style="display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; padding: 5px 8px; background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 8px; flex-shrink: 0;">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <button type="button" id="demoBtnToggleManual" class="demo-editor-btn" title="Toggle manual draw-to-redact mode">
+                                    <span>✏️</span><span>Manual Redact</span>
+                                </button>
+                                <div id="demoToolGroup" style="display: none; align-items: center; background: #F3ECE7; padding: 2px; border-radius: 6px; gap: 2px; border: 1px solid #E6DCD5;">
+                                    <button type="button" id="demoToolDraw" class="demo-editor-btn active" style="padding: 2px 6px; font-size: 10px;" title="Draw rectangular blackout box">
+                                        Draw
+                                    </button>
+                                    <button type="button" id="demoToolSelect" class="demo-editor-btn" style="padding: 2px 6px; font-size: 10px;" title="Select and delete existing manual redactions">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 3px;">
+                                <button type="button" id="demoBtnUndo" class="demo-editor-btn" title="Undo last action (Ctrl+Z)" disabled>
+                                    <span>↩️</span>
+                                </button>
+                                <button type="button" id="demoBtnRedo" class="demo-editor-btn" title="Redo action (Ctrl+Y)" disabled>
+                                    <span>↪️</span>
+                                </button>
+                                <button type="button" id="demoBtnDeleteManual" class="demo-editor-btn" title="Delete selected manual redaction (Del)" disabled>
+                                    <span>🗑️</span>
+                                </button>
+                            </div>
+
+                            <!-- Page Navigation Demo -->
+                            <div id="demoPageNavGroup" style="display: flex; align-items: center; gap: 3px;">
+                                <button type="button" id="demoBtnPrevPage" class="demo-editor-btn" style="padding: 2px 6px; font-size: 10px;" title="Previous Page" disabled>
+                                    ◀
+                                </button>
+                                <span id="demoPageIndicator" style="font-size: 10px; font-weight: 700; color: #2A2A2A; min-width: 54px; text-align: center;">
+                                    Page 1 / 1
+                                </span>
+                                <button type="button" id="demoBtnNextPage" class="demo-editor-btn" style="padding: 2px 6px; font-size: 10px;" title="Next Page" disabled>
+                                    ▶
+                                </button>
+                            </div>
                         </div>
-                        <div style="font-size: 11px; color: #6B7280; line-height: 1.4; margin-top: 4px;">
-                            <strong style="color: #2A2A2A;">medical_invoice_aadhaar.pdf</strong><br/>
-                            124.6 KB &bull; PDF Document &bull; Intercepted
+
+                        <!-- Viewport with Canvas, Interactive Overlay and Rubberband -->
+                        <div id="demoPreviewViewport" style="background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 10px; overflow: hidden; flex: 1; min-height: 200px; display: flex; align-items: center; justify-content: center; position: relative; user-select: none;">
+                            <canvas id="demoDocCanvas" width="280" height="300" style="width: 100%; height: 100%; object-fit: contain; display: block;"></canvas>
+                            <div id="demoRubberBand" style="display: none; position: absolute; border: 2px dashed #C65A4A; background: rgba(198, 90, 74, 0.25); pointer-events: none; z-index: 25; border-radius: 2px;"></div>
+                        </div>
+
+                        <div style="font-size: 11px; color: #6B7280; line-height: 1.4; margin-top: 6px; flex-shrink: 0;">
+                            <strong style="color: #2A2A2A;">medical_invoice_confidential.pdf</strong><br/>
+                            142.8 KB &bull; PDF Document &bull; <span id="demoRedactedSummary" style="color: #C65A4A; font-weight: 600;">10 items redacted</span>
                         </div>
                     </div>
 
-                    <!-- Card 2: Detections & Selective Undo List -->
-                    <div style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span id="demoModalActiveCount" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #2A2A2A;">
-                                Detected &mdash; 3 items redacted
-                            </span>
+                    <!-- Column 2: Scrollable Detections List with Individual Controls -->
+                    <div style="background: #FFFFFF; border: 1px solid #F1E8E0; border-radius: 16px; padding: 14px 16px; box-shadow: 0 4px 16px rgba(198, 90, 74, 0.04); display: flex; flex-direction: column; min-height: 0; overflow: hidden; box-sizing: border-box;">
+                        
+                        <!-- Panel Header with bulk actions -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0;">
+                            <div>
+                                <span id="demoModalActiveCount" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #2A2A2A;">
+                                    Detected Items &mdash; 10 redacted
+                                </span>
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button type="button" id="demoBtnRedactAll" title="Redact all items" style="
+                                    background: #FDF1EE;
+                                    color: #C65A4A;
+                                    border: 1px solid #F8DCD6;
+                                    border-radius: 6px;
+                                    padding: 3px 8px;
+                                    font-size: 10px;
+                                    font-weight: 700;
+                                    cursor: pointer;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.3px;
+                                    transition: all 0.15s ease;
+                                ">
+                                    Redact All
+                                </button>
+                                <button type="button" id="demoBtnKeepAll" title="Keep all items visible" style="
+                                    background: #EAF3EE;
+                                    color: #2E7D5B;
+                                    border: 1px solid #D5E7DC;
+                                    border-radius: 6px;
+                                    padding: 3px 8px;
+                                    font-size: 10px;
+                                    font-weight: 700;
+                                    cursor: pointer;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.3px;
+                                    transition: all 0.15s ease;
+                                ">
+                                    Keep All
+                                </button>
+                            </div>
                         </div>
 
-                        <div id="demoModalDetectionsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 230px; overflow-y: auto; padding-right: 4px; margin-bottom: 10px;">
+                        <!-- Independent Scrollable List -->
+                        <div id="demoModalDetectionsList" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 6px; margin: 4px 0 6px 0;">
                             <!-- Items injected dynamically -->
                         </div>
 
-                        <div style="font-size: 11px; color: #6B7280; background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 8px; padding: 6px 10px; line-height: 1.45;">
-                            💡 <em>Click <strong>Undo</strong> or <strong>Redact</strong> to customize individual redactions. The preview canvas flattens changes in real time.</em>
+                        <!-- Manual Redactions Section -->
+                        <div id="demoManualSection" style="display: none; margin-top: 6px; border-top: 1px dashed #F1E8E0; padding-top: 6px; flex-shrink: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <span id="demoManualCount" style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #2A2A2A;">
+                                    Manual Redactions (0)
+                                </span>
+                                <button type="button" id="demoBtnClearManual" style="background: none; border: none; font-size: 10px; font-weight: 600; color: #C65A4A; cursor: pointer; text-decoration: underline; padding: 0;">
+                                    Clear All
+                                </button>
+                            </div>
+                            <div id="demoManualList" style="max-height: 85px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+                                <!-- Injected dynamically -->
+                            </div>
+                        </div>
+
+                        <div style="font-size: 11px; color: #6B7280; background: #FFFBF3; border: 1px solid #F1E8E0; border-radius: 8px; padding: 6px 10px; line-height: 1.4; flex-shrink: 0; margin-top: 4px;">
+                            💡 <em>Click <strong>Redact</strong> or <strong>Keep</strong> to toggle findings, or activate <strong>✏️ Manual Redact</strong> to draw custom blackout boxes.</em>
                         </div>
                     </div>
                 </div>
 
-                <!-- Footer Actions -->
-                <div style="padding: 14px 20px; background: #FFFFFF; border-top: 1px solid #F1E8E0; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Footer Actions (Fixed bottom) -->
+                <div style="padding: 14px 20px; background: #FFFFFF; border-top: 1px solid #F1E8E0; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; box-sizing: border-box;">
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <button type="button" id="btnModalSendSanitized" style="flex: 2; min-width: 180px; padding: 10px 18px; background: #C65A4A; color: #FFFFFF; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 8px rgba(198, 90, 74, 0.22); transition: all 0.18s ease;">
                             <i class="fa-solid fa-check"></i>
@@ -893,10 +1076,305 @@
         document.body.appendChild(overlay);
 
         const canvas = overlay.querySelector('#demoDocCanvas');
+        const viewport = overlay.querySelector('#demoPreviewViewport');
+        const rubberBand = overlay.querySelector('#demoRubberBand');
         const listContainer = overlay.querySelector('#demoModalDetectionsList');
         const countElem = overlay.querySelector('#demoModalActiveCount');
+        const summaryElem = overlay.querySelector('#demoRedactedSummary');
+        const previewBadge = overlay.querySelector('#demoPreviewBadge');
 
-        // Draw Simulated Document on Canvas
+        // Manual Redaction Editor DOM elements
+        const btnToggleManual = overlay.querySelector('#demoBtnToggleManual');
+        const toolGroup = overlay.querySelector('#demoToolGroup');
+        const toolDraw = overlay.querySelector('#demoToolDraw');
+        const toolSelect = overlay.querySelector('#demoToolSelect');
+        const btnUndo = overlay.querySelector('#demoBtnUndo');
+        const btnRedo = overlay.querySelector('#demoBtnRedo');
+        const btnDeleteManual = overlay.querySelector('#demoBtnDeleteManual');
+        const manualBadge = overlay.querySelector('#demoManualBadge');
+        const manualSection = overlay.querySelector('#demoManualSection');
+        const manualCountElem = overlay.querySelector('#demoManualCount');
+        const manualList = overlay.querySelector('#demoManualList');
+        const btnClearManual = overlay.querySelector('#demoBtnClearManual');
+
+        // Manual Redaction State
+        let manualRedactions = [];
+        let undoStack = [];
+        let redoStack = [];
+        let manualMode = false;
+        let activeTool = 'draw';
+        let selectedManualId = null;
+
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let dragClientStartX = 0;
+        let dragClientStartY = 0;
+
+        function updateToolbarState() {
+            if (btnUndo) btnUndo.disabled = undoStack.length === 0;
+            if (btnRedo) btnRedo.disabled = redoStack.length === 0;
+            if (btnDeleteManual) btnDeleteManual.disabled = !selectedManualId;
+        }
+
+        function pushUndo() {
+            undoStack.push(JSON.parse(JSON.stringify(manualRedactions)));
+            redoStack = [];
+            updateToolbarState();
+        }
+
+        function undo() {
+            if (undoStack.length === 0) return;
+            redoStack.push(JSON.parse(JSON.stringify(manualRedactions)));
+            manualRedactions = undoStack.pop();
+            selectedManualId = null;
+            updateToolbarState();
+            renderManualItems();
+            renderItems();
+            drawCanvas();
+        }
+
+        function redo() {
+            if (redoStack.length === 0) return;
+            undoStack.push(JSON.parse(JSON.stringify(manualRedactions)));
+            manualRedactions = redoStack.pop();
+            selectedManualId = null;
+            updateToolbarState();
+            renderManualItems();
+            renderItems();
+            drawCanvas();
+        }
+
+        function deleteSelected() {
+            if (!selectedManualId) return;
+            pushUndo();
+            manualRedactions = manualRedactions.filter(m => m.id !== selectedManualId);
+            selectedManualId = null;
+            updateToolbarState();
+            renderManualItems();
+            renderItems();
+            drawCanvas();
+        }
+
+        function clearAllManual() {
+            if (manualRedactions.length === 0) return;
+            pushUndo();
+            manualRedactions = [];
+            selectedManualId = null;
+            updateToolbarState();
+            renderManualItems();
+            renderItems();
+            drawCanvas();
+        }
+
+        function setManualMode(enabled) {
+            manualMode = enabled;
+            if (btnToggleManual) {
+                btnToggleManual.classList.toggle('active', manualMode);
+            }
+            if (toolGroup) toolGroup.style.display = manualMode ? 'inline-flex' : 'none';
+            if (manualBadge) manualBadge.style.display = manualMode ? 'inline-block' : 'none';
+            if (viewport) {
+                viewport.style.cursor = manualMode ? (activeTool === 'draw' ? 'crosshair' : 'pointer') : 'default';
+            }
+        }
+
+        if (btnToggleManual) {
+            btnToggleManual.addEventListener('click', () => {
+                setManualMode(!manualMode);
+            });
+        }
+
+        if (toolDraw) {
+            toolDraw.addEventListener('click', () => {
+                activeTool = 'draw';
+                toolDraw.classList.add('active');
+                if (toolSelect) toolSelect.classList.remove('active');
+                if (viewport) viewport.style.cursor = 'crosshair';
+            });
+        }
+
+        if (toolSelect) {
+            toolSelect.addEventListener('click', () => {
+                activeTool = 'select';
+                toolSelect.classList.add('active');
+                if (toolDraw) toolDraw.classList.remove('active');
+                if (viewport) viewport.style.cursor = 'pointer';
+            });
+        }
+
+        if (btnUndo) btnUndo.addEventListener('click', undo);
+        if (btnRedo) btnRedo.addEventListener('click', redo);
+        if (btnDeleteManual) btnDeleteManual.addEventListener('click', deleteSelected);
+        if (btnClearManual) btnClearManual.addEventListener('click', clearAllManual);
+
+        function viewportPointToCanvas(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const cx = Math.max(0, Math.min(canvas.width, (e.clientX - rect.left) * scaleX));
+            const cy = Math.max(0, Math.min(canvas.height, (e.clientY - rect.top) * scaleY));
+            return { x: Math.round(cx), y: Math.round(cy) };
+        }
+
+        if (viewport) {
+            viewport.addEventListener('pointerdown', (e) => {
+                if (!manualMode) return;
+                const pt = viewportPointToCanvas(e);
+
+                if (activeTool === 'draw') {
+                    isDragging = true;
+                    dragStartX = pt.x;
+                    dragStartY = pt.y;
+                    dragClientStartX = e.clientX;
+                    dragClientStartY = e.clientY;
+                    try { viewport.setPointerCapture(e.pointerId); } catch (_) {}
+                    if (rubberBand) {
+                        const vRect = viewport.getBoundingClientRect();
+                        rubberBand.style.display = 'block';
+                        rubberBand.style.left = `${e.clientX - vRect.left}px`;
+                        rubberBand.style.top = `${e.clientY - vRect.top}px`;
+                        rubberBand.style.width = '0px';
+                        rubberBand.style.height = '0px';
+                    }
+                } else if (activeTool === 'select') {
+                    const clicked = manualRedactions.slice().reverse().find(m => {
+                        const [bx, by, bw, bh] = m.bbox;
+                        return pt.x >= bx && pt.x <= bx + bw && pt.y >= by && pt.y <= by + bh;
+                    });
+                    selectedManualId = clicked ? clicked.id : null;
+                    updateToolbarState();
+                    renderManualItems();
+                    drawCanvas();
+                }
+            });
+
+            viewport.addEventListener('pointermove', (e) => {
+                if (!isDragging || activeTool !== 'draw') return;
+                const vRect = viewport.getBoundingClientRect();
+                const left = Math.min(e.clientX, dragClientStartX) - vRect.left;
+                const top = Math.min(e.clientY, dragClientStartY) - vRect.top;
+                const width = Math.abs(e.clientX - dragClientStartX);
+                const height = Math.abs(e.clientY - dragClientStartY);
+
+                if (rubberBand) {
+                    rubberBand.style.left = `${Math.max(0, left)}px`;
+                    rubberBand.style.top = `${Math.max(0, top)}px`;
+                    rubberBand.style.width = `${width}px`;
+                    rubberBand.style.height = `${height}px`;
+                }
+            });
+
+            const onPointerUp = (e) => {
+                if (!isDragging || activeTool !== 'draw') return;
+                isDragging = false;
+                try { viewport.releasePointerCapture(e.pointerId); } catch (_) {}
+                if (rubberBand) rubberBand.style.display = 'none';
+
+                const pt = viewportPointToCanvas(e);
+                const bx = Math.min(dragStartX, pt.x);
+                const by = Math.min(dragStartY, pt.y);
+                const bw = Math.abs(pt.x - dragStartX);
+                const bh = Math.abs(pt.y - dragStartY);
+
+                if (bw >= 6 && bh >= 6) {
+                    pushUndo();
+                    const newId = 'man-' + Date.now();
+                    manualRedactions.push({
+                        id: newId,
+                        page: 1,
+                        bbox: [bx, by, bw, bh],
+                        label: `Manual Blackout (${bw}×${bh}px)`
+                    });
+                    selectedManualId = newId;
+                    updateToolbarState();
+                    renderManualItems();
+                    renderItems();
+                    drawCanvas();
+                }
+            };
+
+            viewport.addEventListener('pointerup', onPointerUp);
+            viewport.addEventListener('pointercancel', onPointerUp);
+        }
+
+        // Render Manual Redactions List
+        function renderManualItems() {
+            if (!manualSection || !manualList) return;
+            const count = manualRedactions.length;
+            if (count === 0) {
+                manualSection.style.display = 'none';
+                manualList.innerHTML = '';
+                return;
+            }
+
+            manualSection.style.display = 'block';
+            if (manualCountElem) {
+                manualCountElem.textContent = `Manual Redactions (${count})`;
+            }
+
+            manualList.innerHTML = '';
+            manualRedactions.forEach((item, idx) => {
+                const isSelected = item.id === selectedManualId;
+                const row = document.createElement('div');
+                row.style.cssText = `
+                    background: ${isSelected ? '#FDF1EE' : '#FFFFFF'};
+                    border: 1px solid ${isSelected ? '#F8DCD6' : '#F1E8E0'};
+                    border-left: 3px solid ${isSelected ? '#C65A4A' : '#78716C'};
+                    border-radius: 6px;
+                    padding: 4px 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 11px;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                `;
+
+                row.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                        <span style="font-weight: 700; color: #2A2A2A;">#${idx + 1}</span>
+                        <span style="color: #6B7280; font-family: monospace; font-size: 10px;">[${item.bbox.join(', ')}]</span>
+                        <span style="font-size: 10px; color: #C65A4A; font-weight: 600;">Manual Box</span>
+                    </div>
+                    <button type="button" class="demo-btn-del-item" title="Delete this manual redaction" style="
+                        background: none;
+                        border: none;
+                        color: #C65A4A;
+                        font-size: 11px;
+                        cursor: pointer;
+                        padding: 2px 4px;
+                        border-radius: 4px;
+                    ">🗑️</button>
+                `;
+
+                row.addEventListener('click', (ev) => {
+                    if (ev.target.closest('.demo-btn-del-item')) return;
+                    selectedManualId = item.id;
+                    updateToolbarState();
+                    renderManualItems();
+                    drawCanvas();
+                });
+
+                const btnDel = row.querySelector('.demo-btn-del-item');
+                if (btnDel) {
+                    btnDel.addEventListener('click', (ev) => {
+                        ev.stopPropagation();
+                        pushUndo();
+                        manualRedactions = manualRedactions.filter(m => m.id !== item.id);
+                        if (selectedManualId === item.id) selectedManualId = null;
+                        updateToolbarState();
+                        renderManualItems();
+                        renderItems();
+                        drawCanvas();
+                    });
+                }
+
+                manualList.appendChild(row);
+            });
+        }
+
+        // Draw Simulated Hospital Invoice on Canvas with dynamic auto and manual redactions
         function drawCanvas() {
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
@@ -914,174 +1392,363 @@
 
             // Hospital Header
             ctx.fillStyle = '#C65A4A';
-            ctx.fillRect(12, 12, w - 24, 26);
+            ctx.fillRect(10, 10, w - 20, 24);
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 11px sans-serif';
-            ctx.fillText('CITY HOSPITAL & CLINIC — INVOICE', 20, 29);
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText('METROPOLITAN GENERAL HOSPITAL', 18, 26);
 
-            // Document Metadata
+            // Patient Name & Invoice #
             ctx.fillStyle = '#2A2A2A';
-            ctx.font = 'bold 9px sans-serif';
-            ctx.fillText('Patient: Ananya Sharma', 16, 54);
-            ctx.fillStyle = '#6B7280';
-            ctx.font = '8px sans-serif';
-            ctx.fillText('Date: 14-Nov-2026  •  Ref: #INV-9842', 16, 68);
+            ctx.font = 'bold 8.5px sans-serif';
+            ctx.fillText('Patient Name:', 14, 48);
+            if (items[0].redacted) {
+                ctx.fillStyle = '#2A2A2A';
+                ctx.fillRect(72, 38, 70, 12);
+            } else {
+                ctx.fillStyle = '#2E7D5B';
+                ctx.fillText(items[0].raw, 74, 48);
+            }
+
+            ctx.fillStyle = '#2A2A2A';
+            ctx.font = 'bold 8.5px sans-serif';
+            ctx.fillText('Inv #:', 160, 48);
+            if (items[3].redacted) {
+                ctx.fillStyle = '#2A2A2A';
+                ctx.fillRect(190, 38, 65, 12);
+            } else {
+                ctx.fillStyle = '#2E7D5B';
+                ctx.fillText(items[3].raw, 192, 48);
+            }
+
+            // Email & Phone
+            ctx.fillStyle = '#2A2A2A';
+            ctx.fillText('Email:', 14, 68);
+            if (items[1].redacted) {
+                ctx.fillStyle = '#2A2A2A';
+                ctx.fillRect(48, 58, 96, 12);
+            } else {
+                ctx.fillStyle = '#2E7D5B';
+                ctx.font = '7.5px monospace';
+                ctx.fillText(items[1].raw, 50, 68);
+            }
+
+            ctx.fillStyle = '#2A2A2A';
+            ctx.font = 'bold 8.5px sans-serif';
+            ctx.fillText('Phone:', 160, 68);
+            if (items[2].redacted) {
+                ctx.fillStyle = '#2A2A2A';
+                ctx.fillRect(195, 58, 65, 12);
+            } else {
+                ctx.fillStyle = '#2E7D5B';
+                ctx.fillText(items[2].raw, 197, 68);
+            }
+
+            // SSN & Doctor
+            ctx.fillStyle = '#2A2A2A';
+            ctx.fillText('SSN:', 14, 88);
+            if (items[4].redacted) {
+                ctx.fillStyle = '#2A2A2A';
+                ctx.fillRect(40, 78, 64, 12);
+            } else {
+                ctx.fillStyle = '#2E7D5B';
+                ctx.fillText(items[4].raw, 42, 88);
+            }
+
+            ctx.fillStyle = '#2A2A2A';
+            ctx.fillText('Doctor:', 130, 88);
+            if (items[8].redacted) {
+                ctx.fillStyle = '#2A2A2A';
+                ctx.fillRect(166, 78, 90, 12);
+            } else {
+                ctx.fillStyle = '#2E7D5B';
+                ctx.fillText(items[8].raw, 168, 88);
+            }
+
+            // Billing Address
+            ctx.fillStyle = '#2A2A2A';
+            ctx.fillText('Billing Addr:', 14, 108);
+            if (items[7].redacted) {
+                ctx.fillStyle = '#2A2A2A';
+                ctx.fillRect(68, 98, 185, 12);
+            } else {
+                ctx.fillStyle = '#2E7D5B';
+                ctx.font = '7.5px sans-serif';
+                ctx.fillText(items[7].raw, 70, 108);
+            }
 
             // Divider
             ctx.strokeStyle = '#F1E8E0';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(16, 76);
-            ctx.lineTo(w - 16, 76);
+            ctx.moveTo(14, 120);
+            ctx.lineTo(w - 14, 120);
             ctx.stroke();
 
-            // Field 1: Aadhaar UID
-            ctx.fillStyle = '#6B7280';
-            ctx.font = 'bold 8px sans-serif';
-            ctx.fillText('AADHAAR UID (GOVT ID):', 16, 94);
-            if (items[0].redacted) {
-                // Blackout redaction block
+            // Card & Exp
+            ctx.fillStyle = '#2A2A2A';
+            ctx.font = 'bold 8.5px sans-serif';
+            ctx.fillText('Visa Card:', 14, 140);
+            if (items[5].redacted) {
                 ctx.fillStyle = '#2A2A2A';
-                ctx.fillRect(16, 98, 140, 16);
-                ctx.fillStyle = '#2E7D5B';
-                ctx.font = 'bold 8px monospace';
-                ctx.fillText('[REDACTED]', 165, 110);
+                ctx.fillRect(65, 130, 110, 12);
             } else {
-                ctx.fillStyle = '#C65A4A';
-                ctx.font = 'bold 9px monospace';
-                ctx.fillText('2345 6789 0123', 16, 110);
-                ctx.fillStyle = '#B27329';
-                ctx.font = '8px sans-serif';
-                ctx.fillText('(UNMASKED)', 165, 110);
+                ctx.fillStyle = '#2E7D5B';
+                ctx.font = '8px monospace';
+                ctx.fillText(items[5].raw, 67, 140);
             }
 
-            // Field 2: PAN Card
-            ctx.fillStyle = '#6B7280';
-            ctx.font = 'bold 8px sans-serif';
-            ctx.fillText('INCOME TAX PAN:', 16, 134);
-            if (items[1].redacted) {
+            ctx.fillStyle = '#2A2A2A';
+            ctx.font = 'bold 8.5px sans-serif';
+            ctx.fillText('Exp:', 190, 140);
+            if (items[6].redacted) {
                 ctx.fillStyle = '#2A2A2A';
-                ctx.fillRect(16, 138, 120, 16);
-                ctx.fillStyle = '#2E7D5B';
-                ctx.font = 'bold 8px monospace';
-                ctx.fillText('[REDACTED]', 145, 150);
+                ctx.fillRect(215, 130, 35, 12);
             } else {
-                ctx.fillStyle = '#C65A4A';
-                ctx.font = 'bold 9px monospace';
-                ctx.fillText('ABCDE1234F', 16, 150);
-                ctx.fillStyle = '#B27329';
-                ctx.font = '8px sans-serif';
-                ctx.fillText('(UNMASKED)', 145, 150);
+                ctx.fillStyle = '#2E7D5B';
+                ctx.fillText(items[6].raw, 217, 140);
             }
 
-            // Field 3: Credit Card
-            ctx.fillStyle = '#6B7280';
-            ctx.font = 'bold 8px sans-serif';
-            ctx.fillText('PAYMENT METHOD (VISA CARD):', 16, 174);
-            if (items[2].redacted) {
+            // QR Code Box
+            ctx.fillStyle = '#2A2A2A';
+            ctx.fillText('Payment QR:', 14, 175);
+            if (items[9].redacted) {
                 ctx.fillStyle = '#2A2A2A';
-                ctx.fillRect(16, 178, 160, 16);
-                ctx.fillStyle = '#2E7D5B';
-                ctx.font = 'bold 8px monospace';
-                ctx.fillText('[REDACTED]', 185, 190);
+                ctx.fillRect(80, 160, 50, 50);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 7px sans-serif';
+                ctx.fillText('BLACKOUT', 84, 188);
             } else {
-                ctx.fillStyle = '#C65A4A';
-                ctx.font = 'bold 9px monospace';
-                ctx.fillText('4111 2222 3333 1111', 16, 190);
-                ctx.fillStyle = '#B27329';
-                ctx.font = '8px sans-serif';
-                ctx.fillText('(UNMASKED)', 185, 190);
+                ctx.fillStyle = '#2E7D5B';
+                ctx.strokeRect(80, 160, 50, 50);
+                ctx.font = '7px monospace';
+                ctx.fillText('LIVE QR', 88, 188);
             }
 
             // Summary Table
             ctx.fillStyle = '#FFFBF3';
-            ctx.fillRect(16, 206, w - 32, 42);
+            ctx.fillRect(14, 222, w - 28, 44);
             ctx.strokeStyle = '#F1E8E0';
-            ctx.strokeRect(16, 206, w - 32, 42);
+            ctx.strokeRect(14, 222, w - 28, 44);
 
             ctx.fillStyle = '#2A2A2A';
             ctx.font = '8px sans-serif';
-            ctx.fillText('Consultation & Diagnostic Lab', 22, 222);
-            ctx.fillText('Total Paid:', 22, 238);
+            ctx.fillText('Comprehensive Cardiology Consultation', 20, 238);
+            ctx.fillText('Total Billed:', 20, 254);
             ctx.font = 'bold 9px sans-serif';
-            ctx.fillText('INR 14,500.00', w - 90, 238);
+            ctx.fillText('$550.00 USD', w - 85, 254);
 
-            // Sovereign Non-Recoverable Seal watermark
-            ctx.fillStyle = 'rgba(46, 125, 91, 0.12)';
-            ctx.font = 'bold 10px sans-serif';
-            ctx.fillText('SHA-256 ZERO STREAM VERIFIED', 42, 268);
+            // Non-recoverable Seal Watermark
+            ctx.fillStyle = 'rgba(46, 125, 91, 0.16)';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillText('✓ SHA-256 FLATTENED & VERIFIED', 40, 284);
+
+            // Render manual redactions as blackout boxes
+            manualRedactions.forEach((m) => {
+                const [bx, by, bw, bh] = m.bbox;
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(bx, by, bw, bh);
+
+                if (m.id === selectedManualId) {
+                    ctx.save();
+                    ctx.strokeStyle = '#C65A4A';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 2]);
+                    ctx.strokeRect(bx - 0.5, by - 0.5, bw + 1, bh + 1);
+                    ctx.restore();
+                }
+            });
         }
 
-        // Render Detections List
+        // Render Detections List with individual Redact / Keep controls
         function renderItems() {
             if (!listContainer) return;
             listContainer.innerHTML = '';
             const active = items.filter(i => i.redacted).length;
-            countElem.textContent = `Detected — ${active} items redacted`;
+            const kept = items.length - active;
+            const manualCount = manualRedactions.length;
 
-            items.forEach((item, idx) => {
+            countElem.textContent = `Detected Items — ${active} redacted, ${kept} kept`;
+            if (summaryElem) {
+                const manualNote = manualCount > 0 ? ` &bull; ${manualCount} manual redaction${manualCount === 1 ? '' : 's'}` : '';
+                if (active === items.length) {
+                    summaryElem.innerHTML = `All 10 items redacted${manualNote}`;
+                    summaryElem.style.color = '#C65A4A';
+                } else if (active === 0) {
+                    summaryElem.innerHTML = `All items kept visible${manualNote}`;
+                    summaryElem.style.color = '#B27329';
+                } else {
+                    summaryElem.innerHTML = `${active} of ${items.length} items redacted${manualNote}`;
+                    summaryElem.style.color = '#C65A4A';
+                }
+            }
+
+            if (previewBadge) {
+                if (active === 0 && manualCount === 0) {
+                    previewBadge.textContent = '⚠️ Unredacted Copy';
+                    previewBadge.style.background = '#FDF1E3';
+                    previewBadge.style.color = '#B27329';
+                    previewBadge.style.borderColor = '#E8D7BF';
+                } else {
+                    previewBadge.textContent = '✓ Safe to Send';
+                    previewBadge.style.background = '#EAF3EE';
+                    previewBadge.style.color = '#2E7D5B';
+                    previewBadge.style.borderColor = '#D5E7DC';
+                }
+            }
+
+            items.forEach((item) => {
                 const isRedacted = item.redacted;
                 const row = document.createElement('div');
                 row.style.cssText = `
-                    background: #FFFFFF;
-                    border: 1px solid #F1E8E0;
-                    border-radius: 12px;
-                    padding: 10px 12px;
+                    background: ${isRedacted ? '#FFFFFF' : '#FCFDFD'};
+                    border: 1px solid ${isRedacted ? '#F1E8E0' : '#D5E7DC'};
+                    border-left: 3px solid ${isRedacted ? '#C65A4A' : '#2E7D5B'};
+                    border-radius: 10px;
+                    padding: 8px 10px;
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    transition: all 0.15s ease;
+                    justify-content: space-between;
+                    gap: 10px;
+                    box-sizing: border-box;
+                    transition: background 0.15s ease, border-color 0.15s ease;
                 `;
 
                 row.innerHTML = `
-                    <div style="width: 34px; height: 34px; border-radius: 50%; background: #FDF1EE; border: 1px solid #F8DCD6; color: #C65A4A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px;">
-                        🛡️
-                    </div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
-                            <span style="font-size: 13px; font-weight: 700; color: #2A2A2A; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.label}</span>
-                            <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background: ${isRedacted ? '#FDF1EE' : '#FBF4EA'}; color: ${isRedacted ? '#C65A4A' : '#B27329'}; border: 1px solid ${isRedacted ? '#F8DCD6' : '#F0DFCA'}; text-transform: uppercase;">
-                                ${isRedacted ? 'REDACTED' : 'KEPT'}
-                            </span>
+                    <!-- Left: Icon & Details -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+                        <div style="width: 30px; height: 30px; border-radius: 8px; background: ${isRedacted ? '#FDF1EE' : '#EAF3EE'}; border: 1px solid ${isRedacted ? '#F8DCD6' : '#D5E7DC'}; color: ${isRedacted ? '#C65A4A' : '#2E7D5B'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px;">
+                            ${item.icon || '🛡️'}
                         </div>
-                        <div style="font-size: 12px; color: #6B7280; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                            ${isRedacted ? item.masked : '<span style="color: #C65A4A; font-weight: 700;">' + item.raw + '</span>'} &bull; ${item.details}
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                                <span style="font-size: 12px; font-weight: 700; color: #2A2A2A; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.label}</span>
+                                <span style="font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 9999px; background: ${isRedacted ? '#FDF1EE' : '#EAF3EE'}; color: ${isRedacted ? '#C65A4A' : '#2E7D5B'}; border: 1px solid ${isRedacted ? '#F8DCD6' : '#D5E7DC'}; text-transform: uppercase; letter-spacing: 0.3px;">
+                                    ${isRedacted ? 'REDACTED' : 'KEPT'}
+                                </span>
+                            </div>
+                            <div style="font-size: 11px; color: #6B7280; display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <code style="font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: ${isRedacted ? '#F9FAFB' : '#EAF3EE'}; color: ${isRedacted ? '#4B5563' : '#2E7D5B'}; padding: 1px 5px; border-radius: 4px; border: 1px solid ${isRedacted ? '#E5E7EB' : '#D5E7DC'}; font-weight: ${isRedacted ? '400' : '600'};">
+                                    ${isRedacted ? item.masked : item.raw}
+                                </code>
+                                <span style="color: #9CA3AF; font-size: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.details}</span>
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <button type="button" class="btn-toggle-demo" style="
-                            padding: 5px 9px;
-                            font-size: 11px;
-                            font-weight: 600;
+
+                    <!-- Right: Individual Redact / Keep Controls -->
+                    <div class="demo-toggle-group" style="
+                        display: inline-flex;
+                        align-items: center;
+                        background: #F3ECE7;
+                        padding: 2px;
+                        border-radius: 8px;
+                        border: 1px solid #E6DCD5;
+                        flex-shrink: 0;
+                        gap: 2px;
+                    ">
+                        <button type="button" class="demo-btn-choice demo-btn-redact" title="Redact ${item.label}" style="
+                            background: ${isRedacted ? '#C65A4A' : 'transparent'};
+                            color: ${isRedacted ? '#FFFFFF' : '#78716C'};
+                            font-weight: ${isRedacted ? '700' : '500'};
+                            box-shadow: ${isRedacted ? '0 1px 3px rgba(198,90,74,0.3)' : 'none'};
+                            border: none;
                             border-radius: 6px;
+                            padding: 4px 9px;
+                            font-size: 11px;
                             cursor: pointer;
-                            border: 1px solid #F1E8E0;
-                            background: #FFFFFF;
-                            color: #6B7280;
-                            transition: all 0.15s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 3px;
                         ">
-                            ${isRedacted ? '✕ Undo' : '↩ Redact'}
+                            <span>🛡️</span><span>Redact</span>
+                        </button>
+                        <button type="button" class="demo-btn-choice demo-btn-keep" title="Keep ${item.label}" style="
+                            background: ${!isRedacted ? '#2E7D5B' : 'transparent'};
+                            color: ${!isRedacted ? '#FFFFFF' : '#78716C'};
+                            font-weight: ${!isRedacted ? '700' : '500'};
+                            box-shadow: ${!isRedacted ? '0 1px 3px rgba(46,125,91,0.3)' : 'none'};
+                            border: none;
+                            border-radius: 6px;
+                            padding: 4px 9px;
+                            font-size: 11px;
+                            cursor: pointer;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 3px;
+                        ">
+                            <span>👁️</span><span>Keep</span>
                         </button>
                     </div>
                 `;
 
-                row.querySelector('.btn-toggle-demo').addEventListener('click', () => {
-                    item.redacted = !item.redacted;
-                    renderItems();
-                    drawCanvas();
+                // Handle individual Redact / Keep buttons
+                const btnRedact = row.querySelector('.demo-btn-redact');
+                const btnKeep = row.querySelector('.demo-btn-keep');
+
+                btnRedact.addEventListener('click', () => {
+                    if (!item.redacted) {
+                        item.redacted = true;
+                        renderItems();
+                        drawCanvas();
+                    }
+                });
+
+                btnKeep.addEventListener('click', () => {
+                    if (item.redacted) {
+                        item.redacted = false;
+                        renderItems();
+                        drawCanvas();
+                    }
                 });
 
                 listContainer.appendChild(row);
             });
         }
 
+        // Bulk buttons
+        overlay.querySelector('#demoBtnRedactAll').addEventListener('click', () => {
+            items.forEach(i => i.redacted = true);
+            renderItems();
+            drawCanvas();
+        });
+
+        overlay.querySelector('#demoBtnKeepAll').addEventListener('click', () => {
+            items.forEach(i => i.redacted = false);
+            renderItems();
+            drawCanvas();
+        });
+
+        // Keyboard navigation and shortcuts for editor
+        overlay.tabIndex = 0;
+        overlay.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (selectedManualId) {
+                    e.preventDefault();
+                    deleteSelected();
+                }
+            } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) redo();
+                else undo();
+            } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+                e.preventDefault();
+                redo();
+            }
+        });
+
         renderItems();
         drawCanvas();
+        updateToolbarState();
+
+        // Focus overlay so hotkeys work immediately
+        setTimeout(() => { try { overlay.focus(); } catch (_) {} }, 100);
 
         // Button Actions
         overlay.querySelector('#btnModalSendSanitized').addEventListener('click', () => {
+            const activeAuto = items.filter(i => i.redacted).length;
+            const manualCount = manualRedactions.length;
             overlay.remove();
-            showExtensionToast('Sanitized attachment dispatched! DataTransfer file swap executed. Original raw file was never sent.', 'success');
+            showExtensionToast(`Sanitized attachment dispatched (${activeAuto} auto-redacted, ${manualCount} manual)! DataTransfer file swap executed. Original raw file was never sent.`, 'success');
         });
 
         overlay.querySelector('#btnModalDownloadClean').addEventListener('click', () => {

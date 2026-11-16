@@ -3,11 +3,11 @@ param(
     [string]$ImagePath
 )
 
+$netStream = $null
 try {
     Add-Type -AssemblyName System.Runtime.WindowsRuntime
     [Windows.Media.Ocr.OcrEngine, Windows.Foundation, ContentType = WindowsRuntime] | Out-Null
     [Windows.Graphics.Imaging.BitmapDecoder, Windows.Foundation, ContentType = WindowsRuntime] | Out-Null
-    [Windows.Storage.StorageFile, Windows.Foundation, ContentType = WindowsRuntime] | Out-Null
 
     $asTask = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object { $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperation`1' })[0]
     function Await($asyncOp, $type) {
@@ -18,9 +18,9 @@ try {
     }
 
     $fullPath = [System.IO.Path]::GetFullPath($ImagePath)
-    $f = Await ([Windows.Storage.StorageFile]::GetFileFromPathAsync($fullPath)) ([Windows.Storage.StorageFile])
-    $stream = Await ($f.OpenAsync([Windows.Storage.FileAccessMode]::Read)) ([Windows.Storage.Streams.IRandomAccessStream])
-    $dec = Await ([Windows.Graphics.Imaging.BitmapDecoder]::CreateAsync($stream)) ([Windows.Graphics.Imaging.BitmapDecoder])
+    $netStream = [System.IO.File]::OpenRead($fullPath)
+    $ras = [System.IO.WindowsRuntimeStreamExtensions]::AsRandomAccessStream($netStream)
+    $dec = Await ([Windows.Graphics.Imaging.BitmapDecoder]::CreateAsync($ras)) ([Windows.Graphics.Imaging.BitmapDecoder])
     $bmp = Await ($dec.GetSoftwareBitmapAsync()) ([Windows.Graphics.Imaging.SoftwareBitmap])
     $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages()
     if (-not $engine) {
@@ -52,4 +52,8 @@ try {
     $wordsList | ConvertTo-Json -Compress
 } catch {
     Write-Output "[]"
+} finally {
+    if ($netStream) {
+        $netStream.Dispose()
+    }
 }

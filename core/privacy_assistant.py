@@ -219,6 +219,36 @@ class PrivacyAssistant:
             risk_description = "Often used as a verification factor for identity verification and account recovery."
             recommendation = "Redact the birth date to minimize demographic profile disclosure."
 
+        # 8.1 Personal / Patient Names
+        elif d_type == 'name':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Name'
+            suggested_style = 'blackout'
+            explanation = f"Personal name identifying an individual ({d_label})."
+            risk_description = "Directly identifies the patient, customer, resident, or individual associated with this record."
+            recommendation = "Redact patient and personal names before document distribution to preserve confidentiality."
+
+        # 8.2 Billing and Residential Addresses
+        elif d_type == 'address':
+            priority = 'HIGH_PRIORITY' if context in ('public', 'professional') else 'REVIEW'
+            action = 'REDACT'
+            action_label = 'Redact Address'
+            suggested_style = 'blackout'
+            explanation = f"Physical location or mailing record ({d_label})."
+            risk_description = "Exposes personal residential address or billing location."
+            recommendation = "Redact address information to prevent physical location tracking and preserve home privacy."
+
+        # 8.3 Card Expiration Date
+        elif d_type == 'expiration_date':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Expiration'
+            suggested_style = 'blackout'
+            explanation = "Payment card expiration date credential."
+            risk_description = "Used alongside payment card numbers to authorize financial transactions."
+            recommendation = "Always redact payment expiration dates alongside payment card numbers."
+
         # 9. QR Codes (Context and Payload Dependent)
         elif d_type == 'qr_code':
             if payload_type in ('upi', 'aadhaar_qr', 'wifi', 'vcard', 'url_sensitive', 'text_sensitive'):

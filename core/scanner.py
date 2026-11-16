@@ -457,7 +457,7 @@ class DocumentScanner:
         # 3. Sliding-window sequence scanning across reading order
         reading_order_words = [w for line in lines for w in line]
         n_words = len(reading_order_words)
-        for k in (2, 3, 4, 5, 6):
+        for k in (2, 3, 4, 5, 6, 7, 8, 9, 10):
             for i in range(n_words - k + 1):
                 chunk = reading_order_words[i : i + k]
                 chunk_text = " ".join([w['text'] for w in chunk])

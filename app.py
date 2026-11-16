@@ -1117,20 +1117,35 @@ def auto_redact_attachment():
         detected_vals = [d.get('value', '') for d in detections]
         verification = validate_non_recoverability(safe_output_path, is_pdf, detected_vals)
 
-        # Render preview thumbnail as data URL
+        # Render preview thumbnails as data URLs (matching DocumentRedactor's 150 DPI render)
+        page_previews = []
         preview_data_url = ""
         import base64
         if is_pdf:
             import pymupdf
             out_doc = pymupdf.open(safe_output_path)
-            if len(out_doc) > 0:
-                pix = out_doc[0].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5))
+            zoom_mat = pymupdf.Matrix(150 / 72, 150 / 72)
+            for p_idx, p in enumerate(out_doc):
+                pix = p.get_pixmap(matrix=zoom_mat)
                 preview_bytes = pix.tobytes("png")
-                preview_data_url = f"data:image/png;base64,{base64.b64encode(preview_bytes).decode('utf-8')}"
+                p_b64 = f"data:image/png;base64,{base64.b64encode(preview_bytes).decode('utf-8')}"
+                page_previews.append({
+                    'page_number': p_idx + 1,
+                    'width': pix.width,
+                    'height': pix.height,
+                    'preview_data_url': p_b64
+                })
+            if len(page_previews) > 0:
+                preview_data_url = page_previews[0]['preview_data_url']
             out_doc.close()
         else:
             with open(safe_output_path, 'rb') as f:
-                preview_data_url = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+                b64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+                preview_data_url = b64
+                page_previews.append({
+                    'page_number': 1,
+                    'preview_data_url': b64
+                })
 
         # Read sanitized file bytes
         with open(safe_output_path, 'rb') as f:
@@ -1160,6 +1175,8 @@ def auto_redact_attachment():
             'file_name': display_name,
             'file_size': os.path.getsize(target_path),
             'is_pdf': is_pdf,
+            'page_count': len(page_previews),
+            'pages': page_previews,
             'total_findings': len(detections),
             'detections': annotated_detections,
             'risk_summary': risk_summary,
@@ -1200,6 +1217,7 @@ def update_attachment_redactions(session_id):
         data = request.get_json() or {}
         excluded_ids = set(data.get('excluded_detection_ids', []))
         custom_styles = data.get('custom_styles', {})
+        manual_redactions = data.get('manual_redactions', [])
 
         target_path = session_info['original_path']
         is_pdf = session_info['is_pdf']
@@ -1229,6 +1247,19 @@ def update_attachment_redactions(session_id):
                 d_copy['style'] = 'none'
             annotated_detections.append(d_copy)
 
+        # Incorporate user-drawn manual redactions
+        for mr in manual_redactions:
+            m_bbox = mr.get('bbox')
+            if m_bbox and len(m_bbox) == 4:
+                active_redactions.append({
+                    'id': mr.get('id', f"man_{uuid.uuid4().hex[:8]}"),
+                    'page': int(mr.get('page', 1)),
+                    'bbox': [float(v) for v in m_bbox],
+                    'style': mr.get('style', default_style),
+                    'label': mr.get('label', 'Manual Redaction'),
+                    'category': 'User Defined'
+                })
+
         out_filename = f"safe_{display_name}"
         safe_output_path = DocumentRedactor.redact_document(
             original_file_path=target_path,
@@ -1241,19 +1272,35 @@ def update_attachment_redactions(session_id):
         detected_vals = [d.get('value', '') for d in detections if d['id'] not in excluded_ids]
         verification = validate_non_recoverability(safe_output_path, is_pdf, detected_vals)
 
-        import base64
+        # Render preview thumbnails matching 150 DPI
+        page_previews = []
         preview_data_url = ""
+        import base64
         if is_pdf:
             import pymupdf
             out_doc = pymupdf.open(safe_output_path)
-            if len(out_doc) > 0:
-                pix = out_doc[0].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5))
+            zoom_mat = pymupdf.Matrix(150 / 72, 150 / 72)
+            for p_idx, p in enumerate(out_doc):
+                pix = p.get_pixmap(matrix=zoom_mat)
                 preview_bytes = pix.tobytes("png")
-                preview_data_url = f"data:image/png;base64,{base64.b64encode(preview_bytes).decode('utf-8')}"
+                p_b64 = f"data:image/png;base64,{base64.b64encode(preview_bytes).decode('utf-8')}"
+                page_previews.append({
+                    'page_number': p_idx + 1,
+                    'width': pix.width,
+                    'height': pix.height,
+                    'preview_data_url': p_b64
+                })
+            if len(page_previews) > 0:
+                preview_data_url = page_previews[0]['preview_data_url']
             out_doc.close()
         else:
             with open(safe_output_path, 'rb') as f:
-                preview_data_url = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+                b64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+                preview_data_url = b64
+                page_previews.append({
+                    'page_number': 1,
+                    'preview_data_url': b64
+                })
 
         with open(safe_output_path, 'rb') as f:
             sanitized_bytes = f.read()
@@ -1268,6 +1315,9 @@ def update_attachment_redactions(session_id):
             'file_name': display_name,
             'detections': annotated_detections,
             'total_active_redactions': len(active_redactions),
+            'page_count': len(page_previews),
+            'pages': page_previews,
+            'manual_redactions': manual_redactions,
             'sanitized_filename': f"safe_{display_name}",
             'sanitized_base64': sanitized_b64,
             'sanitized_mime': mime_type,

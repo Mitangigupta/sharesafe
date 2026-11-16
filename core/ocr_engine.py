@@ -104,39 +104,85 @@ class OCREngine:
 
     def extract_words_and_boxes(self, pil_image: Image.Image, img_path: Optional[str] = None) -> List[Dict[str, Any]]:
         """Extracts individual words and their pixel bounding boxes [x, y, w, h]."""
-        # 1. Try Windows Media OCR if available (fastest on Windows, zero installation)
-        if self._has_windows_ocr:
-            res = self._extract_via_windows_ocr(pil_image, img_path)
-            if res:
-                return res
-
-        # 2. Try Tesseract
-        if self._pytesseract_module and self._tesseract_path:
+        if pil_image is None and img_path and os.path.isfile(img_path):
             try:
-                data = self._pytesseract_module.image_to_data(pil_image, output_type=self._pytesseract_module.Output.DICT)
-                results = []
-                n_boxes = len(data['text'])
-                for i in range(n_boxes):
-                    text = data['text'][i].strip()
-                    if not text:
-                        continue
-                    conf = float(data['conf'][i])
-                    if conf < 10.0:
-                        continue
+                pil_image = Image.open(img_path)
+            except Exception:
+                return []
 
-                    x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
-                    results.append({
-                        'text': text,
-                        'bbox': [x, y, w, h],
-                        'conf': conf,
-                        'line_num': data['line_num'][i],
-                        'block_num': data['block_num'][i]
-                    })
-                return results
-            except Exception as e:
-                print(f"[OCREngine Tesseract Error]: {e}")
+        if pil_image is None:
+            return []
 
-        return []
+        # Normalize mode for OCR
+        proc_img = pil_image
+        if proc_img.mode in ('RGBA', 'LA', 'P'):
+            bg = Image.new('RGB', proc_img.size, (255, 255, 255))
+            if proc_img.mode == 'RGBA':
+                bg.paste(proc_img, mask=proc_img.split()[3])
+            else:
+                bg.paste(proc_img.convert('RGB'))
+            proc_img = bg
+        elif proc_img.mode != 'RGB':
+            proc_img = proc_img.convert('RGB')
+
+        w, h = proc_img.size
+        # Adaptive upscaling for small images / screenshots to ensure small fonts (8-14px) are OCR-readable
+        scale = 1.0
+        if min(w, h) < 1200 or max(w, h) < 1800:
+            scale = 2.0
+            new_w = int(round(w * scale))
+            new_h = int(round(h * scale))
+            proc_img = proc_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+        # 1. Try Windows Media OCR if available (fastest on Windows, zero installation)
+        words = []
+        if self._has_windows_ocr:
+            target_path = img_path if (scale == 1.0 and img_path and os.path.isfile(img_path) and pil_image.mode == 'RGB') else None
+            words = self._extract_via_windows_ocr(proc_img, target_path)
+
+        # 2. Try Tesseract if Windows OCR produced no words
+        if not words and self._pytesseract_module and self._tesseract_path:
+            words = self._extract_via_tesseract(proc_img)
+
+        # Scale bounding boxes back to original image coordinates
+        if scale != 1.0 and words:
+            for item in words:
+                if 'bbox' in item and len(item['bbox']) == 4:
+                    item['bbox'] = [
+                        round(item['bbox'][0] / scale, 1),
+                        round(item['bbox'][1] / scale, 1),
+                        round(item['bbox'][2] / scale, 1),
+                        round(item['bbox'][3] / scale, 1)
+                    ]
+
+        return words
+
+    def _extract_via_tesseract(self, pil_image: Image.Image) -> List[Dict[str, Any]]:
+        """Extracts words and bounding boxes via PyTesseract."""
+        try:
+            data = self._pytesseract_module.image_to_data(pil_image, output_type=self._pytesseract_module.Output.DICT)
+            results = []
+            n_boxes = len(data['text'])
+            for i in range(n_boxes):
+                text = data['text'][i].strip()
+                if not text:
+                    continue
+                conf = float(data['conf'][i])
+                if conf < 10.0:
+                    continue
+
+                x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
+                results.append({
+                    'text': text,
+                    'bbox': [x, y, w, h],
+                    'conf': conf,
+                    'line_num': data['line_num'][i],
+                    'block_num': data['block_num'][i]
+                })
+            return results
+        except Exception as e:
+            print(f"[OCREngine Tesseract Error]: {e}")
+            return []
 
     def _extract_via_windows_ocr(self, pil_image: Image.Image, img_path: Optional[str] = None) -> List[Dict[str, Any]]:
         """Calls the native Windows Media OCR PowerShell bridge."""

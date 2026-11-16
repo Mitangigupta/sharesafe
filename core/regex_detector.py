@@ -100,12 +100,32 @@ class SensitiveDetector:
     def _compile_patterns(self):
         self.regexes = {
             'upi_vpa': re.compile(r'\b[a-zA-Z0-9.\-_]{2,64}@(oksbi|okhdfcbank|okaxis|okicici|paytm|ybl|ibl|axl|upi|sbi|hdfcbank|icici|kotak|barodampay|postbank|federal|idfcbank|indus|airtel|gpay|apl)\b', re.IGNORECASE),
-            'email': re.compile(r'\b[A-Za-z0-9](?:[A-Za-z0-9._%+-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,24}\b', re.IGNORECASE),
+            'email': re.compile(r'\b[A-Za-z0-9](?:[A-Za-z0-9._%+\u2022\u00b7\u2013\u2014~-]*[A-Za-z0-9])?@[A-Za-z0-9](?:[A-Za-z0-9.\u2022\u00b7\u2013\u2014~-]*[A-Za-z0-9])?\.[A-Za-z]{2,24}\b', re.IGNORECASE),
             'pan': re.compile(r'\b([A-Za-z]{5})[\s-]?([0-9]{4})[\s-]?([A-Za-z]{1})\b'),
             'voter_id': re.compile(r'\b([A-Za-z]{3})[\s-]?([0-9]{7})\b'),
             'driving_licence': re.compile(r'\b([A-Za-z]{2}[\s-]?[0-9]{2}[\s-]?(?:19|20[0-9]{2})[\s-]?[0-9]{7}|[A-Za-z]{2}[ -]?[0-9]{13,15})\b'),
             'passport': re.compile(r'\b([A-PR-WYa-pr-wy][0-9]{7})\b'),
             'dob': re.compile(r'\b(?:DOB|Date\s*of\s*Birth|Year\s*of\s*Birth|जन्म\s*तिथि)\s*[:\-]?\s*(\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}|\d{4})\b', re.IGNORECASE),
+            'name_prefixed': re.compile(
+                r'(?i)\b(?:patient(?:\s+name)?|resident(?:\s+name)?|name\s*/\s*resident|cardholder(?:\s+name)?|customer(?:\s+name)?|client(?:\s+name)?|employee(?:\s+name)?|member(?:\s+name)?|(?:full\s+)?name|attending\s+physician|physician|doctor)\s*[:\-]\s*'
+                r'([A-Z][a-zA-Z\'.]+(?:\s+[A-Z][a-zA-Z\'.]+){0,3}?)'
+                r'(?=\s+(?:invoice|date|email|phone|ssn|department|dept|age|sex|dob|gender|mrn|account|id\b|no\b|ref\b|\$|\d|#|status|balance|amount)|$|[,\n;])'
+            ),
+            'expiration_date': re.compile(
+                r'(?i)\b(?:card\s*expiration|exp(?:ir(?:y|ation|es))?(?:\s*date)?|valid\s*thru|good\s*thru)\s*[:\-]?\s*'
+                r'((?:0[1-9]|1[0-2])\s*[/,\'\-.\s]{1,3}\s*(?:20\d{2}|\d{2}))\b'
+            ),
+            'address_prefixed': re.compile(
+                r'(?i)\b(?:billing\s*address|residential\s*address|permanent\s*address|mailing\s*address|home\s*address|current\s*address|address)\s*[:\-]\s*'
+                r'([^,\n\r]+(?:,[^,\n\r]+){1,3}(?:\s+\d{5}(?:-\d{4})?)?)'
+            ),
+            'address_street': re.compile(
+                r'\b\d{1,5}\s+[A-Za-z0-9.\s]+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Terrace|Ter|Drive|Dr|Court|Ct|Lane|Ln|Way)\b.*?\b[A-Z]{2}\s+\d{5}(?:-\d{4})?\b',
+                re.IGNORECASE
+            ),
+            'id_candidate': re.compile(
+                r'(?i)\b(?:invoice(?:\s*#|\s*no\.?|\s*num|\s*g)?|mrn\b|medical\s*record\b|patient\s*(?:id\b|#|no\.?)|account\s*(?:id\b|#|no\.?)|member\s*(?:id\b|#|no\.?)|policy\s*(?:id\b|#|no\.?)|national\s*id\b)\s*[:\-#.]?\s*([A-Za-z0-9\-_.]{4,20})\b'
+            ),
             'aadhaar_spaced': re.compile(r'\b([0-9]{4})[\s./-]+([0-9]{4})[\s./-]+([0-9]{4})\b'),
             'aadhaar_compact': re.compile(r'\b([0-9]{12})\b'),
             'aadhaar_masked': re.compile(r'(?:(?<=\s)|(?<=[^\w])|^)([Xx*•]{4})[\s./-]+([Xx*•]{4})[\s./-]+([0-9]{4})(?=\b|[^\w]|$)'),
@@ -113,8 +133,9 @@ class SensitiveDetector:
             'card_spaced': re.compile(r'\b(?:\d{4}[\s-]){3}\d{1,4}\b'),
             'card_compact': re.compile(r'\b(?:4\d{12}(?:\d{3})?|5[1-5]\d{14}|2[2-7]\d{14}|3[47]\d{13}|6(?:011|5\d{2})\d{12}|652\d{13})\b'),
             'indian_phone': re.compile(r'(?:(?<!\w)\+91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}\b'),
-            'intl_phone': re.compile(r'(?:(?<!\w)\+(?:[1-9]\d{0,2})[-.\s]?)?\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b'),
+            'intl_phone': re.compile(r'(?:(?<!\w)\+(?:[1-9]\d{0,2})[-.\s]?)?\(?[2-9]\d{2}\)?[-.\s]?[0-9OBIl]{3}[-.\s]?[0-9OBIl]{4}\b'),
             'ssn': re.compile(r'\b(?!000|666|9\d{2})\d{3}[-\s](?!00)\d{2}[-\s](?!0000)\d{4}\b'),
+            'ssn_context': re.compile(r'(?i)\b(?:ssn|social\s*security(?:\s*no\.?|\s*number)?)\s*[:\-]?\s*(\d{3}[-\s]?\d{2}[-\s]?\d{4})\b'),
             'ipv4': re.compile(r'\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'),
             'aws_key': re.compile(r'\bAKIA[0-9A-Z]{16}\b'),
             'jwt_token': re.compile(r'\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b'),
@@ -168,8 +189,8 @@ class SensitiveDetector:
                             'confidence': 'high',
                             'review_required': False
                         })
-                    elif pat == self.regexes['card_spaced'] and len(clean) == 16:
-                        # 4 groups of 4 digits formatted as card: require financial/card context
+                    elif pat == self.regexes['card_spaced'] and len(clean) in (15, 16):
+                        # 4 groups of digits formatted as card: require financial/card context
                         window = text[max(0, span[0]-40) : min(len(text), span[1]+40)].lower()
                         has_card_context = bool(re.search(r'(?:card|credit|debit|visa|mastercard|amex|payment|cvv|expir)', window))
                         if has_card_context:
@@ -186,6 +207,33 @@ class SensitiveDetector:
                                 'confidence': 'medium',
                                 'review_required': True
                             })
+
+        # 0.1 Context-prefixed Card Number (e.g. "Card Number on Record: 4532 0156 7890 1239" or OCR-truncated cards)
+        for cm in re.finditer(
+            r'(?i)\b(?:card\s*(?:number|no\.?|#)?|card\s*on\s*record|credit\s*card|debit\s*card|payment\s*method|payment\s*card)\s*[:\-]?\s*([0-9\s-]{12,24})\b',
+            text
+        ):
+            cval = cm.group(1).strip()
+            cspan = cm.span(1)
+            if is_overlapping(cspan[0], cspan[1]):
+                continue
+            cclean = re.sub(r'[\s-]', '', cval)
+            if 12 <= len(cclean) <= 19 and cclean.isdigit():
+                network = identify_card_network(cval)
+                is_valid = validate_luhn(cval)
+                seen_spans.add(cspan)
+                results.append({
+                    'type': 'credit_card',
+                    'label': f'{network} Card' if is_valid else 'Payment Card Candidate',
+                    'value': cval,
+                    'masked': f"****-****-****-{cclean[-4:]}",
+                    'category': 'Financial Payment',
+                    'risk': 'CRITICAL' if is_valid else 'HIGH',
+                    'char_span': cspan,
+                    'details': f'{network} payment card record' if is_valid else 'Payment card record in card context',
+                    'confidence': 'high' if is_valid else 'medium',
+                    'review_required': not is_valid
+                })
 
         # 1. Masked Aadhaar UID (e.g. XXXX XXXX 1234 or **** **** 1234)
         for match in self.regexes['aadhaar_masked'].finditer(text):
@@ -409,6 +457,152 @@ class SensitiveDetector:
                     'review_required': False
                 })
 
+        # 2.5 Expiration Dates (Payment card validity)
+        for match in self.regexes['expiration_date'].finditer(text):
+            val = match.group(1).strip()
+            span = match.span(1)
+            if not is_overlapping(span[0], span[1]):
+                seen_spans.add(span)
+                results.append({
+                    'type': 'expiration_date',
+                    'label': 'Card Expiration Date',
+                    'value': val,
+                    'masked': '**/**',
+                    'category': 'Financial Payment',
+                    'risk': 'HIGH',
+                    'char_span': span,
+                    'details': f'Payment instrument expiration date ({val})',
+                    'confidence': 'high',
+                    'review_required': False
+                })
+
+        # 2.6 Billing and Residential Addresses
+        for match in self.regexes['address_prefixed'].finditer(text):
+            val = match.group(1).strip()
+            span = match.span(1)
+            if not is_overlapping(span[0], span[1]) and len(val) >= 10:
+                seen_spans.add(span)
+                label = 'Billing Address' if re.search(r'billing', match.group(0), re.IGNORECASE) else 'Residential Address'
+                masked_addr = val[:4] + '*** (Redacted Address)'
+                results.append({
+                    'type': 'address',
+                    'label': label,
+                    'value': val,
+                    'masked': masked_addr,
+                    'category': 'Location & Address',
+                    'risk': 'HIGH',
+                    'char_span': span,
+                    'details': 'Physical billing or residential street address',
+                    'confidence': 'high',
+                    'review_required': False
+                })
+
+        for match in self.regexes['address_street'].finditer(text):
+            val = match.group().strip()
+            span = (match.start(), match.end())
+            if not is_overlapping(span[0], span[1]) and len(val) >= 10:
+                seen_spans.add(span)
+                is_billing = bool(re.search(r'billing', text[max(0, span[0]-35):span[0]], re.IGNORECASE))
+                label = 'Billing Address' if is_billing else 'Residential / Postal Address'
+                masked_addr = val[:4] + '*** (Redacted Address)'
+                results.append({
+                    'type': 'address',
+                    'label': label,
+                    'value': val,
+                    'masked': masked_addr,
+                    'category': 'Location & Address',
+                    'risk': 'HIGH',
+                    'char_span': span,
+                    'details': f'Physical {label.lower()}',
+                    'confidence': 'high',
+                    'review_required': False
+                })
+
+        # 2.7 Patient and Individual Names
+        BLACKLIST_NAME_WORDS = {
+            'hospital', 'clinic', 'statement', 'invoice', 'summary', 'report', 'receipt',
+            'system', 'department', 'manual', 'method', 'experiment', 'description',
+            'code', 'table', 'doctor', 'physician', 'patient', 'name', 'health', 'care',
+            'medical', 'billing', 'services', 'confidential', 'fictional', 'demo', 'card'
+        }
+        for match in self.regexes['name_prefixed'].finditer(text):
+            val = match.group(1).strip()
+            span = match.span(1)
+            if is_overlapping(span[0], span[1]):
+                continue
+            words_in_name = val.split()
+            if not words_in_name or len(words_in_name) > 4:
+                continue
+            if all(w.lower().rstrip('.,') in BLACKLIST_NAME_WORDS for w in words_in_name):
+                continue
+            matched_prefix = text[match.start():match.start(1)].lower()
+            if 'patient' in matched_prefix:
+                label = 'Patient Name'
+            elif 'physician' in matched_prefix or 'doctor' in matched_prefix:
+                label = 'Attending Physician Name'
+            elif 'resident' in matched_prefix:
+                label = 'Resident Name'
+            elif 'cardholder' in matched_prefix:
+                label = 'Cardholder Name'
+            else:
+                label = 'Person Name'
+
+            seen_spans.add(span)
+            if len(words_in_name) >= 2:
+                masked_name = f"{words_in_name[0][0]}*** {words_in_name[-1][0]}***"
+            else:
+                masked_name = f"{val[0]}***"
+            results.append({
+                'type': 'name',
+                'label': label,
+                'value': val,
+                'masked': masked_name,
+                'category': 'Personal Identity',
+                'risk': 'HIGH',
+                'char_span': span,
+                'details': f'Individual identifying name ({label})',
+                'confidence': 'high',
+                'review_required': False
+            })
+
+        # 2.8 Identification Numbers (Invoice #, MRN, Patient ID, Account #)
+        for match in self.regexes['id_candidate'].finditer(text):
+            val = match.group(1).strip()
+            span = match.span(1)
+            if is_overlapping(span[0], span[1]):
+                continue
+            clean_id = re.sub(r'[\s\-_.#]', '', val)
+            if len(clean_id) < 4:
+                continue
+            matched_prefix = text[match.start():match.start(1)].lower()
+            if 'invoice' in matched_prefix:
+                label = 'Invoice Number'
+            elif 'mrn' in matched_prefix or 'medical' in matched_prefix:
+                label = 'Medical Record Number (MRN)'
+            elif 'patient' in matched_prefix:
+                label = 'Patient Identifier'
+            elif 'account' in matched_prefix:
+                label = 'Account Number'
+            elif 'policy' in matched_prefix:
+                label = 'Policy Number'
+            else:
+                label = 'Identification Number'
+
+            seen_spans.add(span)
+            masked_id = (val[:2] + '****' + val[-2:]) if len(val) > 4 else '****'
+            results.append({
+                'type': 'identifier_candidate',
+                'label': label,
+                'value': val,
+                'masked': masked_id,
+                'category': 'Identity Document',
+                'risk': 'MEDIUM',
+                'char_span': span,
+                'details': f'Official record identifier ({label})',
+                'confidence': 'high',
+                'review_required': False
+            })
+
         # 3.5 UPI Virtual Payment Address (VPA)
         for match in self.regexes['upi_vpa'].finditer(text):
             val = match.group()
@@ -442,25 +636,31 @@ class SensitiveDetector:
                 continue
 
             user, domain = val.split('@', 1)
+            # Normalize common OCR dot/dash artifacts in domain (•, ·, –, —, ~)
+            norm_domain = re.sub(r'[\u2022\u00b7]', '.', domain)
+            norm_domain = re.sub(r'[\u2013\u2014~_]', '-', norm_domain)
+            norm_user = re.sub(r'[\u2022\u00b7]', '.', user)
+            norm_user = re.sub(r'[\u2013\u2014~_]', '-', norm_user)
+
             # Validate user and domain syntax
-            if not user or not domain or '..' in val or user.startswith('.') or user.endswith('.'):
+            if not norm_user or not norm_domain or '..' in norm_domain or norm_user.startswith('.') or norm_user.endswith('.'):
                 continue
-            if '.' not in domain or domain.startswith('.') or domain.endswith('.'):
+            if '.' not in norm_domain or norm_domain.startswith('.') or norm_domain.endswith('.'):
                 continue
-            tld = domain.split('.')[-1]
+            tld = norm_domain.split('.')[-1]
             if len(tld) < 2 or not tld.isalpha():
                 continue
             # Exclude code constructs such as ${#str} or shell variable expansions
-            if user.startswith(('#', '$', '{', '<', '!', '"', '\'')):
+            if norm_user.startswith(('#', '$', '{', '<', '!', '"', '\'')):
                 continue
 
             seen_spans.add(span)
-            masked_user = (user[0] + '***' + user[-1]) if len(user) > 2 else user[0] + '***'
+            masked_user = (norm_user[0] + '***' + norm_user[-1]) if len(norm_user) > 2 else norm_user[0] + '***'
             results.append({
                 'type': 'email',
                 'label': 'Email Address',
                 'value': val,
-                'masked': f"{masked_user}@{domain}",
+                'masked': f"{masked_user}@{norm_domain}",
                 'category': 'Contact Information',
                 'risk': 'LOW',
                 'char_span': span,
@@ -470,26 +670,55 @@ class SensitiveDetector:
             })
 
         # 5. US Social Security Number (SSN)
-        for match in self.regexes['ssn'].finditer(text):
-            val = match.group()
-            span = (match.start(), match.end())
-            if is_overlapping(span[0], span[1]):
-                continue
-            seen_spans.add(span)
-            results.append({
-                'type': 'ssn',
-                'label': 'US Social Security Number',
-                'value': val,
-                'masked': f"***-**-{val[-4:]}",
-                'category': 'Identity Document',
-                'risk': 'CRITICAL',
-                'char_span': span,
-                'details': '9-digit US Social Security Number',
-                'confidence': 'high',
-                'review_required': False
-            })
+        for pat in (self.regexes['ssn'], self.regexes['ssn_context']):
+            for match in pat.finditer(text):
+                val = match.group(1) if pat == self.regexes['ssn_context'] else match.group()
+                span = match.span(1) if pat == self.regexes['ssn_context'] else (match.start(), match.end())
+                if is_overlapping(span[0], span[1]):
+                    continue
+                clean_ssn = re.sub(r'\D', '', val)
+                if len(clean_ssn) != 9:
+                    continue
+                seen_spans.add(span)
+                results.append({
+                    'type': 'ssn',
+                    'label': 'US Social Security Number',
+                    'value': val,
+                    'masked': f"***-**-{clean_ssn[-4:]}",
+                    'category': 'Identity Document',
+                    'risk': 'CRITICAL',
+                    'char_span': span,
+                    'details': '9-digit US Social Security Number',
+                    'confidence': 'high',
+                    'review_required': False
+                })
 
         # 6. Phone Numbers (Indian & International) - Context-aware, filters out dates, prices, units
+        # 6.0 Context-prefixed phone number with OCR noise tolerance (e.g. Phone: +1 (555) 234.567B)
+        for pm in re.finditer(
+            r'(?i)\b(?:phone|tel|mobile|cell|contact|fax|voice)\s*[:\-]?\s*(\+?(?:1\s*[-.]?)?\(?[2-9]\d{2}\)?[-.\s]?[0-9OBIl]{3}[-.\s]?[0-9OBIl]{4})\b',
+            text
+        ):
+            pval = pm.group(1).strip()
+            pspan = pm.span(1)
+            if is_overlapping(pspan[0], pspan[1]):
+                continue
+            norm_num = pval.replace('O', '0').replace('B', '8').replace('l', '1').replace('I', '1')
+            pclean = re.sub(r'\D', '', norm_num)
+            if len(pclean) in (10, 11):
+                seen_spans.add(pspan)
+                results.append({
+                    'type': 'phone',
+                    'label': 'Phone Number (Intl)',
+                    'value': pval,
+                    'masked': f"***-***-{pclean[-4:]}",
+                    'category': 'Contact Information',
+                    'risk': 'MEDIUM',
+                    'char_span': pspan,
+                    'details': 'Telephone contact line (context-confirmed)',
+                    'confidence': 'high',
+                    'review_required': False
+                })
         for match in self.regexes['indian_phone'].finditer(text):
             val = match.group()
             clean_digits = re.sub(r'\D', '', val)

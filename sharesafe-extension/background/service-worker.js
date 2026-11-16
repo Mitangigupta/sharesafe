@@ -517,7 +517,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             excluded_detection_ids: message.excludedDetectionIds || [],
-            custom_styles: message.customStyles || {}
+            custom_styles: message.customStyles || {},
+            manual_redactions: message.manualRedactions || []
           })
         });
 
