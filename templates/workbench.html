@@ -1230,7 +1230,7 @@ document.addEventListener("DOMContentLoaded", function() {
         label.textContent = "Undo";
         undoBtn.appendChild(icon);
         undoBtn.appendChild(label);
-        // Wire to canvas_editor.js function (loaded after this inline script via {% block scripts %})
+        // Wire to canvas_editor.js function (loaded after this inline script, in the scripts section)
         undoBtn.onclick = function() {
             if (typeof window.undoLastManualRedaction === "function") {
                 window.undoLastManualRedaction();
