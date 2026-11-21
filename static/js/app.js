@@ -152,144 +152,138 @@ function submitSelectedFile() {
     executeUploadWithFile(currentStagedFile);
 }
 
-function executeUploadWithFile(file) {
-    const idleBox = document.getElementById('dropzoneIdle');
-    const selectedBox = document.getElementById('dropzoneSelected');
-    const scanBox = document.getElementById('dropzoneScanning');
-    const errorBox = document.getElementById('dropzoneError');
+function _startScanProgressSSE(sessionId) {
+    var steps = {
+        validate: { label: "Validating document structure...",    pct: 10 },
+        pages:    { label: "Extracting page content...",          pct: 25 },
+        ocr:      { label: "Running OCR text recognition...",     pct: 45 },
+        risk:     { label: "Assessing risk & compliance...",      pct: 75 },
+        ai:       { label: "Generating AI recommendations...",    pct: 90 },
+        done:     { label: "Scan complete. Opening workspace...", pct: 100 },
+        heartbeat:{ label: "Deep scanning in progress...",        pct: 55 }
+    };
+    var title = document.getElementById("scanStatusTitle");
+    var sub   = document.getElementById("scanStatusSubtitle");
+    var bar   = document.querySelector(".scanner-progress-bar");
+    if (bar)   bar.classList.add("sse-active");
 
-    if (idleBox) idleBox.style.display = 'none';
-    if (selectedBox) selectedBox.style.display = 'none';
-    if (errorBox) errorBox.style.display = 'none';
-    if (scanBox) scanBox.style.display = 'flex';
-
-    // Status progression messaging
-    const title = document.getElementById('scanStatusTitle');
-    const sub = document.getElementById('scanStatusSubtitle');
-    if (title) title.innerText = 'Performing Deep Privacy Scan...';
-    if (sub) sub.innerText = 'Decompiling vector streams, applying OCR, and checking Verhoeff/Luhn checksums...';
-
-    const formData = new FormData();
-    formData.append('file', file);
-    const ctxInput = document.getElementById('sharingContextInput');
-    if (ctxInput && ctxInput.value) {
-        formData.append('sharing_context', ctxInput.value);
-    }
-
-    fetch('/upload', {
-        method: 'POST',
-        body: formData
-    })
-    .then(async res => {
-        let data = null;
+    var es = new EventSource("/api/scan-progress/" + sessionId);
+    es.onmessage = function(e) {
         try {
-            data = await res.json();
-        } catch (e) {
-            data = null;
-        }
-        if (!res.ok) {
-            const errorMsg = (data && data.error) ? data.error : `Server communication error (${res.status} ${res.statusText})`;
-            showUploadError('Analysis Failed', errorMsg);
-            return;
-        }
-        if (data && data.success && data.redirect_url) {
-            if (sub) sub.innerText = 'Verification complete. Transferring to Privacy Studio...';
-            window.location.href = data.redirect_url;
-        } else {
-            showUploadError('Analysis Failed', (data && data.error) || 'Failed to inspect document.');
-        }
-    })
-    .catch(err => {
-        showUploadError('Network Communication Error', err.message);
-    });
+            var ev = JSON.parse(e.data);
+            var info = steps[ev.step] || { label: ev.label || "Processing...", pct: ev.pct || 50 };
+            if (sub)   sub.innerText   = info.label;
+            if (bar)   bar.style.width = info.pct + "%";
+            if (title) title.innerText = ev.pct >= 100 ? "Scan Complete \u2014 Transferring..." : "Deep Privacy Scan Running...";
+        } catch(err) {}
+    };
+    es.onerror = function() { es.close(); };
+    return es;
 }
 
-// Sharing Context Selector
-function setSharingContext(ctx) {
-    const input = document.getElementById('sharingContextInput');
-    if (input) input.value = ctx;
+function executeUploadWithFile(file) {
+    var idleBox     = document.getElementById("dropzoneIdle");
+    var selectedBox = document.getElementById("dropzoneSelected");
+    var scanBox     = document.getElementById("dropzoneScanning");
+    var errorBox    = document.getElementById("dropzoneError");
 
-    const buttons = document.querySelectorAll('.segment-btn[data-context], .profile-chip[data-context]');
-    buttons.forEach(btn => {
-        const isTarget = btn.getAttribute('data-context') === ctx;
-        if (isTarget) {
-            btn.classList.add('active');
-            btn.setAttribute('aria-selected', 'true');
-        } else {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-selected', 'false');
-        }
-    });
+    if (idleBox)     idleBox.style.display     = "none";
+    if (selectedBox) selectedBox.style.display = "none";
+    if (errorBox)    errorBox.style.display    = "none";
+    if (scanBox)     scanBox.style.display     = "flex";
 
-    const desc = document.getElementById('contextDescText');
-    if (desc) {
-        switch (ctx) {
-            case 'academic':
-                desc.innerText = 'Tuned for student assignments, coursework, and research papers with standard PII shielding.';
-                break;
-            case 'professional':
-                desc.innerText = 'Strict enterprise guardrails for API keys, secret tokens, credentials, and financial invoices.';
-                break;
-            case 'private':
-                desc.innerText = 'Direct peer sharing: personal phone numbers, addresses, and identity numbers shielded.';
-                break;
-            case 'public':
-                desc.innerText = 'Maximum defensive redaction for broad social sharing, public slide decks, and external forums.';
-                break;
+    var title = document.getElementById("scanStatusTitle");
+    var sub   = document.getElementById("scanStatusSubtitle");
+    var bar   = document.querySelector(".scanner-progress-bar");
+    if (title) title.innerText = "Uploading document...";
+    if (sub)   sub.innerText   = "Preparing for deep privacy scan...";
+    if (bar)   { bar.style.transition = "width 0.5s ease"; bar.style.width = "5%"; }
+
+    var formData = new FormData();
+    formData.append("file", file);
+    var ctxInput = document.getElementById("sharingContextInput");
+    if (ctxInput && ctxInput.value) formData.append("sharing_context", ctxInput.value);
+
+    // Start SSE listener before the POST so we catch all events
+    var tempId = "pending";
+    var esHolder = { es: null };
+
+    fetch("/upload", { method: "POST", body: formData })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(r) {
+        if (!r.ok || !r.data || !r.data.success) {
+            showUploadError("Analysis Failed", (r.data && r.data.error) || "Failed to process document.");
+            return;
         }
-    }
+        // Wire SSE now we have the real session_id
+        if (esHolder.es) esHolder.es.close();
+        esHolder.es = _startScanProgressSSE(r.data.session_id);
+        // Also redirect on done
+        var redirectUrl = r.data.redirect_url;
+        var origOnMsg = esHolder.es.onmessage;
+        esHolder.es.onmessage = function(e) {
+            origOnMsg && origOnMsg(e);
+            try {
+                var ev = JSON.parse(e.data);
+                if (ev.pct >= 100) {
+                    esHolder.es.close();
+                    setTimeout(function() { window.location.href = redirectUrl; }, 400);
+                }
+            } catch(err) {}
+        };
+    })
+    .catch(function(err) { showUploadError("Network Error", err.message); });
 }
 
 // Demo Vault Sample Loader
 function loadSample(sampleId) {
-    const idleBox = document.getElementById('dropzoneIdle');
-    const selectedBox = document.getElementById('dropzoneSelected');
-    const scanBox = document.getElementById('dropzoneScanning');
-    const errorBox = document.getElementById('dropzoneError');
+    var idleBox     = document.getElementById("dropzoneIdle");
+    var selectedBox = document.getElementById("dropzoneSelected");
+    var scanBox     = document.getElementById("dropzoneScanning");
+    var errorBox    = document.getElementById("dropzoneError");
 
-    if (idleBox) idleBox.style.display = 'none';
-    if (selectedBox) selectedBox.style.display = 'none';
-    if (errorBox) errorBox.style.display = 'none';
-    if (scanBox) {
-        scanBox.style.display = 'flex';
-        const title = document.getElementById('scanStatusTitle');
-        const sub = document.getElementById('scanStatusSubtitle');
-        if (title) title.innerText = 'Loading Synthetic Demonstration Sample...';
-        if (sub) sub.innerText = 'Simulating forensic extraction on verified synthetic dataset...';
-    }
+    if (idleBox)     idleBox.style.display     = "none";
+    if (selectedBox) selectedBox.style.display = "none";
+    if (errorBox)    errorBox.style.display    = "none";
+    if (scanBox)     scanBox.style.display     = "flex";
 
-    const formData = new FormData();
-    formData.append('sample_id', sampleId);
-    const ctxInput = document.getElementById('sharingContextInput');
-    if (ctxInput && ctxInput.value) {
-        formData.append('sharing_context', ctxInput.value);
-    }
+    var title = document.getElementById("scanStatusTitle");
+    var sub   = document.getElementById("scanStatusSubtitle");
+    var bar   = document.querySelector(".scanner-progress-bar");
+    if (title) title.innerText = "Loading Synthetic Demo Sample...";
+    if (sub)   sub.innerText   = "Preparing forensic extraction pipeline...";
+    if (bar)   { bar.style.transition = "width 0.5s ease"; bar.style.width = "5%"; }
 
-    fetch('/upload', {
-        method: 'POST',
-        body: formData
-    })
-    .then(async res => {
-        let data = null;
-        try {
-            data = await res.json();
-        } catch (e) {
-            data = null;
-        }
-        if (!res.ok) {
-            const errorMsg = (data && data.error) ? data.error : `Server communication error (${res.status} ${res.statusText})`;
-            showUploadError('Error Loading Sample', errorMsg);
+    var formData = new FormData();
+    formData.append("sample_id", sampleId);
+    var ctxInput = document.getElementById("sharingContextInput");
+    if (ctxInput && ctxInput.value) formData.append("sharing_context", ctxInput.value);
+
+    var esHolder = { es: null };
+
+    fetch("/upload", { method: "POST", body: formData })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(r) {
+        if (!r.ok || !r.data || !r.data.success) {
+            showUploadError("Error Loading Sample", (r.data && r.data.error) || "Failed to load demo.");
             return;
         }
-        if (data && data.success && data.redirect_url) {
-            window.location.href = data.redirect_url;
-        } else {
-            showUploadError('Error Loading Sample', (data && data.error) || 'Failed to load demo document.');
-        }
+        if (esHolder.es) esHolder.es.close();
+        esHolder.es = _startScanProgressSSE(r.data.session_id);
+        var redirectUrl = r.data.redirect_url;
+        var origOnMsg = esHolder.es.onmessage;
+        esHolder.es.onmessage = function(e) {
+            origOnMsg && origOnMsg(e);
+            try {
+                var ev = JSON.parse(e.data);
+                if (ev.pct >= 100) {
+                    esHolder.es.close();
+                    setTimeout(function() { window.location.href = redirectUrl; }, 400);
+                }
+            } catch(err) {}
+        };
     })
-    .catch(err => {
-        showUploadError('Network Error', err.message);
-    });
+    .catch(function(err) { showUploadError("Network Error", err.message); });
 }
 
 // Engine Settings Modal Logic

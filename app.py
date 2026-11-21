@@ -2,8 +2,11 @@ import os
 import uuid
 import json
 import shutil
+import threading
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash
+import queue
+
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, Response, stream_with_context
 
 from config import Config
 from core.scanner import DocumentScanner
@@ -17,6 +20,22 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 scanner = DocumentScanner()
+
+# ── SSE Scan Progress Store ──────────────────────────────────────────────────
+# Maps session_id -> queue.Queue of progress event dicts
+_scan_progress_queues = {}
+_scan_progress_lock = threading.Lock()
+
+def _emit_progress(session_id, step, label, pct):
+    """Push a progress event onto the session queue (non-blocking)."""
+    with _scan_progress_lock:
+        q = _scan_progress_queues.get(session_id)
+    if q:
+        try:
+            q.put_nowait({"step": step, "label": label, "pct": pct})
+        except Exception:
+            pass
+
 
 def validate_file_content(file_path: str, ext: str):
     """Validates magic bytes / signatures to guarantee file integrity and bounds."""
@@ -296,41 +315,59 @@ def upload_file():
     if sharing_context not in ['academic', 'professional', 'private', 'public']:
         sharing_context = 'academic'
 
-    # Execute Document Scan
+    # Register progress queue for this session
+    q = queue.Queue()
+    with _scan_progress_lock:
+        _scan_progress_queues[session_id] = q
+
+    # Execute Document Scan with progress milestones
     try:
+        _emit_progress(session_id, "validate", "Validating document structure...", 10)
+        import time; time.sleep(0.05)
+
+        _emit_progress(session_id, "pages", "Extracting page content...", 25)
+        import time; time.sleep(0.05)
+
+        _emit_progress(session_id, "ocr", "Running OCR text recognition...", 45)
         scan_result = scanner.scan_file(
-            target_path, 
-            upload_dir, 
-            sharing_context=sharing_context, 
+            target_path,
+            upload_dir,
+            sharing_context=sharing_context,
             original_filename=display_name,
             sample_id=sample_id
         )
+
+        _emit_progress(session_id, "risk", "Assessing risk & compliance...", 75)
         meta_result = MetadataCleaner.inspect_file(target_path)
+
+        _emit_progress(session_id, "ai", "Generating AI recommendations...", 90)
 
         # Save session metadata json
         session_info = {
-            'session_id': session_id,
-            'file_name': scan_result['file_name'],
-            'sample_id': sample_id,
-            'is_pdf': scan_result['is_pdf'],
-            'page_count': scan_result.get('page_count', len(scan_result.get('pages', []))),
-            'sharing_context': sharing_context,
-            'original_path': target_path,
-            'pages': scan_result['pages'],
-            'detections': scan_result['detections'],
-            'risk_summary': scan_result['risk_summary'],
-            'metadata': meta_result,
-            'assistant': scan_result.get('assistant', {}),
-            'warnings': scan_result.get('warnings', [])
+            "session_id": session_id,
+            "file_name": scan_result["file_name"],
+            "sample_id": sample_id,
+            "is_pdf": scan_result["is_pdf"],
+            "page_count": scan_result.get("page_count", len(scan_result.get("pages", []))),
+            "sharing_context": sharing_context,
+            "original_path": target_path,
+            "pages": scan_result["pages"],
+            "detections": scan_result["detections"],
+            "risk_summary": scan_result["risk_summary"],
+            "metadata": meta_result,
+            "assistant": scan_result.get("assistant", {}),
+            "warnings": scan_result.get("warnings", [])
         }
 
-        with open(os.path.join(upload_dir, 'session_info.json'), 'w', encoding='utf-8') as f:
+        with open(os.path.join(upload_dir, "session_info.json"), "w", encoding="utf-8") as f:
             json.dump(session_info, f, indent=2)
 
+        _emit_progress(session_id, "done", "Scan complete. Opening Privacy Studio...", 100)
+
         return jsonify({
-            'success': True,
-            'session_id': session_id,
-            'redirect_url': url_for('workbench', session_id=session_id)
+            "success": True,
+            "session_id": session_id,
+            "redirect_url": url_for("workbench", session_id=session_id)
         })
 
     except (ValueError, pymupdf.FileDataError) as e:
@@ -341,6 +378,38 @@ def upload_file():
         import traceback
         traceback.print_exc()
         return jsonify({'error': f"Failed to process document: {str(e)}"}), 500
+
+
+@app.route("/api/scan-progress/<session_id>")
+def scan_progress_stream(session_id):
+    """SSE endpoint: streams scan progress events to the browser as they happen."""
+    with _scan_progress_lock:
+        q = _scan_progress_queues.get(session_id)
+    if not q:
+        # No active scan for this session - send a done event immediately
+        def empty_gen():
+            yield "data: {\"step\": \"done\", \"label\": \"Complete\", \"pct\": 100}\n\n"
+        return Response(stream_with_context(empty_gen()), mimetype="text/event-stream")
+
+    def generate():
+        try:
+            while True:
+                try:
+                    event = q.get(timeout=30)  # wait up to 30s per event
+                    import json as _json
+                    yield f"data: {_json.dumps(event)}\n\n"
+                    if event.get("pct", 0) >= 100:
+                        break
+                except queue.Empty:
+                    yield "data: {\"step\": \"heartbeat\", \"label\": \"Scanning...\", \"pct\": 50}\n\n"
+        finally:
+            with _scan_progress_lock:
+                _scan_progress_queues.pop(session_id, None)
+
+    response = Response(stream_with_context(generate()), mimetype="text/event-stream")
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["X-Accel-Buffering"] = "no"
+    return response
 
 @app.errorhandler(413)
 def request_entity_too_large(error):

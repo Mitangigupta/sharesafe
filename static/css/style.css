@@ -11742,3 +11742,13 @@ input:checked + .toggle-slider::before {
     border-color: var(--border-stone-strong);
 }
 
+
+/* -- R1: SSE Real-Time Progress Bar Override -------------------------------- */
+/* When SSE is active, switch from indeterminate animation to real width fill */
+.scanner-progress-bar.sse-active {
+    animation: none !important;
+    transform: none !important;
+    transition: width 0.5s ease !important;
+    width: 5%;
+}
+
