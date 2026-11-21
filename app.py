@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import datetime
 import shutil
 import threading
 from pathlib import Path
@@ -345,7 +346,7 @@ def upload_file():
         # Save session metadata json
         session_info = {
             "session_id": session_id,
-            "scan_date": __import__("datetime").datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+            "scan_date": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
             "file_name": scan_result["file_name"],
             "sample_id": sample_id,
             "is_pdf": scan_result["is_pdf"],
@@ -820,7 +821,6 @@ def share_certificate(session_id):
     detections = session_data.get('detections', [])
     scan_date = session_data.get('scan_date', None)
     if not scan_date:
-        import datetime
         scan_date = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')
     return render_template(
         'share_cert.html',
