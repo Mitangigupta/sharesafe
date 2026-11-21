@@ -11625,3 +11625,120 @@ input:checked + .toggle-slider::before {
     color: #fff !important;
 }
 
+
+/* -- R2: Confidence Score Bar ----------------------------------------------- */
+.rec-confidence-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0 2px;
+}
+.rec-conf-label {
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 70px;
+}
+.rec-conf-track {
+    flex: 1;
+    height: 5px;
+    background: var(--bg-stone-muted);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.rec-conf-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+.rec-conf-fill.conf-high   { background: var(--sage-primary); }
+.rec-conf-fill.conf-medium { background: var(--amber-primary); }
+.rec-conf-fill.conf-low    { background: var(--ink-muted); }
+.rec-conf-pct {
+    font-size: 0.72rem;
+    color: var(--ink-secondary);
+    font-weight: 700;
+    min-width: 32px;
+    text-align: right;
+}
+
+/* -- R3: Compliance Tag Chips ----------------------------------------------- */
+.rec-compliance-row {
+    margin: 4px 0 2px;
+}
+.compliance-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.69rem;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.chip-dpdp { background: #EEF2FF; color: #3730a3; border: 1px solid #c7d2fe; }
+.chip-gdpr { background: #F0FDF4; color: #166534; border: 1px solid #bbf7d0; }
+.chip-pci  { background: #FFF7ED; color: #9a3412; border: 1px solid #fed7aa; }
+.chip-iso  { background: #F8F4FF; color: #5b21b6; border: 1px solid #ddd6fe; }
+
+/* -- R10: Dark Mode Theme --------------------------------------------------- */
+[data-theme="dark"] {
+    --bg-canvas: #111210;
+    --bg-surface: #1A1C1A;
+    --bg-surface-elevated: #1F211F;
+    --bg-stone-subtle: #252725;
+    --bg-stone-muted: #2D302D;
+    --border-stone: #2E312E;
+    --border-stone-strong: #3A3D3A;
+    --border-stone-subtle: #282A28;
+    --ink-primary: #ECECE8;
+    --ink-secondary: #A8A89E;
+    --ink-muted: #6E6E66;
+    --ink-subtle: #42443F;
+    --ink-inverse: #111210;
+    --coral-soft: #2D1A18;
+    --coral-border: #5C2E2A;
+    --sage-soft: #172217;
+    --sage-border: #2A422E;
+    --amber-soft: #2A1E0E;
+    --amber-border: #4A3418;
+    --red-finding-soft: #2A1210;
+    --red-finding-border: #5C2220;
+}
+[data-theme="dark"] code {
+    background: #2A2D2A;
+    color: #C4E6C0;
+}
+[data-theme="dark"] .workbench-toolbar,
+[data-theme="dark"] .sidebar-tabs-nav,
+[data-theme="dark"] .workbench-sidebar {
+    background: var(--bg-surface);
+}
+[data-theme="dark"] .chip-dpdp { background: #1E1F3A; color: #a5b4fc; border-color: #3730a3; }
+[data-theme="dark"] .chip-gdpr { background: #0F2A1A; color: #86efac; border-color: #166534; }
+[data-theme="dark"] .chip-pci  { background: #2A1208; color: #fdba74; border-color: #9a3412; }
+[data-theme="dark"] .chip-iso  { background: #1E1230; color: #c4b5fd; border-color: #5b21b6; }
+
+/* Dark mode toggle button */
+.btn-theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-stone);
+    background: var(--bg-surface-elevated);
+    color: var(--ink-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-theme-toggle:hover {
+    background: var(--bg-stone-subtle);
+    color: var(--ink-primary);
+    border-color: var(--border-stone-strong);
+}
+

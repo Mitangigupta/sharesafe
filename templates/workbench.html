@@ -142,6 +142,13 @@
 
         <div class="toolbar-right">
 
+
+            <!-- R10: Dark Mode Toggle -->
+            <button type="button" class="btn-theme-toggle" id="themToggleBtn" onclick="toggleDarkMode()" title="Toggle dark / light mode">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+                <span id="themeLabel">Dark</span>
+            </button>
+
             <!-- Redaction Style Selector -->
 
             <div class="style-selector-container">
@@ -573,6 +580,22 @@
                                 </div>
                                 <!-- Short why-sensitive always visible -->
                                 <p class="rec-short-why">{{ rec.explanation | truncate(110, true, '…') }}</p>
+                                <!-- R2: Confidence score bar -->
+                                <div class="rec-confidence-bar-row">
+                                    <span class="rec-conf-label">Confidence</span>
+                                    <div class="rec-conf-track">
+                                        <div class="rec-conf-fill conf-{{ rec.confidence }}" style="width: {{ '85' if rec.confidence == 'high' else '55' if rec.confidence == 'medium' else '30' }}%"></div>
+                                    </div>
+                                    <span class="rec-conf-pct">{{ '85%' if rec.confidence == 'high' else '55%' if rec.confidence == 'medium' else '30%' }}</span>
+                                </div>
+                                <!-- R3: Compliance regulation tag -->
+                                {% set _cmap = {'Aadhaar Number':'DPDP §3|chip-dpdp','PAN Card':'DPDP §3|chip-dpdp','Voter ID':'DPDP §3|chip-dpdp','Driving Licence':'DPDP §3|chip-dpdp','Credit Card':'PCI-DSS R3|chip-pci','Debit Card':'PCI-DSS R3|chip-pci','Email Address':'GDPR Art.4|chip-gdpr','Phone Number':'GDPR Art.4|chip-gdpr','Date of Birth':'GDPR Art.9|chip-gdpr','SSN':'GDPR Art.9|chip-gdpr','IBAN':'PSD2 Art.4|chip-gdpr','IPv4 Address':'ISO 27001|chip-iso','AWS Access Key':'ISO 27001 A.9|chip-iso','JWT Token':'ISO 27001 A.9|chip-iso'} %}
+                                {% if rec.label in _cmap %}
+                                {% set _cv = _cmap[rec.label].split('|') %}
+                                <div class="rec-compliance-row">
+                                    <span class="compliance-chip {{ _cv[1] }}"><i class="fa-solid fa-scale-balanced"></i> {{ _cv[0] }}</span>
+                                </div>
+                                {% endif %}
                                 <!-- Always-visible actions + details toggle -->
                                 <div class="rec-footer">
                                     <button type="button" class="rec-toggle-details" onclick="toggleRecDetails(this)" aria-expanded="false"><i class="fa-solid fa-chevron-right rec-toggle-icon"></i> <span class="rec-toggle-label">Details</span></button>
@@ -1102,6 +1125,34 @@ document.addEventListener("DOMContentLoaded", function() {
     var jsonBtn = document.getElementById("downloadJsonBtn");
     if (jsonBtn) jsonBtn.addEventListener("click", function(){ setTimeout(function(){ showToast("JSON audit data downloaded"); }, 600); });
 });
+
+
+// ── R10: Dark Mode Toggle ───────────────────────────────────────────────────
+function toggleDarkMode() {
+    var root = document.documentElement;
+    var isDark = root.getAttribute("data-theme") === "dark";
+    root.setAttribute("data-theme", isDark ? "light" : "dark");
+    var icon = document.getElementById("themeIcon");
+    var label = document.getElementById("themeLabel");
+    if (icon)  icon.className  = isDark ? "fa-solid fa-moon"  : "fa-solid fa-sun";
+    if (label) label.textContent = isDark ? "Dark" : "Light";
+    try { localStorage.setItem("ss-theme", isDark ? "light" : "dark"); } catch(e) {}
+}
+// Restore saved theme on load
+(function() {
+    try {
+        var saved = localStorage.getItem("ss-theme");
+        if (saved === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+            document.addEventListener("DOMContentLoaded", function() {
+                var icon  = document.getElementById("themeIcon");
+                var label = document.getElementById("themeLabel");
+                if (icon)  icon.className   = "fa-solid fa-sun";
+                if (label) label.textContent = "Light";
+            });
+        }
+    } catch(e) {}
+})();
 
 </script>
 

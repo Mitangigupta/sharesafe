@@ -127,6 +127,32 @@ class DocumentScanner:
             except Exception as e:
                 pass
 
+            # 1b. R4: Face Detection on each PDF page
+            try:
+                if img_np is not None:
+                    gray_pdf = cv2.cvtColor(img_np, cv2.COLOR_BGR2GRAY)
+                    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+                    pdf_faces = face_cascade.detectMultiScale(gray_pdf, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+                    for (fx, fy, fw, fh) in pdf_faces:
+                        # Scale face coords back to PDF points from 150 DPI render
+                        scale = 72.0 / 150.0
+                        page_detections.append({
+                            "id": f"det_{uuid.uuid4().hex[:8]}",
+                            "type": "face",
+                            "label": "Human Face",
+                            "value": "[face detected]",
+                            "masked": "[face region]",
+                            "category": "Biometric / Visual PII",
+                            "risk": "HIGH",
+                            "page": page_num,
+                            "bbox": [float(fx)*scale, float(fy)*scale, float(fw)*scale, float(fh)*scale],
+                            "details": "Human face detected via OpenCV Haar cascade. Faces are biometric identifiers under DPDP Act 2023 \u00a73 and GDPR Art.9.",
+                            "confidence": "medium",
+                            "review_required": True
+                        })
+            except Exception:
+                pass  # Face detection is best-effort
+
             # 2. Text Extraction: Native PDF words with exact coordinates
             words = page.get_text("words")  # (x0, y0, x1, y1, word, block_no, line_no, word_no)
             
@@ -213,6 +239,29 @@ class DocumentScanner:
             qr['id'] = f"det_{uuid.uuid4().hex[:8]}"
             qr['page'] = 1
             detections.append(qr)
+
+        # 1b. R4: Face / Photo Detection using OpenCV Haar Cascades (bundled with OpenCV)
+        try:
+            gray = cv2.cvtColor(img_np, cv2.COLOR_BGR2GRAY)
+            face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+            for (fx, fy, fw, fh) in faces:
+                detections.append({
+                    "id": f"det_{uuid.uuid4().hex[:8]}",
+                    "type": "face",
+                    "label": "Human Face",
+                    "value": "[face detected]",
+                    "masked": "[face region]",
+                    "category": "Biometric / Visual PII",
+                    "risk": "HIGH",
+                    "page": 1,
+                    "bbox": [float(fx), float(fy), float(fw), float(fh)],
+                    "details": "Human face detected via OpenCV Haar cascade. Faces are biometric identifiers under DPDP Act 2023 \u00a73 and GDPR Art.9.",
+                    "confidence": "medium",
+                    "review_required": True
+                })
+        except Exception:
+            pass  # Face detection is best-effort; never block the scan
 
         # 2. OCR Text & Sensitive Entity Detection
         if ocr_engine.is_available():

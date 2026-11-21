@@ -426,6 +426,16 @@ class PrivacyAssistant:
                 risk_description = "Payload inspection revealed no known credential or high-risk PII patterns."
                 recommendation = "Review if the embedded text is appropriate for document recipients. Can safely remain in most sharing scenarios."
 
+        # 9b. R4: Human Face (Biometric Visual PII)
+        elif d_type == "face":
+            priority = "HIGH_PRIORITY"
+            action = "REDACT"
+            action_label = "Blur Face"
+            suggested_style = "blur"
+            explanation = "A human face was detected in the document image, constituting biometric visual PII."
+            risk_description = "Under DPDP Act 2023 \u00a73 and GDPR Art.9, photographs of identifiable individuals are sensitive personal data. Sharing unredacted faces may violate the subject\u0027s right to privacy."
+            recommendation = "Apply blur or blackout redaction over the detected face region before distributing this document externally."
+
         # 10. Fallback for other entities
         else:
             priority = 'REVIEW' if d_risk in ('HIGH', 'CRITICAL') else 'INFORMATIONAL'
