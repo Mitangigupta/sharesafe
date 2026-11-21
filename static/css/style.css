@@ -11752,3 +11752,24 @@ input:checked + .toggle-slider::before {
     width: 5%;
 }
 
+
+/* -- R6: Animated Risk Dial transition ---------------------------------------*/
+.risk-score-radial {
+    transition: background 0.1s;
+}
+
+/* -- R9: Undo button (injected by JS) ----------------------------------------*/
+#undoBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    padding: 7px 13px;
+}
+#undoBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* -- Fix #12: Favicon is inline SVG via base.html <link> — no extra CSS needed */
+
