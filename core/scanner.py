@@ -454,10 +454,51 @@ class DocumentScanner:
                     match_copy['bbox'] = bbox
                     detections.append(match_copy)
 
-        # 3. Sliding-window sequence scanning across reading order
+        # 2.1 Multi-line pair scanning (detects entities wrapping across adjacent lines)
+        for line_idx in range(len(lines) - 1):
+            pair_words = lines[line_idx] + lines[line_idx + 1]
+            pair_text = " ".join([w['text'] for w in pair_words])
+            pair_matches = self.detector.scan_text(pair_text)
+
+            for match in pair_matches:
+                char_start, char_end = match['char_span']
+                current_char = 0
+                relevant_words = []
+
+                for w in pair_words:
+                    word_len = len(w['text'])
+                    word_start = current_char
+                    word_end = current_char + word_len
+
+                    if not (word_end <= char_start or word_start >= char_end):
+                        relevant_words.append(w)
+
+                    current_char += word_len + 1
+
+                if relevant_words:
+                    x0 = min(w['bbox'][0] for w in relevant_words)
+                    y0 = min(w['bbox'][1] for w in relevant_words)
+                    x1 = max(w['bbox'][0] + w['bbox'][2] for w in relevant_words)
+                    y1 = max(w['bbox'][1] + w['bbox'][3] for w in relevant_words)
+
+                    padding = 3.0
+                    bbox = [
+                        round(max(0, x0 - padding), 1),
+                        round(max(0, y0 - padding), 1),
+                        round((x1 - x0) + (padding * 2), 1),
+                        round((y1 - y0) + (padding * 2), 1)
+                    ]
+
+                    match_copy = dict(match)
+                    match_copy['id'] = f"det_{uuid.uuid4().hex[:8]}"
+                    match_copy['page'] = page_num
+                    match_copy['bbox'] = bbox
+                    detections.append(match_copy)
+
+        # 3. Sliding-window sequence scanning across reading order (k=2 to 15 words)
         reading_order_words = [w for line in lines for w in line]
         n_words = len(reading_order_words)
-        for k in (2, 3, 4, 5, 6, 7, 8, 9, 10):
+        for k in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15):
             for i in range(n_words - k + 1):
                 chunk = reading_order_words[i : i + k]
                 chunk_text = " ".join([w['text'] for w in chunk])
@@ -507,7 +548,9 @@ class DocumentScanner:
             b = d.get('bbox')
             area = (b[2] * b[3]) if (b and len(b) >= 4) else 1e9
             conf_score = 2 if d.get('confidence') == 'high' else (1 if d.get('confidence') == 'medium' else 0)
+            is_generic = 1 if d.get('type') == 'identifier_candidate' else 0
             return (
+                is_generic,
                 -severity_rank.get(d.get('risk', 'LOW'), 0),
                 -conf_score,
                 -len(d.get('value', '')),

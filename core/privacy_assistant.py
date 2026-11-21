@@ -110,8 +110,8 @@ class PrivacyAssistant:
         risk_description = ''
         recommendation = ''
 
-        # 1. Government Identifiers (Aadhaar, SSN, Passport, PAN, DL, Voter ID)
-        if d_type in ('aadhaar', 'ssn', 'passport', 'pan', 'driving_licence', 'voter_id'):
+        # 1. Government Identifiers (Aadhaar, SSN, Passport, PAN, DL, Voter ID, NINO, SIN)
+        if d_type in ('aadhaar', 'ssn', 'passport', 'pan', 'driving_licence', 'voter_id', 'nino', 'sin'):
             if review_required or confidence == 'low':
                 priority = 'REVIEW'
                 action = 'REVIEW'
@@ -249,6 +249,156 @@ class PrivacyAssistant:
             risk_description = "Used alongside payment card numbers to authorize financial transactions."
             recommendation = "Always redact payment expiration dates alongside payment card numbers."
 
+        # 8.4 Bank Account Numbers
+        elif d_type == 'bank_account':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Bank Account'
+            suggested_style = 'blackout'
+            explanation = "Direct financial institution banking account number."
+            risk_description = "Exposes personal or corporate banking details, inviting fraud or unauthorized debits."
+            recommendation = "Redact bank account numbers before sharing documents externally."
+
+        # 8.5 International Bank Account Numbers (IBAN)
+        elif d_type == 'iban':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact IBAN'
+            suggested_style = 'blackout'
+            explanation = "International Bank Account Number (IBAN) with verified country routing."
+            risk_description = "Global financial identifier linking directly to an active bank account."
+            recommendation = "Always redact international bank account numbers to prevent payment diversion or fraud."
+
+        # 8.6 Bank Clearing / Routing Identifiers (ABA / IFSC)
+        elif d_type in ('bank_routing', 'bank_ifsc'):
+            priority = 'HIGH_PRIORITY' if context in ('public', 'professional') else 'REVIEW'
+            action = 'REDACT'
+            action_label = 'Redact Routing Code'
+            suggested_style = 'blackout'
+            explanation = f"Financial institution routing code ({d_label})."
+            risk_description = "Identifies specific banking institutions, clearing houses, and branch locations."
+            recommendation = "Redact routing transit numbers when accompanied by account numbers."
+
+        # 8.7 Card Security Code (CVV / CVC)
+        elif d_type == 'cvv_code':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact CVV'
+            suggested_style = 'blackout'
+            explanation = "Card Verification Value (CVV/CVC) payment authentication secret."
+            risk_description = "Critical financial secret enabling card-not-present unauthorized transactions."
+            recommendation = "Must be permanently redacted before any document sharing."
+
+        # 8.8 SWIFT / BIC Code
+        elif d_type == 'swift_bic':
+            priority = 'REVIEW'
+            action = 'REVIEW'
+            action_label = 'Review SWIFT Code'
+            suggested_style = 'blackout'
+            explanation = "SWIFT Business Identifier Code for international interbank transfers."
+            risk_description = "Identifies corporate or institutional banking partners."
+            recommendation = "Review if institutional banking relationships should remain private."
+
+        # 8.9 Tax Identification / Payment Transaction Ref
+        elif d_type in ('tax_ein', 'payment_txn'):
+            priority = 'REVIEW'
+            action = 'REVIEW'
+            action_label = 'Review Financial Ref'
+            suggested_style = 'blackout'
+            explanation = f"Financial reference identifier ({d_label})."
+            risk_description = "May disclose tax registration or specific payment audit trails."
+            recommendation = "Review whether this financial transaction or tax identifier should be redacted."
+
+        # 8.10 Employee Identifiers
+        elif d_type == 'employee_id':
+            priority = 'HIGH_PRIORITY' if context in ('public', 'professional') else 'REVIEW'
+            action = 'REDACT' if context == 'public' else 'REVIEW'
+            action_label = 'Redact Employee ID' if context == 'public' else 'Review Employee ID'
+            suggested_style = 'blackout'
+            explanation = "Corporate employee badge or staff identification code."
+            risk_description = "Can be leveraged for social engineering, spear-phishing, or employee impersonation."
+            recommendation = "Redact internal employee IDs before distributing files to external or public recipients."
+
+        # 8.11 Confidential Business Information & Markings
+        elif d_type == 'confidential_marking':
+            priority = 'HIGH_PRIORITY'
+            action = 'REVIEW'
+            action_label = 'Review Confidential Banner'
+            suggested_style = 'blackout'
+            explanation = f"Protective marking or confidentiality banner ({d_label})."
+            risk_description = "Explicitly indicates that the document contains non-public proprietary or restricted content."
+            recommendation = "Verify if this confidential document is authorized for disclosure before sharing."
+
+        # 8.12 Internal Reference Numbers
+        elif d_type == 'internal_reference':
+            priority = 'REVIEW'
+            action = 'REVIEW'
+            action_label = 'Review Reference #'
+            suggested_style = 'blackout'
+            explanation = f"Internal organizational reference code ({d_label})."
+            risk_description = "May expose internal project designations, purchase orders, or contract codes."
+            recommendation = "Review whether this reference number is sensitive or safe to leave unredacted."
+
+        # 8.13 Patient Identifiers
+        elif d_type == 'patient_id':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Patient ID'
+            suggested_style = 'blackout'
+            explanation = "Direct patient identification code."
+            risk_description = "Exposes Protected Health Information (PHI) subject to healthcare confidentiality and HIPAA privacy rules."
+            recommendation = "Always redact patient identifiers before document transmission or sharing."
+
+        # 8.14 Medical Record Numbers (MRN)
+        elif d_type == 'mrn':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Medical Record #'
+            suggested_style = 'blackout'
+            explanation = "Medical Record Number (MRN) or clinical chart number."
+            risk_description = "Directly indexes patient medical history and confidential diagnostic records."
+            recommendation = "Permanently redact medical record numbers to prevent unauthorized access to clinical history."
+
+        # 8.15 Health Insurance Identifiers
+        elif d_type == 'health_insurance':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Health Insurance'
+            suggested_style = 'blackout'
+            explanation = "Healthcare insurance member ID, group policy, or Medicaid/Medicare number."
+            risk_description = "Can lead to medical identity fraud, fraudulent claims, or privacy violation."
+            recommendation = "Redact health insurance member and policy numbers before document distribution."
+
+        # 8.16 Prescription Rx Numbers
+        elif d_type == 'prescription_rx':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Prescription Rx'
+            suggested_style = 'blackout'
+            explanation = "Pharmacy prescription order (Rx) number."
+            risk_description = "Discloses confidential prescription details and pharmacy dispensing records."
+            recommendation = "Redact prescription numbers to protect medication privacy."
+
+        # 8.17 Medical Condition / Diagnosis
+        elif d_type == 'medical_condition':
+            priority = 'HIGH_PRIORITY'
+            action = 'REDACT'
+            action_label = 'Redact Medical Condition'
+            suggested_style = 'blackout'
+            explanation = f"Medical diagnosis or clinical finding ({d_label})."
+            risk_description = "Discloses personal healthcare diagnoses and medical conditions."
+            recommendation = "Redact sensitive medical findings and diagnoses to protect patient health privacy."
+
+        # 8.18 Attending Physician / Doctor
+        elif d_type == 'attending_physician':
+            priority = 'HIGH_PRIORITY' if context in ('public', 'professional') else 'REVIEW'
+            action = 'REDACT'
+            action_label = 'Redact Physician'
+            suggested_style = 'blackout'
+            explanation = "Attending physician or healthcare provider name."
+            risk_description = "Associates healthcare provider identities with clinical records."
+            recommendation = "Review and redact physician names if patient-doctor privacy is required."
+
         # 9. QR Codes (Context and Payload Dependent)
         elif d_type == 'qr_code':
             if payload_type in ('upi', 'aadhaar_qr', 'wifi', 'vcard', 'url_sensitive', 'text_sensitive'):
@@ -321,6 +471,7 @@ class PrivacyAssistant:
             return (
                 f"No sensitive items or automated security risks were identified in '{file_name}'. "
                 "The document appears clear for standard distribution under the enabled checks. "
+                "Note: Automated detection uses multi-modal heuristic, algorithmic, and OCR analysis and is not 100% exhaustive. "
                 "If your document contains handwritten elements, signatures, or visual stamps, "
                 "you can use the Manual Draw tool in the toolbar to apply custom redactions."
             )
@@ -368,5 +519,6 @@ class PrivacyAssistant:
             )
 
         summary_parts.append("Accept recommendations to select items for redaction, or dismiss any items you choose to keep.")
+        summary_parts.append("Note: Automated detection uses multi-modal heuristic, algorithmic, and OCR analysis. It is not 100% exhaustive; please inspect highlighted regions and apply manual redaction if any unflagged confidential details remain.")
 
         return " ".join(summary_parts)

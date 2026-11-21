@@ -315,7 +315,7 @@
                     </div>
                     <div class="assistant-callout-content">
                         <div class="assistant-callout-title">
-                            <span>Privacy Assistant Guidance</span>
+                            <span>Open AI Privacy Overview</span>
                             <span class="assistant-callout-pill">{{ session_data.assistant.stats.pending if session_data.assistant and session_data.assistant.stats else 0 }} Suggestions</span>
                         </div>
                         <p class="assistant-callout-desc">
@@ -363,6 +363,11 @@
                         </button>
 
                     </div>
+
+                        <button type="button" class="btn-tag-action btn-redact-all-high" onclick="selectCriticalAndHigh(); executeRedaction();" title="Select Critical &amp; High items then immediately sanitize &amp; export">
+                            <i class="fa-solid fa-bolt text-coral"></i> Redact All High Risk
+                        </button>
+
 
                 </div>
 
@@ -1070,6 +1075,33 @@ function toggleAiOverview(btn) {
     const label = btn.querySelector('.ai-overview-label');
     if (label) label.textContent = expanded ? 'Hide full analysis' : 'View full analysis';
 }
+
+
+// Toast Notification Helper
+function showToast(msg, type) {
+    type = type || "success";
+    var t = document.getElementById("shareToast");
+    if (!t) {
+        t = document.createElement("div");
+        t.id = "shareToast";
+        t.style.cssText = "position:fixed;bottom:24px;right:24px;z-index:9999;padding:11px 20px;border-radius:10px;font-size:0.86rem;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.14);transition:opacity 0.3s;";
+        document.body.appendChild(t);
+    }
+    t.style.background = type === "success" ? "var(--sage-primary, #4a7c59)" : "var(--coral-primary, #c05c3e)";
+    t.style.color = "#fff";
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function(){ t.style.opacity = "0"; }, 3200);
+}
+document.addEventListener("DOMContentLoaded", function() {
+    var certBtn = document.getElementById("downloadCertBtn");
+    if (certBtn) certBtn.addEventListener("click", function(){ setTimeout(function(){ showToast("Audit Certificate downloaded"); }, 600); });
+    var docBtn = document.getElementById("downloadDocBtn");
+    if (docBtn) docBtn.addEventListener("click", function(){ setTimeout(function(){ showToast("Sanitized document downloaded"); }, 600); });
+    var jsonBtn = document.getElementById("downloadJsonBtn");
+    if (jsonBtn) jsonBtn.addEventListener("click", function(){ setTimeout(function(){ showToast("JSON audit data downloaded"); }, 600); });
+});
 
 </script>
 

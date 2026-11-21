@@ -126,6 +126,17 @@ class OCREngine:
             proc_img = proc_img.convert('RGB')
 
         w, h = proc_img.size
+        # Contrast optimization for faint or low-contrast document scans
+        try:
+            from PIL import ImageOps
+            gray = proc_img.convert('L')
+            extrema = gray.getextrema()
+            if extrema and (extrema[1] - extrema[0] < 190):
+                enhanced = ImageOps.autocontrast(proc_img, cutoff=1)
+                proc_img = enhanced
+        except Exception:
+            pass
+
         # Adaptive upscaling for small images / screenshots to ensure small fonts (8-14px) are OCR-readable
         scale = 1.0
         if min(w, h) < 1200 or max(w, h) < 1800:
