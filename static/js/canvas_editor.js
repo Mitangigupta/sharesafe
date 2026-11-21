@@ -20,6 +20,8 @@ let selectedIds = new Set();
 
 let manualRedactions = []; // [{ id, page, bbox: [x,y,w,h], style, label }]
 
+let _manualUndoStack = []; // Stack of removed manual redaction objects for proper undo
+
 let isDrawMode = false;
 
 let isDrawing = false;
@@ -468,8 +470,10 @@ function setupDrawingCanvas() {
 
 
         manualRedactions.push(newManual);
-
-        if (typeof switchSidebarTab === 'function') switchSidebarTab('manual');
+        _manualUndoStack.push(newManual);       // Record for undo
+        updateUndoButtonState();                // Enable undo button
+        _manualUndoStack.push(newManual);       // Record for undo
+        updateUndoButtonState();                // Enable undo button
 
         updateManualRedactionsUI();
 
@@ -598,11 +602,55 @@ function deleteManualRedaction(manualId) {
 
     manualRedactions = manualRedactions.filter(m => m.id !== manualId);
 
+    // Also remove from undo stack so undo doesn't try to restore an explicitly deleted box
+    _manualUndoStack = _manualUndoStack.filter(m => m.id !== manualId);
+
+    updateUndoButtonState();
+
     updateManualRedactionsUI();
 
     notifySelectionChanged();
 
 }
+
+// ── Bug Fix: Proper Undo for Manual Redaction ─────────────────────────────
+// undoLastManualRedaction: removes the most recently drawn box, updates UI,
+// re-renders overlay, and marks session dirty so the next Sanitize reflects it.
+function undoLastManualRedaction() {
+    if (_manualUndoStack.length === 0) {
+        if (typeof showToastNotification === 'function') showToastNotification('Nothing to undo');
+        else if (typeof showToast === 'function') showToast('Nothing to undo');
+        return;
+    }
+    const last = _manualUndoStack.pop();
+    manualRedactions = manualRedactions.filter(m => m.id !== last.id);
+    updateManualRedactionsUI();
+    updateUndoButtonState();
+    notifySelectionChanged();   // re-renders overlay + marks dirty
+    if (typeof showToastNotification === 'function') showToastNotification('Manual box removed (Undo)');
+    else if (typeof showToast === 'function') showToast('Manual box removed (Undo)');
+}
+
+// updateUndoButtonState: disables undo button when stack is empty
+function updateUndoButtonState() {
+    const btn = document.getElementById('undoBtn');
+    if (!btn) return;
+    if (_manualUndoStack.length === 0) {
+        btn.disabled = true;
+        btn.style.opacity = '0.45';
+        btn.title = 'Nothing to undo';
+    } else {
+        btn.disabled = false;
+        btn.style.opacity = '';
+        btn.title = `Undo last manual box (${_manualUndoStack.length} in history)`;
+    }
+}
+
+// Expose to workbench.html inline script so the undo button can call it
+window.undoLastManualRedaction = undoLastManualRedaction;
+// Also expose as undoLastRedaction so existing keyboard shortcut and buttons still work
+window.undoLastRedaction = undoLastManualRedaction;
+
 
 
 
@@ -627,6 +675,9 @@ function updateSidebarSelectedCount() {
 function notifySelectionChanged() {
 
     isDirty = true;
+
+    // Invalidate stale sanitized preview cache so split/side-by-side always reflects latest state
+    redactedPreviews = [];
 
     renderBoundingBoxes();
 
@@ -2038,4 +2089,17 @@ function updateAssistantStatsUI(stats) {
     if (acceptedEl) acceptedEl.innerText = stats.accepted;
     if (dismissedEl) dismissedEl.innerText = stats.dismissed;
     if (badgeEl) badgeEl.innerText = stats.pending;
+}
+
+// Guard: define escapeHtml locally if not already defined by workbench inline script
+if (typeof escapeHtml === 'undefined') {
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 }

@@ -1210,48 +1210,33 @@ function toggleDarkMode() {
     setTimeout(function() { requestAnimationFrame(step); }, 300);
 })();
 
-// R9: Redaction Undo Stack
-var _undoStack = [];
-function undoLastRedaction() {
-    if (!_undoStack.length) { showToast("Nothing to undo", "error"); return; }
-    var last = _undoStack.pop();
-    if (last.type === "manual" && typeof manualRedactions !== "undefined") {
-        var idx = manualRedactions.findIndex(function(m) { return m.id === last.id; });
-        if (idx !== -1) {
-            manualRedactions.splice(idx, 1);
-            if (typeof redrawCanvas === "function") redrawCanvas();
-            if (typeof updateManualRedactionsUI === "function") updateManualRedactionsUI();
-        }
-    } else if (last.type === "accept") {
-        var chk = document.getElementById("chk-" + last.findingId);
-        if (chk) { chk.checked = false; if (typeof onCheckboxChange === "function") onCheckboxChange(last.findingId); }
-    }
-    showToast("Undo applied");
-}
+// R9: Undo for Manual Redactions (fixed - delegates to canvas_editor.js which owns manualRedactions)
+// canvas_editor.js exposes window.undoLastManualRedaction and window.undoLastRedaction
+// The undo button is injected here and wired to that function.
 document.addEventListener("DOMContentLoaded", function() {
+    // Inject Undo button next to Sanitize & Export if not already present
     var applyBtn = document.getElementById("applyRedactBtn");
     if (applyBtn && applyBtn.parentNode && !document.getElementById("undoBtn")) {
         var undoBtn = document.createElement("button");
         undoBtn.type = "button";
         undoBtn.id = "undoBtn";
         undoBtn.className = "btn-editorial-secondary";
-        undoBtn.title = "Undo last manual redaction or acceptance";
-        undoBtn.setAttribute("style", "gap:6px;");
+        undoBtn.title = "Nothing to undo";
+        undoBtn.disabled = true;
+        undoBtn.style.cssText = "gap:6px;opacity:0.45;";
         var icon = document.createElement("i");
         icon.className = "fa-solid fa-rotate-left";
         var label = document.createElement("span");
         label.textContent = "Undo";
         undoBtn.appendChild(icon);
         undoBtn.appendChild(label);
-        undoBtn.onclick = undoLastRedaction;
-        applyBtn.parentNode.insertBefore(undoBtn, applyBtn);
-    }
-    if (typeof manualRedactions !== "undefined") {
-        var _origPush = manualRedactions.push.bind(manualRedactions);
-        manualRedactions.push = function(item) {
-            _undoStack.push({ type: "manual", id: item.id });
-            return _origPush(item);
+        // Wire to canvas_editor.js function (loaded after this inline script via {% block scripts %})
+        undoBtn.onclick = function() {
+            if (typeof window.undoLastManualRedaction === "function") {
+                window.undoLastManualRedaction();
+            }
         };
+        applyBtn.parentNode.insertBefore(undoBtn, applyBtn);
     }
 });
 
