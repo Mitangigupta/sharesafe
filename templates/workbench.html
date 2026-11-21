@@ -1230,6 +1230,79 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+// R14: Keyboard Shortcuts
+document.addEventListener('keydown', function(e) {
+    var tag = document.activeElement ? document.activeElement.tagName : '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) { e.preventDefault(); showShortcutsModal(); }
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') { e.preventDefault(); if (typeof selectCriticalAndHigh === 'function') { selectCriticalAndHigh(); executeRedaction(); } }
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); if (typeof selectAllDetections === 'function') selectAllDetections(); }
+    if (e.ctrlKey && !e.shiftKey && e.key === 'z') { if (typeof undoLastRedaction === 'function') undoLastRedaction(); }
+    if (e.key === 'Escape') {
+        var drawer = document.getElementById('exportDrawer');
+        if (drawer && drawer.style.display !== 'none') { drawer.style.display = 'none'; return; }
+        var sm = document.getElementById('shortcutsModal');
+        if (sm && sm.style.display !== 'none') { sm.style.display = 'none'; return; }
+    }
+});
+function showShortcutsModal() {
+    var existing = document.getElementById('shortcutsModal');
+    if (existing) { existing.style.display = existing.style.display === 'none' ? 'flex' : 'none'; return; }
+    var modal = document.createElement('div');
+    modal.id = 'shortcutsModal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Keyboard Shortcuts');
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;';
+    var card = document.createElement('div');
+    card.style.cssText = 'background:var(--bg-surface);border-radius:14px;padding:28px 32px;max-width:430px;width:92%;box-shadow:0 8px 48px rgba(0,0,0,.24);';
+    var h3 = document.createElement('h3');
+    h3.style.cssText = 'margin:0 0 18px;font-size:1.05rem;display:flex;align-items:center;gap:8px;';
+    h3.textContent = '\u2328\uFE0F Keyboard Shortcuts';
+    var rows = [['?','Show this dialog'],['Ctrl+Shift+R','Redact all High Risk findings'],['Ctrl+Shift+A','Accept all findings'],['Ctrl+Z','Undo last redaction'],['Escape','Close modal / export drawer']];
+    var table = document.createElement('table');
+    table.style.cssText = 'width:100%;border-collapse:collapse;font-size:0.875rem;';
+    rows.forEach(function(r) {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        td1.style.cssText = 'padding:7px 12px 7px 0;white-space:nowrap;';
+        var kbd = document.createElement('kbd');
+        kbd.style.cssText = 'background:var(--bg-canvas);border:1px solid var(--border-stone);border-radius:5px;padding:2px 7px;font-family:monospace;font-size:0.82rem;color:var(--ink-secondary);';
+        kbd.textContent = r[0];
+        td1.appendChild(kbd);
+        var td2 = document.createElement('td');
+        td2.style.cssText = 'padding:7px 0;color:var(--ink-secondary);';
+        td2.textContent = r[1];
+        tr.appendChild(td1); tr.appendChild(td2); table.appendChild(tr);
+    });
+    var closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.textContent = 'Close';
+    closeBtn.style.cssText = 'margin-top:18px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-stone);background:var(--bg-canvas);cursor:pointer;font-weight:600;font-size:0.9rem;color:var(--ink-primary);';
+    closeBtn.onclick = function() { modal.style.display = 'none'; };
+    card.appendChild(h3); card.appendChild(table); card.appendChild(closeBtn);
+    modal.appendChild(card);
+    modal.addEventListener('click', function(ev) { if (ev.target === modal) modal.style.display = 'none'; });
+    document.body.appendChild(modal);
+}
+// Add ? help button to toolbar on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    var toolbar = document.querySelector('.workbench-toolbar-actions, .toolbar-actions, .redaction-actions');
+    if (!toolbar) return;
+    if (document.getElementById('kbdHelpBtn')) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'kbdHelpBtn';
+    btn.className = 'btn-editorial-secondary';
+    btn.title = 'Keyboard shortcuts (?)';
+    btn.style.cssText = 'min-width:36px;padding:0 10px;';
+    var icon = document.createElement('i');
+    icon.className = 'fa-solid fa-keyboard';
+    btn.appendChild(icon);
+    btn.onclick = showShortcutsModal;
+    toolbar.appendChild(btn);
+});
+
 </script>
 
 <!-- Cloud Session Recovery Modal (Appears if serverless host recycles session) -->
