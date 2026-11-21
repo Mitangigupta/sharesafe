@@ -1,14 +1,19 @@
 import re
 import urllib.parse
 from typing import List, Dict, Any, Optional
-import cv2
-import numpy as np
-
+try:
+    import cv2
+    import numpy as np
+    _CV2_AVAILABLE = True
+except ImportError:
+    cv2 = None
+    np = None
+    _CV2_AVAILABLE = False
 class QRDetector:
     """Detects QR codes, extracts bounding boxes, and performs deep payload threat inspection."""
 
     def __init__(self):
-        self.detector = cv2.QRCodeDetector()
+        self.detector = cv2.QRCodeDetector() if _CV2_AVAILABLE else None
         self._sensitive_detector = None
 
     def _get_sensitive_detector(self):
@@ -21,6 +26,8 @@ class QRDetector:
         """Scans a numpy image (BGR or Grayscale) for QR codes and analyzes their payloads.
         Filters out false-positive geometric candidates where no valid payload was decoded.
         """
+        if not _CV2_AVAILABLE or self.detector is None:
+            return []
         if image_np is None or image_np.size == 0:
             return []
 

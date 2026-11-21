@@ -1,7 +1,12 @@
 import os
-import cv2
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+try:
+    import cv2
+    import numpy as np
+    _CV2_AVAILABLE = True
+except ImportError:
+    cv2 = None
+    np = None
+    _CV2_AVAILABLE = False
 import pymupdf
 from typing import List, Dict, Any, Optional
 

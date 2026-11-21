@@ -5,8 +5,14 @@ import base64
 from typing import List, Dict, Any, Tuple, Optional
 from PIL import Image, ImageOps
 import pymupdf  # Modern PyMuPDF import
-import cv2
-import numpy as np
+try:
+    import cv2
+    import numpy as np
+    _CV2_AVAILABLE = True
+except ImportError:
+    cv2 = None
+    np = None
+    _CV2_AVAILABLE = False
 
 from core.regex_detector import SensitiveDetector
 from core.qr_detector import QRDetector
@@ -117,7 +123,7 @@ class DocumentScanner:
             # 1. QR Code Detection on rendered page
             # Read rendered page image safely
             try:
-                img_np = cv2.imdecode(np.frombuffer(png_bytes, np.uint8), cv2.IMREAD_COLOR)
+                img_np = cv2.imdecode(np.frombuffer(png_bytes, np.uint8), cv2.IMREAD_COLOR) if _CV2_AVAILABLE else None
                 if img_np is not None:
                     qr_results = self.qr_detector.detect(img_np)
                     for qr in qr_results:
@@ -216,9 +222,12 @@ class DocumentScanner:
 
                 w, h = pil_img.size
 
-                # Convert to numpy BGR for OpenCV
-                img_rgb = np.array(pil_img)
-                img_np = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
+                # Convert to numpy BGR for OpenCV (requires cv2)
+                if _CV2_AVAILABLE:
+                    img_rgb = np.array(pil_img)
+                    img_np = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
+                else:
+                    img_np = None
 
         except Exception as e:
             raise ValueError(f"Could not open image file: {str(e)}")
@@ -234,7 +243,7 @@ class DocumentScanner:
         detections = []
 
         # 1. QR Code Detection
-        qr_results = self.qr_detector.detect(img_np)
+        qr_results = self.qr_detector.detect(img_np) if img_np is not None else []
         for qr in qr_results:
             qr['id'] = f"det_{uuid.uuid4().hex[:8]}"
             qr['page'] = 1
