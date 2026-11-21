@@ -465,23 +465,43 @@
             <!-- Tab Content: Intelligent Privacy Assistant -->
             <div class="sidebar-tab-pane" id="paneAssistant" style="display: none;">
                 <div class="assistant-panel-wrapper">
-                    <!-- Assistant Header & Sharing Context -->
-                    <div class="assistant-header-card">
-                        <div class="assistant-header-top">
-                            <div class="assistant-brand">
-                                <div class="assistant-icon-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                                <div>
-                                    <h4 class="assistant-panel-title">Privacy Assistant</h4>
-                                    <span class="assistant-context-pill"><i class="fa-solid fa-sliders"></i> Context: {{ (session_data.assistant.context or session_data.sharing_context or 'academic')|capitalize }}</span>
-                                </div>
+
+                    <!-- AI Privacy Overview Compact Card -->
+                    <div class="ai-overview-card" id="aiOverviewCard">
+                        <div class="ai-overview-header-row">
+                            <div class="ai-overview-title-group">
+                                <i class="fa-solid fa-wand-magic-sparkles text-coral" style="font-size:0.8rem;"></i>
+                                <span class="ai-overview-title">AI Privacy Overview</span>
                             </div>
+                            <span class="assistant-context-pill"><i class="fa-solid fa-sliders"></i> {{ (session_data.assistant.context or session_data.sharing_context or 'academic')|capitalize }}</span>
                         </div>
-                        <!-- Explainable Summary -->
-                        <div class="assistant-summary-box">
-                            <p class="assistant-summary-text" id="assistantSummaryText">
-                                {{ session_data.assistant.summary if session_data.assistant else "Assistant is analyzing the document for context-aware privacy recommendations." }}
-                            </p>
+                        <p class="ai-overview-summary" id="assistantSummaryText">
+                            {% if session_data.assistant and session_data.assistant.summary %}
+                                {{ session_data.assistant.summary | truncate(220, true, '…') }}
+                            {% else %}
+                                Assistant is analyzing this document for context-aware privacy recommendations.
+                            {% endif %}
+                        </p>
+                        <div class="ai-overview-severity-row">
+                            {% if session_data.risk_summary.critical_count > 0 %}
+                            <span class="severity-chip chip-critical"><i class="fa-solid fa-circle-exclamation"></i> {{ session_data.risk_summary.critical_count }} Critical</span>
+                            {% endif %}
+                            {% if session_data.risk_summary.high_count > 0 %}
+                            <span class="severity-chip chip-high"><i class="fa-solid fa-triangle-exclamation"></i> {{ session_data.risk_summary.high_count }} High</span>
+                            {% endif %}
+                            {% if session_data.risk_summary.medium_count > 0 %}
+                            <span class="severity-chip chip-med"><i class="fa-solid fa-circle-dot"></i> {{ session_data.risk_summary.medium_count }} Med</span>
+                            {% endif %}
+                            {% if session_data.risk_summary.low_count > 0 %}
+                            <span class="severity-chip chip-low"><i class="fa-solid fa-circle-info"></i> {{ session_data.risk_summary.low_count }} Low</span>
+                            {% endif %}
                         </div>
+                        {% if session_data.assistant and session_data.assistant.summary %}
+                        <button type="button" class="ai-overview-view-details" onclick="toggleAiOverview(this)" aria-expanded="false"><i class="fa-solid fa-chevron-right ai-overview-chevron"></i> <span class="ai-overview-label">View full analysis</span></button>
+                        <div class="ai-overview-full-text">
+                            {{ session_data.assistant.summary }}
+                        </div>
+                        {% endif %}
                     </div>
 
                     <!-- Assistant Metrics / Stats Tracker Bar -->
@@ -519,7 +539,7 @@
                     <div class="assistant-recommendations-list" id="assistantRecsList">
                         {% if session_data.assistant and session_data.assistant.recommendations and session_data.assistant.recommendations|length > 0 %}
                             {% for rec in session_data.assistant.recommendations %}
-                            <div class="rec-card rec-status-{{ rec.status|lower }} rec-pri-{{ rec.priority|lower }}" 
+                            <div class="rec-card rec-status-{{ rec.status|lower }} rec-pri-{{ rec.priority|lower }}"
                                  id="rec-card-{{ rec.id }}"
                                  data-rec-id="{{ rec.id }}"
                                  data-finding-id="{{ rec.finding_id }}"
@@ -546,6 +566,24 @@
                                         <code>{{ rec.masked }}</code>
                                     </div>
                                 </div>
+                                <!-- Short why-sensitive always visible -->
+                                <p class="rec-short-why">{{ rec.explanation | truncate(110, true, '…') }}</p>
+                                <!-- Always-visible actions + details toggle -->
+                                <div class="rec-footer">
+                                    <button type="button" class="rec-toggle-details" onclick="toggleRecDetails(this)" aria-expanded="false"><i class="fa-solid fa-chevron-right rec-toggle-icon"></i> <span class="rec-toggle-label">Details</span></button>
+                                    <div class="rec-actions-group">
+                                        <button type="button" class="btn-rec-action btn-rec-locate" onclick="focusRecommendationOnCanvas('{{ rec.finding_id }}', {{ rec.page }})" title="Locate on document">
+                                            <i class="fa-solid fa-location-crosshairs"></i> Locate
+                                        </button>
+                                        <button type="button" class="btn-rec-action btn-rec-dismiss" onclick="dismissRecommendation('{{ rec.id }}', '{{ rec.finding_id }}')" title="Dismiss">
+                                            <i class="fa-solid fa-xmark"></i> Dismiss
+                                        </button>
+                                        <button type="button" class="btn-rec-action btn-rec-accept" onclick="acceptRecommendation('{{ rec.id }}', '{{ rec.finding_id }}', {{ rec.page }}, '{{ rec.suggested_style }}')" title="Accept for redaction">
+                                            <i class="fa-solid fa-check"></i> Accept
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Expandable details (hidden by default) -->
                                 <div class="rec-body">
                                     <div class="rec-point">
                                         <span class="rec-point-tag"><i class="fa-solid fa-circle-info"></i> Why Sensitive:</span>
@@ -559,21 +597,8 @@
                                         <span class="rec-point-tag text-sand"><i class="fa-solid fa-lightbulb"></i> Guidance:</span>
                                         <p class="rec-point-text">{{ rec.recommendation }}</p>
                                     </div>
-                                </div>
-                                <div class="rec-footer">
-                                    <div class="rec-suggested-style">
-                                        <span class="rec-style-hint"><i class="fa-solid fa-paintbrush"></i> Style: <strong>{{ rec.suggested_style|capitalize }}</strong></span>
-                                    </div>
-                                    <div class="rec-actions-group">
-                                        <button type="button" class="btn-rec-action btn-rec-locate" onclick="focusRecommendationOnCanvas('{{ rec.finding_id }}', {{ rec.page }})" title="Jump to page and highlight this item">
-                                            <i class="fa-solid fa-location-crosshairs"></i> Locate
-                                        </button>
-                                        <button type="button" class="btn-rec-action btn-rec-dismiss" onclick="dismissRecommendation('{{ rec.id }}', '{{ rec.finding_id }}')" title="Dismiss suggestion and leave finding unchanged">
-                                            <i class="fa-solid fa-xmark"></i> Dismiss
-                                        </button>
-                                        <button type="button" class="btn-rec-action btn-rec-accept" onclick="acceptRecommendation('{{ rec.id }}', '{{ rec.finding_id }}', {{ rec.page }}, '{{ rec.suggested_style }}')" title="Accept recommendation and select for redaction">
-                                            <i class="fa-solid fa-check"></i> Accept
-                                        </button>
+                                    <div class="rec-expanded-style">
+                                        <span class="rec-style-hint"><i class="fa-solid fa-paintbrush"></i> Suggested Style: <strong>{{ rec.suggested_style|capitalize }}</strong></span>
                                     </div>
                                 </div>
                                 <div class="rec-status-stamp" id="rec-stamp-{{ rec.id }}">
@@ -1020,6 +1045,30 @@ function switchSidebarTab(tabName) {
 
     });
 
+}
+
+// Toggle expandable details on individual rec-cards
+function toggleRecDetails(btn) {
+    const card = btn.closest('.rec-card');
+    if (!card) return;
+    const expanded = card.classList.toggle('details-expanded');
+    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    const icon = btn.querySelector('.rec-toggle-icon');
+    if (icon) icon.style.transform = expanded ? 'rotate(90deg)' : 'rotate(0deg)';
+    const label = btn.querySelector('.rec-toggle-label');
+    if (label) label.textContent = expanded ? 'Hide details' : 'Details';
+}
+
+// Toggle AI Overview full analysis text
+function toggleAiOverview(btn) {
+    const card = document.getElementById('aiOverviewCard');
+    if (!card) return;
+    const expanded = card.classList.toggle('expanded');
+    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    const icon = btn.querySelector('.ai-overview-chevron');
+    if (icon) icon.style.transform = expanded ? 'rotate(90deg)' : 'rotate(0deg)';
+    const label = btn.querySelector('.ai-overview-label');
+    if (label) label.textContent = expanded ? 'Hide full analysis' : 'View full analysis';
 }
 
 </script>

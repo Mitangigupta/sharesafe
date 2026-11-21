@@ -10989,3 +10989,626 @@ input:checked + .toggle-slider::before {
     background: #E8F8EE;
     color: #25D366;
 }
+
+
+/* ==========================================================================
+   ShareSafe UI Redesign Overrides — Compact, Light-Theme Assistant & Findings
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Assistant Panel — Light Theme Overrides
+   -------------------------------------------------------------------------- */
+
+.assistant-panel-wrapper {
+  background: var(--bg-canvas);
+  color: var(--ink-primary);
+}
+
+/* Header card */
+.assistant-header-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  box-shadow: var(--shadow-subtle);
+  color: var(--ink-primary);
+}
+
+.assistant-header-card .asst-title {
+  color: var(--ink-primary);
+}
+
+.assistant-header-card .asst-context-pill {
+  color: var(--ink-secondary);
+}
+
+.assistant-header-card .asst-summary-box {
+  background: var(--bg-canvas);
+  color: var(--ink-secondary);
+  border: 1px solid var(--border-stone);
+}
+
+/* Stats bar */
+.assistant-stats-bar {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  color: var(--ink-secondary);
+}
+
+.assistant-stats-bar .stat-number {
+  color: var(--ink-primary);
+}
+
+/* Action buttons */
+.btn-asst-action {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  color: var(--ink-secondary);
+}
+
+.btn-asst-action:hover {
+  background: var(--bg-canvas);
+  color: var(--ink-primary);
+}
+
+/* Quick actions */
+.assistant-quick-actions .btn-asst-action {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  color: var(--ink-secondary);
+}
+
+.assistant-quick-actions .btn-asst-action:hover {
+  background: var(--bg-canvas);
+  color: var(--ink-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Recommendation Cards — Light Theme
+   -------------------------------------------------------------------------- */
+
+.rec-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  box-shadow: var(--shadow-subtle);
+  color: var(--ink-primary);
+}
+
+/* Collapse body by default; show when expanded */
+.rec-card .rec-body {
+  display: none;
+}
+
+.rec-card.details-expanded .rec-body {
+  display: flex;
+}
+
+.rec-body {
+  padding: 0;
+  background: var(--bg-surface);
+  color: var(--ink-secondary);
+}
+
+.rec-card.details-expanded .rec-body {
+  padding: 10px 14px;
+}
+
+/* Toggle details button */
+.rec-toggle-details {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  margin-top: 2px;
+  transition: color var(--transition-fast);
+}
+
+.rec-toggle-details:hover {
+  color: var(--ink-secondary);
+}
+
+/* Details section */
+.rec-details {
+  display: none;
+}
+
+.rec-card.details-expanded .rec-details {
+  display: block;
+}
+
+/* Priority badges */
+.priority-high {
+  background: var(--coral-soft);
+  color: var(--coral-primary);
+  border: 1px solid var(--coral-border);
+}
+
+.priority-review {
+  background: var(--amber-soft);
+  color: var(--amber-primary);
+  border: 1px solid var(--amber-border);
+}
+
+.priority-info {
+  background: var(--sage-soft);
+  color: var(--sage-primary);
+  border: 1px solid var(--sage-border);
+}
+
+/* Entity row */
+.rec-entity-row {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-stone);
+  color: var(--ink-secondary);
+}
+
+/* Value preview */
+.rec-value-preview code {
+  background: var(--bg-canvas);
+  color: var(--ink-primary);
+  border: 1px solid var(--border-stone);
+}
+
+/* Point text and tags */
+.rec-point-text {
+  color: var(--ink-secondary);
+}
+
+.rec-point-tag {
+  color: var(--ink-primary);
+}
+
+/* Footer */
+.rec-footer {
+  border-top: 1px solid var(--border-stone);
+  background: var(--bg-surface);
+  color: var(--ink-secondary);
+}
+
+/* Footer action buttons */
+.btn-rec-action {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-stone);
+  color: var(--ink-secondary);
+}
+
+.btn-rec-action:hover {
+  color: var(--ink-primary);
+}
+
+.btn-rec-locate {
+  background: var(--coral-soft);
+  border: 1px solid var(--coral-border);
+  color: var(--coral-primary);
+}
+
+.btn-rec-locate:hover {
+  background: var(--coral-border);
+  color: var(--coral-primary);
+}
+
+.btn-rec-accept {
+  background: var(--sage-soft);
+  border: 1px solid var(--sage-border);
+  color: var(--sage-primary);
+}
+
+.btn-rec-accept:hover {
+  background: var(--sage-border);
+  color: var(--sage-primary);
+}
+
+.btn-rec-dismiss {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-stone);
+  color: var(--ink-muted);
+}
+
+.btn-rec-dismiss:hover {
+  color: var(--ink-secondary);
+}
+
+/* Status variants */
+.rec-card.rec-status-accepted {
+  border: 1px solid var(--sage-border);
+  background: var(--sage-soft);
+}
+
+.rec-card.rec-status-dismissed {
+  opacity: 0.55;
+  filter: grayscale(1);
+}
+
+.rec-status-stamp {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-stone);
+  color: var(--ink-muted);
+}
+
+/* --------------------------------------------------------------------------
+   2. AI Privacy Overview Compact Card
+   -------------------------------------------------------------------------- */
+
+.ai-overview-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 0;
+}
+
+.ai-overview-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+}
+
+.ai-overview-summary {
+  font-size: 0.82rem;
+  color: var(--ink-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.ai-overview-severity-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.ai-overview-view-details {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+}
+
+.ai-overview-view-details:hover {
+  color: var(--ink-secondary);
+}
+
+.ai-overview-full-text {
+  font-size: 0.8rem;
+  color: var(--ink-secondary);
+  line-height: 1.5;
+  margin-top: 8px;
+  display: none;
+}
+
+.ai-overview-card.expanded .ai-overview-full-text {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   3. Detection Items — Compact Findings Tab
+   -------------------------------------------------------------------------- */
+
+.detection-item {
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  gap: 10px;
+}
+
+.severity-border-critical {
+  border-left: 3px solid var(--red-finding);
+}
+
+.severity-border-high {
+  border-left: 3px solid var(--coral-primary);
+}
+
+.severity-border-medium {
+  border-left: 3px solid var(--amber-primary);
+}
+
+.severity-border-low {
+  border-left: 3px solid var(--sage-primary);
+}
+
+.item-value-line {
+  margin-bottom: 4px;
+}
+
+.item-label-text {
+  font-size: 0.8rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. Pane Padding Reduction
+   -------------------------------------------------------------------------- */
+
+.sidebar-tab-pane {
+  padding: 12px 14px;
+  gap: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   5. Sidebar Scroll Fix
+   -------------------------------------------------------------------------- */
+
+.workbench-sidebar {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Additional styles for new compact elements */
+.rec-short-why {
+  font-size: 0.78rem;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+  margin: 2px 0 0 0;
+}
+
+.rec-expanded-style {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+}
+
+.ai-overview-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.ai-overview-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-overview-chevron,
+.rec-toggle-icon {
+  transition: transform 0.18s ease;
+  font-size: 0.65em;
+}
+
+.text-muted {
+  color: var(--ink-muted) !important;
+}
+
+/* Rec-footer flex layout for the new design (toggle + actions inline) */
+.rec-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-stone-subtle);
+  margin-top: 6px;
+  flex-wrap: nowrap;
+}
+
+/* Ensure rec-actions-group stays compact */
+.rec-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Compact action buttons */
+.btn-rec-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.69rem;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-stone);
+  background: var(--bg-canvas);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-rec-action:hover {
+  background: var(--bg-stone-subtle);
+  color: var(--ink-primary);
+  border-color: var(--border-stone-strong);
+}
+
+.btn-rec-locate {
+  color: var(--coral-primary);
+  border-color: var(--coral-border);
+  background: var(--coral-soft);
+}
+.btn-rec-locate:hover {
+  background: var(--coral-soft);
+  border-color: var(--coral-primary);
+}
+
+.btn-rec-accept {
+  color: var(--sage-primary);
+  border-color: var(--sage-border);
+  background: var(--sage-soft);
+}
+.btn-rec-accept:hover {
+  background: var(--sage-soft);
+  border-color: var(--sage-primary);
+}
+
+.btn-rec-dismiss {
+  color: var(--ink-muted);
+}
+.btn-rec-dismiss:hover {
+  color: var(--ink-secondary);
+  background: var(--bg-stone-subtle);
+}
+
+/* Compact stats bar for light theme */
+.assistant-stats-bar {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-stone);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.asst-stat-num {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.asst-stat-lbl {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.asst-stat-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-stone);
+}
+
+/* Compact quick actions */
+.btn-asst-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 8px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  border: 1px solid var(--border-stone);
+  background: var(--bg-canvas);
+  color: var(--ink-secondary);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.btn-asst-action:hover {
+  background: var(--bg-stone-subtle);
+  color: var(--ink-primary);
+  border-color: var(--border-stone-strong);
+}
+.btn-asst-accept-all {
+  background: var(--coral-soft);
+  border-color: var(--coral-border);
+  color: var(--coral-primary);
+}
+.btn-asst-accept-all:hover {
+  background: var(--coral-soft);
+  border-color: var(--coral-primary);
+}
+.btn-asst-guided {
+  background: var(--sage-soft);
+  border-color: var(--sage-border);
+  color: var(--sage-primary);
+}
+.btn-asst-guided:hover {
+  background: var(--sage-soft);
+  border-color: var(--sage-primary);
+}
+.btn-asst-reset {
+  background: var(--bg-canvas);
+  color: var(--ink-secondary);
+}
+
+/* Light theme for rec-card accepted/dismissed status stamps */
+.rec-card.rec-status-accepted {
+  border-color: var(--sage-border);
+  background: var(--bg-surface);
+}
+.rec-card.rec-status-accepted .rec-status-stamp {
+  display: block;
+  background: var(--sage-soft);
+  color: var(--sage-primary);
+  border: 1px solid var(--sage-border);
+}
+
+.rec-card.rec-status-dismissed {
+  opacity: 0.55;
+  filter: grayscale(0.3);
+  border-color: var(--border-stone-subtle);
+}
+.rec-card.rec-status-dismissed .rec-status-stamp {
+  display: block;
+  background: var(--bg-stone-subtle);
+  color: var(--ink-muted);
+  border: 1px solid var(--border-stone);
+}
+
+/* Guided focus state uses coral ring on light theme */
+.rec-card.rec-card-focus-guided {
+  border-color: var(--coral-primary);
+  box-shadow: 0 0 0 2px var(--coral-glow);
+}
+
+/* Meta chips light theme */
+.rec-meta-chip {
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-stone-subtle);
+  color: var(--ink-secondary);
+  border: 1px solid var(--border-stone);
+}
+.rec-meta-chip.chip-confirmed {
+  color: var(--sage-primary);
+  background: var(--sage-soft);
+  border-color: var(--sage-border);
+}
+.rec-meta-chip.chip-uncertain {
+  color: var(--amber-primary);
+  background: var(--amber-soft);
+  border-color: var(--amber-border);
+}
+
+/* Entity row light theme */
+.rec-entity-row {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-stone);
+}
+.rec-entity-name strong {
+  color: var(--ink-primary);
+  font-size: 0.82rem;
+}
+.rec-category-label {
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+}
+.rec-value-preview code {
+  background: var(--bg-stone-subtle);
+  color: var(--ink-secondary);
+  border: 1px solid var(--border-stone);
+  font-size: 0.74rem;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+}
+
+/* Point text light theme */
+.rec-point-tag {
+  color: var(--ink-secondary);
+  font-size: 0.68rem;
+}
+.rec-point-text {
+  color: var(--ink-secondary);
+  border-left: 2px solid var(--border-stone-strong);
+  font-size: 0.75rem;
+}
