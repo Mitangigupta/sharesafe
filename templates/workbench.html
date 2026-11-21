@@ -1002,6 +1002,11 @@
 
                         </a>
 
+                        <button type="button" id="copyShareLinkBtn" class="btn-editorial-secondary" title="Copy shareable certificate link" onclick="copyShareCertLink()">
+                            <i class="fa-solid fa-link"></i> Copy Share Link
+                        </button>
+
+
                         <button type="button" class="btn-drawer-close" onclick="document.getElementById('exportDrawer').style.display='none'" title="Dismiss drawer" aria-label="Dismiss export drawer">
 
                             <i class="fa-solid fa-xmark"></i>
@@ -1126,6 +1131,26 @@ function showToast(msg, type) {
     clearTimeout(t._timer);
     t._timer = setTimeout(function(){ t.style.opacity = "0"; }, 3200);
 }
+// R13: Copy shareable certificate link
+function copyShareCertLink() {
+    var sid = "{{ session_data.session_id if session_data is defined else '' }}";
+    if (!sid) {
+        // Try to extract from current URL or certBtn href
+        var certBtn = document.getElementById("downloadCertBtn");
+        if (certBtn && certBtn.href) {
+            var m = certBtn.href.match(/\/download\/([^\/]+)\/certificate/);
+            if (m) sid = m[1];
+        }
+    }
+    if (!sid) { showToast("Session ID not available"); return; }
+    var shareUrl = window.location.origin + "/share/cert/" + sid;
+    navigator.clipboard.writeText(shareUrl).then(function() {
+        showToast("\u2705 Share link copied to clipboard!");
+    }).catch(function() {
+        showToast("Share URL: " + shareUrl);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     var certBtn = document.getElementById("downloadCertBtn");
     if (certBtn) certBtn.addEventListener("click", function(){ setTimeout(function(){ showToast("Audit Certificate downloaded"); }, 600); });

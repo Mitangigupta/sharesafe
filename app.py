@@ -345,6 +345,7 @@ def upload_file():
         # Save session metadata json
         session_info = {
             "session_id": session_id,
+            "scan_date": __import__("datetime").datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
             "file_name": scan_result["file_name"],
             "sample_id": sample_id,
             "is_pdf": scan_result["is_pdf"],
@@ -802,6 +803,38 @@ def download_certificate(session_id):
     if not os.path.exists(cert_pdf):
         return "Certificate not found", 404
     return send_file(cert_pdf, as_attachment=True, download_name=f"ShareSafe_Audit_Certificate_{session_id[:8]}.pdf")
+
+@app.route('/share/cert/<session_id>')
+def share_certificate(session_id):
+    """Public read-only shareable audit certificate page (R13)."""
+    upload_dir = SessionManager.get_session_upload_dir(session_id)
+    info_path = os.path.join(upload_dir, 'session_info.json')
+    if not os.path.exists(info_path):
+        return render_template('cert_not_found.html', session_id=session_id), 404
+    try:
+        with open(info_path, 'r', encoding='utf-8') as f:
+            session_data = json.load(f)
+    except Exception:
+        return render_template('cert_not_found.html', session_id=session_id), 404
+    risk = session_data.get('risk_summary', {})
+    detections = session_data.get('detections', [])
+    scan_date = session_data.get('scan_date', None)
+    if not scan_date:
+        import datetime
+        scan_date = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')
+    return render_template(
+        'share_cert.html',
+        session_id=session_id,
+        file_name=session_data.get('file_name', 'Unknown Document'),
+        risk_level=risk.get('level', 'LOW'),
+        risk_score=risk.get('score', 0),
+        total_findings=len(detections),
+        page_count=session_data.get('page_count', 1),
+        scan_date=scan_date,
+        sharing_context=session_data.get('sharing_context', 'General'),
+        risk_summary=risk
+    )
+
 
 @app.route('/download/extension-zip')
 def download_extension_zip():

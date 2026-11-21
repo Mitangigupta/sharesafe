@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}ShareSafe Audit Certificate — {{ file_name }}{% endblock %}
+
+{% block head %}
+<style>
+/* ===== R13: Shareable Certificate Page ===== */
+.cert-page {
+  min-height: 100vh;
+  background: var(--bg-canvas, #f5f4f0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 48px 16px 80px;
+}
+
+.cert-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 18px 28px;
+  margin-bottom: 28px;
+  max-width: 680px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(26,86,219,0.22);
+}
+.cert-banner-icon { font-size: 2rem; }
+.cert-banner-text { flex: 1; }
+.cert-banner-text h2 { margin: 0; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.01em; }
+.cert-banner-text p { margin: 4px 0 0; font-size: 0.84rem; opacity: 0.85; }
+.cert-verified-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.cert-card {
+  background: var(--bg-surface, #fff);
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.09);
+  max-width: 680px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.cert-header {
+  padding: 32px 36px 24px;
+  border-bottom: 1px solid var(--border-stone, #e5e3dc);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.cert-logo {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #1a56db, #7c3aed);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cert-logo svg { width: 28px; height: 28px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cert-title-block h1 { margin: 0 0 4px; font-size: 1.25rem; font-weight: 700; color: var(--ink-primary, #1a1915); }
+.cert-title-block p { margin: 0; font-size: 0.875rem; color: var(--ink-muted, #7a7066); }
+.cert-file-name {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-secondary, #3d3a34);
+  word-break: break-all;
+}
+
+.cert-body { padding: 28px 36px; }
+
+.cert-risk-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.cert-risk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}
+.cert-risk-pill.critical { background: #fef2f2; color: #dc2626; border: 2px solid #fca5a5; }
+.cert-risk-pill.high     { background: #fff7ed; color: #c2410c; border: 2px solid #fdba74; }
+.cert-risk-pill.medium   { background: #fffbeb; color: #b45309; border: 2px solid #fcd34d; }
+.cert-risk-pill.low      { background: #f0fdf4; color: #15803d; border: 2px solid #86efac; }
+.cert-risk-pill.minimal  { background: #f0fdf4; color: #15803d; border: 2px solid #86efac; }
+
+.cert-score-bar-wrap { flex: 1; min-width: 160px; }
+.cert-score-label { font-size: 0.78rem; color: var(--ink-muted); margin-bottom: 5px; }
+.cert-score-bar-bg {
+  height: 10px; border-radius: 6px;
+  background: var(--bg-canvas, #f5f4f0);
+  overflow: hidden;
+}
+.cert-score-bar-fill {
+  height: 100%; border-radius: 6px;
+  transition: width 0.8s cubic-bezier(.4,0,.2,1);
+}
+.cert-score-bar-fill.critical { background: #dc2626; }
+.cert-score-bar-fill.high     { background: #ea580c; }
+.cert-score-bar-fill.medium   { background: #d97706; }
+.cert-score-bar-fill.low      { background: #16a34a; }
+.cert-score-bar-fill.minimal  { background: #16a34a; }
+
+.cert-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.cert-stat-box {
+  background: var(--bg-canvas, #f5f4f0);
+  border-radius: 10px;
+  padding: 16px 14px;
+  text-align: center;
+}
+.cert-stat-num { font-size: 1.75rem; font-weight: 800; color: var(--ink-primary); line-height: 1; }
+.cert-stat-label { font-size: 0.75rem; color: var(--ink-muted); margin-top: 5px; }
+
+.cert-compliance-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+  align-items: center;
+}
+.cert-compliance-label { font-size: 0.8rem; color: var(--ink-muted); margin-right: 4px; }
+.cert-compliance-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;
+  background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+}
+.cert-compliance-chip.gdpr   { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.cert-compliance-chip.pci    { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.cert-compliance-chip.iso    { background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; }
+
+.cert-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: var(--bg-canvas, #f5f4f0);
+  border-radius: 10px;
+  margin-bottom: 28px;
+  font-size: 0.84rem;
+}
+.cert-meta-item { display: flex; gap: 10px; align-items: flex-start; }
+.cert-meta-key { color: var(--ink-muted); min-width: 120px; flex-shrink: 0; }
+.cert-meta-val { color: var(--ink-secondary); font-weight: 500; word-break: break-all; }
+
+.cert-footer {
+  padding: 20px 36px 28px;
+  border-top: 1px solid var(--border-stone, #e5e3dc);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cert-footer-note { font-size: 0.78rem; color: var(--ink-muted); flex: 1; }
+.cert-actions { display: flex; gap: 10px; }
+
+.btn-cert-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;
+  background: #1a56db; color: #fff; font-weight: 600; font-size: 0.875rem;
+  text-decoration: none; transition: background 0.2s;
+}
+.btn-cert-primary:hover { background: #1e40af; color: #fff; }
+
+.btn-cert-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.875rem;
+  background: var(--bg-canvas); color: var(--ink-secondary); border: 1px solid var(--border-stone);
+  text-decoration: none; transition: background 0.2s;
+}
+.btn-cert-secondary:hover { background: var(--bg-surface); }
+
+/* Toast */
+.cert-toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: #1a1915; color: #fff; padding: 10px 24px; border-radius: 50px;
+  font-size: 0.875rem; font-weight: 500; z-index: 9999;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s;
+  opacity: 0; white-space: nowrap;
+}
+.cert-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@media (max-width: 600px) {
+  .cert-header, .cert-body, .cert-footer { padding-left: 20px; padding-right: 20px; }
+  .cert-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .cert-banner { flex-direction: column; align-items: flex-start; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cert-page">
+  <!-- Verified Banner -->
+  <div class="cert-banner">
+    <div class="cert-banner-icon">🛡️</div>
+    <div class="cert-banner-text">
+      <h2>ShareSafe Privacy Audit Certificate</h2>
+      <p>This document was scanned and verified by ShareSafe's AI-powered privacy detection engine.</p>
+    </div>
+    <div class="cert-verified-badge">
+      <i class="fa-solid fa-circle-check"></i> Verified
+    </div>
+  </div>
+
+  <!-- Certificate Card -->
+  <div class="cert-card">
+
+    <!-- Header -->
+    <div class="cert-header">
+      <div class="cert-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <div class="cert-title-block">
+        <h1>Audit Certificate</h1>
+        <p>Generated by <strong>ShareSafe</strong> — AI-Powered Document Privacy Analysis</p>
+        <div class="cert-file-name">📄 {{ file_name }}</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="cert-body">
+
+      <!-- Risk Level + Score Bar -->
+      <div class="cert-risk-row">
+        <div class="cert-risk-pill {{ risk_level | lower }}">
+          {% if risk_level == 'CRITICAL' %}<i class="fa-solid fa-triangle-exclamation"></i>
+          {% elif risk_level == 'HIGH' %}<i class="fa-solid fa-circle-exclamation"></i>
+          {% elif risk_level == 'MEDIUM' %}<i class="fa-solid fa-circle-minus"></i>
+          {% else %}<i class="fa-solid fa-circle-check"></i>{% endif %}
+          {{ risk_level }} RISK
+        </div>
+        <div class="cert-score-bar-wrap">
+          <div class="cert-score-label">Risk Score: {{ risk_score }}/100</div>
+          <div class="cert-score-bar-bg">
+            <div class="cert-score-bar-fill {{ risk_level | lower }}" style="width: {{ risk_score }}%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="cert-stats-grid">
+        <div class="cert-stat-box">
+          <div class="cert-stat-num">{{ total_findings }}</div>
+          <div class="cert-stat-label">Privacy Findings</div>
+        </div>
+        <div class="cert-stat-box">
+          <div class="cert-stat-num">{{ page_count }}</div>
+          <div class="cert-stat-label">Pages Scanned</div>
+        </div>
+        <div class="cert-stat-box">
+          <div class="cert-stat-num">{{ risk_score }}</div>
+          <div class="cert-stat-label">Risk Score</div>
+        </div>
+      </div>
+
+      <!-- Compliance Chips -->
+      <div class="cert-compliance-row">
+        <span class="cert-compliance-label">Compliance Scope:</span>
+        <span class="cert-compliance-chip"><i class="fa-solid fa-scale-balanced"></i> DPDP 2023</span>
+        <span class="cert-compliance-chip gdpr"><i class="fa-solid fa-shield-halved"></i> GDPR</span>
+        <span class="cert-compliance-chip pci"><i class="fa-solid fa-credit-card"></i> PCI-DSS</span>
+        <span class="cert-compliance-chip iso"><i class="fa-solid fa-award"></i> ISO 27001</span>
+      </div>
+
+      <!-- Scan Metadata -->
+      <div class="cert-meta-row">
+        <div class="cert-meta-item">
+          <span class="cert-meta-key"><i class="fa-solid fa-calendar-days"></i> Scan Date</span>
+          <span class="cert-meta-val">{{ scan_date }}</span>
+        </div>
+        <div class="cert-meta-item">
+          <span class="cert-meta-key"><i class="fa-solid fa-share-nodes"></i> Sharing Context</span>
+          <span class="cert-meta-val">{{ sharing_context }}</span>
+        </div>
+        <div class="cert-meta-item">
+          <span class="cert-meta-key"><i class="fa-solid fa-fingerprint"></i> Audit ID</span>
+          <span class="cert-meta-val" style="font-family:monospace;font-size:0.8rem;">{{ session_id }}</span>
+        </div>
+        <div class="cert-meta-item">
+          <span class="cert-meta-key"><i class="fa-solid fa-robot"></i> Detection Engine</span>
+          <span class="cert-meta-val">ShareSafe v3.3 — 40+ PII patterns, OpenCV face detection, regex engine</span>
+        </div>
+      </div>
+
+    </div><!-- /cert-body -->
+
+    <!-- Footer -->
+    <div class="cert-footer">
+      <div class="cert-footer-note">
+        <i class="fa-solid fa-lock" style="color:#1a56db;"></i>
+        This certificate is publicly verifiable. No document content is exposed — only audit metadata.
+      </div>
+      <div class="cert-actions">
+        <button class="btn-cert-secondary" onclick="copyCertLink()">
+          <i class="fa-solid fa-link"></i> Copy Link
+        </button>
+        <a href="/download/{{ session_id }}/certificate" class="btn-cert-primary">
+          <i class="fa-solid fa-download"></i> Download PDF
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /cert-card -->
+</div>
+
+<!-- Toast -->
+<div class="cert-toast" id="certToast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyCertLink() {
+  navigator.clipboard.writeText(window.location.href).then(function() {
+    var toast = document.getElementById('certToast');
+    toast.textContent = '✅ Certificate link copied!';
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 2500);
+  }).catch(function() {
+    var toast = document.getElementById('certToast');
+    toast.textContent = window.location.href;
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 4000);
+  });
+}
+// Animate score bar on load
+window.addEventListener('load', function() {
+  var bar = document.querySelector('.cert-score-bar-fill');
+  if (bar) {
+    var w = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(function() { bar.style.width = w; }, 100);
+  }
+});
+</script>
+{% endblock %}

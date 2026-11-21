@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate Not Found — ShareSafe{% endblock %}
+
+{% block content %}
+<div style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 16px;text-align:center;">
+  <div style="font-size:4rem;margin-bottom:16px;">🔍</div>
+  <h2 style="font-size:1.5rem;font-weight:700;color:var(--ink-primary);margin-bottom:8px;">Audit Certificate Not Found</h2>
+  <p style="color:var(--ink-muted);max-width:420px;margin-bottom:28px;">
+    This certificate link may have expired or the session was cleared.
+    ShareSafe sessions are temporary — please re-upload the document to generate a new audit.
+  </p>
+  <a href="/" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;background:#1a56db;color:#fff;font-weight:600;text-decoration:none;">
+    <i class="fa-solid fa-arrow-left"></i> Back to ShareSafe
+  </a>
+</div>
+{% endblock %}
