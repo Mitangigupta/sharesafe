@@ -43,16 +43,28 @@ document.addEventListener("DOMContentLoaded", () => {
   let activePlatformTab = null;
 
   // 1. Check Server Connection
+  const linkWorkbench = document.getElementById("linkWorkbench");
+  const offlineBanner = document.getElementById("offlineBanner");
+
   function checkServer() {
     chrome.runtime.sendMessage({ action: "CHECK_HEALTH" }, (response) => {
       if (response && response.success) {
         statusDot.className = "status-dot online";
-        statusLabel.textContent = "Online (:5000)";
-        serverStatus.title = `Connected to ShareSafe Engine v${response.data.version || "1.0"}`;
+        const isVercel = response.source === "vercel";
+        statusLabel.textContent = isVercel ? "Online (Vercel)" : "Online (:5000)";
+        serverStatus.title = `Connected to ShareSafe Engine v${response.data.version || "1.0"} via ${isVercel ? "Vercel cloud" : "localhost"}`;
+        // Update "Open Web Studio" link to the working server
+        if (linkWorkbench && response.apiUrl) {
+          linkWorkbench.href = response.apiUrl;
+        }
+        // Hide offline banner if visible
+        if (offlineBanner) offlineBanner.style.display = "none";
       } else {
         statusDot.className = "status-dot offline";
         statusLabel.textContent = "Offline Mode";
-        serverStatus.title = "ShareSafe local server is offline; client-side privacy scanner is active.";
+        serverStatus.title = "ShareSafe local & cloud servers unreachable; client-side privacy scanner is active.";
+        // Show offline mode banner
+        if (offlineBanner) offlineBanner.style.display = "flex";
       }
     });
   }
@@ -464,7 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (popupDropzone && popupFileInput) {
     popupDropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
-      popupDropzone.style.background = "var(--coral-soft)";
+      popupDropzone.style.background = "var(--bg-peach)";
     });
 
     popupDropzone.addEventListener("dragleave", () => {

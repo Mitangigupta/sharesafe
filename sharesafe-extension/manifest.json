@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ShareSafe - PII & Privacy Guard",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Defensive privacy scanner that detects sensitive PII, credentials, and identity leaks on webpages, drafts, messaging, and automated file uploads before sharing.",
   "icons": {
     "16": "icons/icon16.png",

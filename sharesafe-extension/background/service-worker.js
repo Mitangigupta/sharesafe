@@ -5,6 +5,7 @@
  */
 
 const DEFAULT_API_URL = "http://127.0.0.1:5000";
+const VERCEL_API_URL = "https://mitangiguptasharesafe.vercel.app";
 const DEFAULT_CONTEXT = "academic";
 
 // Context Menu Setup
@@ -252,6 +253,78 @@ function runOfflineDetectionEngine(text, sharingContext = "academic") {
     maskedText = maskedText.split(rawVal).join("[REDACTED_EMAIL]");
   }
 
+  // 7. IFSC Codes (Indian bank branch identifier)
+  const ifscRegex = /\b([A-Z]{4}0[A-Z0-9]{6})\b/g;
+  while ((match = ifscRegex.exec(text)) !== null) {
+    const rawVal = match[1];
+    detections.push({
+      type: "IFSC_CODE",
+      label: "IFSC Bank Code",
+      value: rawVal,
+      masked: rawVal.slice(0, 4) + "0XXXXXX",
+      risk: "MEDIUM",
+      category: "Banking",
+      details: "RBI-issued branch identifier — links to bank account location"
+    });
+    maskedText = maskedText.split(rawVal).join("[REDACTED_IFSC]");
+  }
+
+  // 8. UPI / VPA (Virtual Payment Address)
+  const upiRegex = /\b([a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64})\b/g;
+  while ((match = upiRegex.exec(text)) !== null) {
+    const rawVal = match[1];
+    // Skip plain emails already caught above, only match known UPI handles
+    const knownUpiHandles = ["upi","paytm","okhdfcbank","okicici","oksbi","okaxis","ybl","ibl","axl","apl","rajgovhdfcbank","chokidar","airtel","jio","kotak","indus","rbl","boi","bob","centralbank","dbs","dena"];
+    const handle = rawVal.split("@")[1] || "";
+    if (knownUpiHandles.some(h => handle.toLowerCase().startsWith(h))) {
+      detections.push({
+        type: "UPI_VPA",
+        label: "UPI Virtual Payment Address",
+        value: rawVal,
+        masked: "***@" + handle,
+        risk: "HIGH",
+        category: "Payment Info",
+        details: "NPCI UPI identifier — directly linked to bank account"
+      });
+      maskedText = maskedText.split(rawVal).join("[REDACTED_UPI]");
+    }
+  }
+
+  // 9. IP Addresses (IPv4)
+  const ipRegex = /\b((?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?))\b/g;
+  while ((match = ipRegex.exec(text)) !== null) {
+    const rawVal = match[1];
+    // Skip loopback / private ranges from being flagged
+    if (!rawVal.startsWith("127.") && !rawVal.startsWith("192.168.") && !rawVal.startsWith("10.") && !rawVal.startsWith("0.")) {
+      detections.push({
+        type: "IP_ADDRESS",
+        label: "Public IP Address",
+        value: rawVal,
+        masked: rawVal.split(".").slice(0, 2).join(".") + ".x.x",
+        risk: "LOW",
+        category: "Network",
+        details: "IPv4 address — may reveal network location or server identity"
+      });
+      maskedText = maskedText.split(rawVal).join("[REDACTED_IP]");
+    }
+  }
+
+  // 10. Indian Passport Number
+  const passportRegex = /\b([A-Z][1-9][0-9]{7})\b/g;
+  while ((match = passportRegex.exec(text)) !== null) {
+    const rawVal = match[1];
+    detections.push({
+      type: "PASSPORT_NUMBER",
+      label: "Indian Passport Number",
+      value: rawVal,
+      masked: rawVal.charAt(0) + "XXXXXXX",
+      risk: "CRITICAL",
+      category: "Government Identity",
+      details: "ICAO-format Indian passport — internationally recognized travel identity document"
+    });
+    maskedText = maskedText.split(rawVal).join("[REDACTED_PASSPORT]");
+  }
+
   // Calculate Context-Aware Risk
   let multiplier = 1.0;
   if (sharingContext === "professional") multiplier = 1.1;
@@ -414,19 +487,40 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.action === "CHECK_HEALTH") {
     getConfig().then(async (config) => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
-
+      // 1. Try configured API URL (default: localhost:5000)
+      const ctrl1 = new AbortController();
+      const t1 = setTimeout(() => ctrl1.abort(), 2000);
       try {
-        const res = await fetchWithLoopbackFallback(config.apiUrl, "/api/health", { signal: controller.signal });
-        clearTimeout(timeoutId);
+        const res = await fetchWithLoopbackFallback(config.apiUrl, "/api/health", { signal: ctrl1.signal });
+        clearTimeout(t1);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        sendResponse({ success: true, data: data, apiUrl: config.apiUrl });
-      } catch (err) {
-        clearTimeout(timeoutId);
-        sendResponse({ success: false, error: err.message, apiUrl: config.apiUrl });
+        sendResponse({ success: true, data: data, apiUrl: config.apiUrl, source: "local" });
+        return;
+      } catch (_) {
+        clearTimeout(t1);
       }
+
+      // 2. Fall back to Vercel deployment
+      if (config.apiUrl !== VERCEL_API_URL) {
+        const ctrl2 = new AbortController();
+        const t2 = setTimeout(() => ctrl2.abort(), 4000);
+        try {
+          const res2 = await fetch(`${VERCEL_API_URL}/api/health`, { signal: ctrl2.signal });
+          clearTimeout(t2);
+          if (!res2.ok) throw new Error(`HTTP ${res2.status}`);
+          const data2 = await res2.json();
+          // Auto-update stored apiUrl to Vercel so future scans also use it
+          chrome.storage.sync.set({ apiUrl: VERCEL_API_URL });
+          sendResponse({ success: true, data: data2, apiUrl: VERCEL_API_URL, source: "vercel" });
+          return;
+        } catch (_) {
+          clearTimeout(t2);
+        }
+      }
+
+      // 3. Both unreachable — full offline
+      sendResponse({ success: false, error: "Both local and Vercel server unreachable", apiUrl: config.apiUrl, source: "offline" });
     });
     return true;
   }
