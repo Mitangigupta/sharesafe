@@ -1,6 +1,7 @@
 import os
 import shutil
 from pathlib import Path
+from core.format_registry import get_allowed_extensions
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -13,7 +14,7 @@ class Config:
     OUTPUT_FOLDER = os.path.join(RUNTIME_DIR, 'outputs')
     SAMPLES_FOLDER = os.path.join(BASE_DIR, 'samples')
     MAX_CONTENT_LENGTH = 30 * 1024 * 1024  # 30 MB max upload
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'bmp', 'pdf'}
+    ALLOWED_EXTENSIONS = get_allowed_extensions()
     SESSION_TTL_MINUTES = 30
     SEND_FILE_MAX_AGE_DEFAULT = 0
 

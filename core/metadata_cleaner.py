@@ -3,15 +3,45 @@ from typing import Dict, Any, List
 from PIL import Image, ExifTags
 import pymupdf
 
+from core.format_registry import get_format_category
+
+
 class MetadataCleaner:
-    """Detects and scrubs embedded metadata including EXIF tags, GPS coordinates, author history, and PDF stream attributes."""
+    """Detects and scrubs embedded metadata including EXIF tags, GPS coordinates, author history, and Office/PDF stream attributes."""
+
+    OFFICE_FIELDS = [
+        ('author', 'Author'),
+        ('creator', 'Creator'),
+        ('last_modified_by', 'Last Modified By'),
+        ('lastModifiedBy', 'Last Modified By'),
+        ('title', 'Title'),
+        ('subject', 'Subject'),
+        ('keywords', 'Keywords'),
+        ('comments', 'Comments'),
+        ('description', 'Description'),
+        ('category', 'Category'),
+        ('company', 'Company'),
+        ('created', 'Created'),
+        ('modified', 'Modified'),
+    ]
 
     @classmethod
     def inspect_file(cls, file_path: str) -> Dict[str, Any]:
         """Inspects a file for latent privacy-leaking metadata attributes."""
-        ext = os.path.splitext(file_path)[1].lower().strip('.')
-        if ext == 'pdf':
+        category = get_format_category(file_path)
+        if category == 'pdf':
             return cls._inspect_pdf(file_path)
+        elif category in ('docx', 'pptx', 'xlsx'):
+            return cls._inspect_office(file_path, category)
+        elif category in ('text', 'csv'):
+            return {
+                'file_type': category,
+                'metadata_count': 0,
+                'has_gps': False,
+                'summary_tags': [],
+                'tags': [],
+                'status': 'Clean / No Embedded Metadata'
+            }
         else:
             return cls._inspect_image(file_path)
 
@@ -79,11 +109,82 @@ class MetadataCleaner:
         }
 
     @classmethod
+    def _inspect_office(cls, file_path: str, category: str) -> Dict[str, Any]:
+        tags_found = []
+        seen = set()
+        try:
+            props = None
+            if category == 'docx':
+                import docx
+                props = docx.Document(file_path).core_properties
+            elif category == 'pptx':
+                import pptx
+                props = pptx.Presentation(file_path).core_properties
+            elif category == 'xlsx':
+                import openpyxl
+                wb = openpyxl.load_workbook(file_path, read_only=True)
+                props = wb.properties
+                # Extract before closing
+                cls._collect_props(props, tags_found, seen)
+                wb.close()
+                props = None
+
+            if props is not None:
+                cls._collect_props(props, tags_found, seen)
+        except Exception:
+            pass
+
+        return {
+            'file_type': category,
+            'metadata_count': len(tags_found),
+            'has_gps': False,
+            'summary_tags': [f"{t['tag']}: {t['value']}" for t in tags_found[:4]],
+            'tags': tags_found,
+            'status': 'Document Metadata Detected' if tags_found else 'Clean / No Metadata'
+        }
+
+    @classmethod
+    def _collect_props(cls, props, tags_found: List[Dict[str, Any]], seen: set):
+        for attr, label in cls.OFFICE_FIELDS:
+            if hasattr(props, attr):
+                val = getattr(props, attr, None)
+                if val is not None and str(val).strip():
+                    val_str = str(val).strip()[:80]
+                    if (label, val_str) not in seen:
+                        seen.add((label, val_str))
+                        tags_found.append({
+                            'tag': label,
+                            'value': val_str,
+                            'is_sensitive': attr.lower() in ('author', 'creator', 'last_modified_by', 'lastmodifiedby', 'company', 'comments')
+                        })
+
+    @classmethod
+    def scrub_office_properties(cls, props) -> None:
+        """Clears identifying author, history, and document metadata fields on Office core_properties."""
+        str_fields = [
+            'author', 'creator', 'last_modified_by', 'lastModifiedBy',
+            'title', 'subject', 'keywords', 'comments', 'description',
+            'category', 'company', 'content_status', 'identifier', 'version'
+        ]
+        for attr in str_fields:
+            if hasattr(props, attr):
+                try:
+                    setattr(props, attr, '')
+                except Exception:
+                    try:
+                        setattr(props, attr, None)
+                    except Exception:
+                        pass
+
+    @classmethod
     def scrub_image(cls, src_path: str, dst_path: str) -> bool:
         """Saves a byte-for-byte image pixel copy with all EXIF, GPS, and header profiles purged."""
         try:
             with Image.open(src_path) as img:
-                # Convert RGBA/P to RGB if needed, discard exif
+                if getattr(img, 'n_frames', 1) > 1:
+                    img.seek(0)
+                if img.mode not in ('RGB', 'RGBA', 'L'):
+                    img = img.convert('RGB')
                 data = list(img.getdata())
                 clean_img = Image.new(img.mode, img.size)
                 clean_img.putdata(data)

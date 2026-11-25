@@ -61,7 +61,7 @@
             <div class="hero-upload-col" id="uploadSection">
                 <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data" class="upload-dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
                     <input type="hidden" id="sharingContextInput" name="sharing_context" value="academic">
-                    <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp" onchange="handleFileSelect(event)" style="display: none;">
+                    <input type="file" id="fileInput" name="file" accept=".pdf,.docx,.pptx,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.tif,.gif" onchange="handleFileSelect(event)" style="display: none;">
                     
                     <!-- State A: Idle / Empty State -->
                     <div class="dropzone-idle" id="dropzoneIdle">
@@ -81,7 +81,7 @@
                         </div>
 
                         <div class="upload-specs-pill">
-                            <span class="spec-tag"><i class="fa-regular fa-file"></i> PDF, PNG, JPG, WEBP, BMP</span>
+                            <span class="spec-tag"><i class="fa-regular fa-file"></i> PDF, DOCX, PPTX, XLSX, TXT, CSV, Images</span>
                             <span class="spec-tag"><i class="fa-solid fa-weight-hanging"></i> Max 30 MB</span>
                             <span class="spec-tag spec-secure"><i class="fa-solid fa-shield-halved"></i> Ephemeral In-Memory</span>
                         </div>

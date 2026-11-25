@@ -16,6 +16,8 @@ from core.metadata_cleaner import MetadataCleaner
 from core.certificate_gen import CertificateGenerator
 from core.cleanup import SessionManager
 from core.ocr_engine import ocr_engine
+from core.format_registry import validate_file_content, get_format_category, get_mime_type
+from core.extractors import extract_document, render_text_preview_image
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -38,42 +40,10 @@ def _emit_progress(session_id, step, label, pct):
             pass
 
 
-def validate_file_content(file_path: str, ext: str):
-    """Validates magic bytes / signatures to guarantee file integrity and bounds."""
-    try:
-        with open(file_path, 'rb') as f:
-            header = f.read(32)
-        if len(header) < 4:
-            return False, "File is empty or corrupted."
-
-        if ext == 'pdf':
-            if not header.startswith(b'%PDF-'):
-                return False, "Invalid PDF structure: missing %PDF- header."
-            import pymupdf
-            doc = pymupdf.open(file_path)
-            page_count = len(doc)
-            doc.close()
-            if page_count > 50:
-                return False, f"PDF exceeds maximum page limit (found {page_count} pages, limit is 50)."
-        elif ext == 'png':
-            if not header.startswith(b'\x89PNG\r\n\x1a\n'):
-                return False, "Invalid PNG file: corrupted header."
-        elif ext in ('jpg', 'jpeg'):
-            if not header.startswith(b'\xff\xd8\xff'):
-                return False, "Invalid JPEG file: corrupted header."
-        elif ext == 'webp':
-            if not (header.startswith(b'RIFF') and b'WEBP' in header[:16]):
-                return False, "Invalid WEBP file: corrupted header."
-        elif ext == 'bmp':
-            if not header.startswith(b'BM'):
-                return False, "Invalid BMP file: corrupted header."
-        return True, ""
-    except Exception as e:
-        return False, f"Failed to validate file: {str(e)}"
-
-def generate_preview_images(file_path: str, session_dir: str, is_pdf: bool):
+def generate_preview_images(file_path: str, session_dir: str, is_pdf: bool, format_category: str = None):
     """Renders page preview images (page_1.png, page_2.png, ...) in session_dir."""
-    if is_pdf:
+    cat = format_category or ('pdf' if is_pdf else get_format_category(file_path))
+    if cat == 'pdf':
         import pymupdf
         doc = pymupdf.open(file_path)
         for page_idx in range(len(doc)):
@@ -83,10 +53,26 @@ def generate_preview_images(file_path: str, session_dir: str, is_pdf: bool):
             pix = page.get_pixmap(matrix=mat)
             pix.save(os.path.join(session_dir, f"page_{page_idx + 1}.png"))
         doc.close()
+    elif cat in ('docx', 'pptx', 'xlsx', 'text', 'csv'):
+        extracted = extract_document(file_path, cat)
+        for page_data in extracted.get('pages', []):
+            p_num = page_data.get('page_number', 1)
+            render_text_preview_image(
+                page_data.get('title', f"Page {p_num}"),
+                page_data.get('preview_lines', []),
+                os.path.join(session_dir, f"page_{p_num}.png")
+            )
     else:
         dest_preview = os.path.join(session_dir, "page_1.png")
         if file_path != dest_preview and os.path.exists(file_path):
-            shutil.copyfile(file_path, dest_preview)
+            from PIL import Image, ImageOps
+            with Image.open(file_path) as raw_img:
+                if getattr(raw_img, 'n_frames', 1) > 1:
+                    raw_img.seek(0)
+                pil_img = ImageOps.exif_transpose(raw_img) or raw_img.copy()
+                if pil_img.mode != 'RGB':
+                    pil_img = pil_img.convert('RGB')
+                pil_img.save(dest_preview, format='PNG')
 
 def restore_session_if_needed(session_id, client_session_data=None):
     """
@@ -297,9 +283,9 @@ def upload_file():
         if file.filename == '':
             return jsonify({'error': 'No selected file'}), 400
 
-        ext = file.filename.rsplit('.', 1)[-1].lower()
+        ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
         if ext not in Config.ALLOWED_EXTENSIONS:
-            return jsonify({'error': f'Unsupported file extension .{ext}. Allowed: {", ".join(Config.ALLOWED_EXTENSIONS)}'}), 400
+            return jsonify({'error': f'Unsupported file extension .{ext}. Allowed: {", ".join(sorted(Config.ALLOWED_EXTENSIONS))}'}), 400
 
         display_name = os.path.basename(file.filename)
         safe_filename = f"upload_{uuid.uuid4().hex[:8]}.{ext}"
@@ -346,10 +332,11 @@ def upload_file():
         # Save session metadata json
         session_info = {
             "session_id": session_id,
-            "scan_date": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+            "scan_date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
             "file_name": scan_result["file_name"],
             "sample_id": sample_id,
             "is_pdf": scan_result["is_pdf"],
+            "format_category": scan_result.get("format_category", get_format_category(target_path)),
             "page_count": scan_result.get("page_count", len(scan_result.get("pages", []))),
             "sharing_context": sharing_context,
             "original_path": target_path,
@@ -628,7 +615,11 @@ def apply_redaction(session_id):
                 'bbox': d.get('bbox'),
                 'style': item_style,
                 'label': d.get('type', 'REDACTED'),
-                'category': d.get('category', 'General PII')
+                'category': d.get('category', 'General PII'),
+                'value': d.get('value', ''),
+                'masked': d.get('masked', ''),
+                'location': d.get('location', ''),
+                'source_type': d.get('source_type', '')
             })
 
     # Add manual user-drawn boxes
@@ -645,16 +636,18 @@ def apply_redaction(session_id):
     orig_path = session_data['original_path']
     is_pdf = session_data['is_pdf']
     ext = os.path.splitext(orig_path)[1].lower()
+    format_category = session_data.get('format_category') or get_format_category(orig_path)
     out_filename = f"safe_sanitized_{session_id[:8]}{ext}"
 
     try:
-        # Perform permanent redaction and text stream flattening
+        # Perform permanent redaction and format-specific sanitization
         safe_output_path = DocumentRedactor.redact_document(
             original_file_path=orig_path,
             is_pdf=is_pdf,
             session_dir=output_dir,
             redactions=active_redactions,
-            output_filename=out_filename
+            output_filename=out_filename,
+            format_category=format_category
         )
 
         # Render preview images for the redacted document
@@ -662,7 +655,7 @@ def apply_redaction(session_id):
         redacted_previews = []
         redacted_previews_data = []
 
-        if is_pdf:
+        if format_category == 'pdf':
             import pymupdf
             out_doc = pymupdf.open(safe_output_path)
             for p_idx in range(len(out_doc)):
@@ -676,10 +669,29 @@ def apply_redaction(session_id):
                     b64 = base64.b64encode(pf.read()).decode('utf-8')
                     redacted_previews_data.append(f"data:image/png;base64,{b64}")
             out_doc.close()
+        elif format_category in ('docx', 'pptx', 'xlsx', 'text', 'csv'):
+            extracted_out = extract_document(safe_output_path, format_category)
+            for page_data in extracted_out.get('pages', []):
+                p_num = page_data.get('page_number', 1)
+                p_name = f"redacted_page_{p_num}.png"
+                p_file = os.path.join(output_dir, p_name)
+                render_text_preview_image(
+                    f"[SANITIZED] {page_data.get('title', f'Page {p_num}')}",
+                    page_data.get('preview_lines', []),
+                    p_file
+                )
+                redacted_previews.append(f"/output-preview/{session_id}/{p_name}")
+                with open(p_file, 'rb') as pf:
+                    b64 = base64.b64encode(pf.read()).decode('utf-8')
+                    redacted_previews_data.append(f"data:image/png;base64,{b64}")
         else:
             p_name = f"redacted_page_1.png"
             p_file = os.path.join(output_dir, p_name)
-            shutil.copyfile(safe_output_path, p_file)
+            from PIL import Image
+            with Image.open(safe_output_path) as out_img:
+                if out_img.mode != 'RGB':
+                    out_img = out_img.convert('RGB')
+                out_img.save(p_file, format='PNG')
             redacted_previews.append(f"/output-preview/{session_id}/{p_name}")
             with open(p_file, 'rb') as pf:
                 b64 = base64.b64encode(pf.read()).decode('utf-8')
@@ -713,7 +725,7 @@ def apply_redaction(session_id):
             'document_base64': doc_b64,
             'certificate_base64': cert_b64,
             'download_filename': f"safe_{session_data['file_name']}",
-            'mime_type': 'application/pdf' if is_pdf else 'image/png',
+            'mime_type': get_mime_type(ext),
             'audit_data': audit_data,
             'download_document_url': url_for('download_document', session_id=session_id),
             'download_certificate_url': url_for('download_certificate', session_id=session_id),
@@ -764,14 +776,19 @@ def download_document(session_id):
                     'bbox': d.get('bbox'),
                     'style': 'blackout',
                     'label': d.get('type', 'REDACTED'),
-                    'category': d.get('category', 'General PII')
+                    'category': d.get('category', 'General PII'),
+                    'value': d.get('value', ''),
+                    'masked': d.get('masked', ''),
+                    'location': d.get('location', ''),
+                    'source_type': d.get('source_type', '')
                 })
             out_file = DocumentRedactor.redact_document(
                 original_file_path=session_data['original_path'],
                 is_pdf=session_data['is_pdf'],
                 session_dir=output_dir,
                 redactions=active_redactions,
-                output_filename=f"safe_sanitized_{session_id[:8]}{target_ext}"
+                output_filename=f"safe_sanitized_{session_id[:8]}{target_ext}",
+                format_category=session_data.get('format_category') or get_format_category(session_data['original_path'])
             )
         except Exception:
             return "File not generated yet", 404
@@ -821,7 +838,7 @@ def share_certificate(session_id):
     detections = session_data.get('detections', [])
     scan_date = session_data.get('scan_date', None)
     if not scan_date:
-        scan_date = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')
+        scan_date = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     return render_template(
         'share_cert.html',
         session_id=session_id,
@@ -1030,6 +1047,7 @@ def api_inspect_file():
             'file_name': scan_result['file_name'],
             'sample_id': None,
             'is_pdf': scan_result['is_pdf'],
+            'format_category': scan_result.get('format_category', get_format_category(target_path)),
             'page_count': scan_result.get('page_count', len(scan_result.get('pages', []))),
             'sharing_context': sharing_context,
             'original_path': target_path,
@@ -1064,9 +1082,10 @@ def api_inspect_file():
         traceback.print_exc()
         return jsonify({'error': f'Failed to process file: {str(e)}'}), 500
 
-def validate_non_recoverability(output_path: str, is_pdf: bool, detected_values: list = None) -> dict:
+def validate_non_recoverability(output_path: str, is_pdf: bool, detected_values: list = None, format_category: str = None) -> dict:
     """Verifies that the redacted document/image does not leak residual text streams or sensitive tokens."""
     detected_values = detected_values or []
+    cat = format_category or ('pdf' if is_pdf else get_format_category(output_path))
     res = {
         'residual_text_chars': 0,
         'metadata_stripped': True,
@@ -1075,7 +1094,7 @@ def validate_non_recoverability(output_path: str, is_pdf: bool, detected_values:
         'verified': True
     }
     try:
-        if is_pdf:
+        if cat == 'pdf':
             import pymupdf
             doc = pymupdf.open(output_path)
             total_chars = 0
@@ -1095,6 +1114,27 @@ def validate_non_recoverability(output_path: str, is_pdf: bool, detected_values:
                     leaks += 1
             res['sensitive_tokens_leaked'] = leaks
             res['verified'] = (total_chars == 0 and leaks == 0)
+        elif cat in ('docx', 'pptx', 'xlsx', 'text', 'csv'):
+            extracted = extract_document(output_path, cat)
+            all_text_parts = []
+            for p in extracted.get('pages', []):
+                for b in p.get('blocks', []):
+                    all_text_parts.append(b.get('text', ''))
+            for mb in extracted.get('metadata_blocks', []):
+                all_text_parts.append(mb.get('text', ''))
+            all_text = "\n".join(all_text_parts)
+            import re as _re
+            scrubbed_check_text = _re.sub(r'\[[^\]]*REDACTED[^\]]*\]', '', all_text, flags=_re.IGNORECASE)
+            leaks = 0
+            for val in detected_values:
+                val_clean = str(val).strip()
+                if len(val_clean) >= 4 and val_clean not in ('[face detected]', '[QR]') and val_clean.lower() in scrubbed_check_text.lower():
+                    leaks += 1
+            meta = MetadataCleaner.inspect_file(output_path)
+            res['metadata_stripped'] = meta.get('metadata_count', 0) == 0
+            res['flattened_raster'] = False
+            res['sensitive_tokens_leaked'] = leaks
+            res['verified'] = (leaks == 0)
         else:
             meta = MetadataCleaner.inspect_file(output_path)
             res['metadata_stripped'] = len(meta.get('tags', [])) == 0 or meta.get('status') == 'CLEAN'
@@ -1163,6 +1203,7 @@ def auto_redact_attachment():
             original_filename=display_name
         )
         is_pdf = scan_result['is_pdf']
+        format_category = scan_result.get('format_category', get_format_category(target_path))
         detections = scan_result['detections']
         risk_summary = scan_result['risk_summary']
 
@@ -1175,6 +1216,7 @@ def auto_redact_attachment():
                 'file_name': display_name,
                 'file_size': os.path.getsize(target_path),
                 'is_pdf': is_pdf,
+                'format_category': format_category,
                 'total_findings': 0,
                 'detections': [],
                 'risk_summary': risk_summary,
@@ -1182,13 +1224,15 @@ def auto_redact_attachment():
                 'message': 'No sensitive information detected. File is clean to share.'
             })
 
-        # By default: ALL detected items with bounding boxes are marked for redaction
+        # By default: ALL detected items (bbox or text/metadata value) are marked for redaction
         active_redactions = []
         annotated_detections = []
         for d in detections:
             bbox = d.get('bbox')
             d_copy = dict(d)
-            if bbox and len(bbox) == 4:
+            has_bbox = bool(bbox and len(bbox) == 4)
+            is_text_redactable = format_category in ('docx', 'pptx', 'xlsx', 'text', 'csv') and bool(d.get('value'))
+            if has_bbox or is_text_redactable:
                 d_copy['redacted'] = True
                 d_copy['style'] = default_style
                 active_redactions.append({
@@ -1197,7 +1241,11 @@ def auto_redact_attachment():
                     'bbox': bbox,
                     'style': default_style,
                     'label': d.get('type', 'REDACTED'),
-                    'category': d.get('category', 'General PII')
+                    'category': d.get('category', 'General PII'),
+                    'value': d.get('value', ''),
+                    'masked': d.get('masked', ''),
+                    'location': d.get('location', ''),
+                    'source_type': d.get('source_type', '')
                 })
             else:
                 d_copy['redacted'] = False
@@ -1205,25 +1253,25 @@ def auto_redact_attachment():
             annotated_detections.append(d_copy)
 
         # Generate sanitized copy
-        out_ext = '.pdf' if is_pdf else os.path.splitext(target_path)[1].lower()
         out_filename = f"safe_{display_name}"
         safe_output_path = DocumentRedactor.redact_document(
             original_file_path=target_path,
             is_pdf=is_pdf,
             session_dir=output_dir,
             redactions=active_redactions,
-            output_filename=out_filename
+            output_filename=out_filename,
+            format_category=format_category
         )
 
         # Validate non-recoverability
         detected_vals = [d.get('value', '') for d in detections]
-        verification = validate_non_recoverability(safe_output_path, is_pdf, detected_vals)
+        verification = validate_non_recoverability(safe_output_path, is_pdf, detected_vals, format_category=format_category)
 
-        # Render preview thumbnails as data URLs (matching DocumentRedactor's 150 DPI render)
+        # Render preview thumbnails as data URLs
         page_previews = []
         preview_data_url = ""
         import base64
-        if is_pdf:
+        if format_category == 'pdf':
             import pymupdf
             out_doc = pymupdf.open(safe_output_path)
             zoom_mat = pymupdf.Matrix(150 / 72, 150 / 72)
@@ -1240,14 +1288,40 @@ def auto_redact_attachment():
             if len(page_previews) > 0:
                 preview_data_url = page_previews[0]['preview_data_url']
             out_doc.close()
-        else:
-            with open(safe_output_path, 'rb') as f:
-                b64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
-                preview_data_url = b64
+        elif format_category in ('docx', 'pptx', 'xlsx', 'text', 'csv'):
+            extracted_out = extract_document(safe_output_path, format_category)
+            for page_data in extracted_out.get('pages', []):
+                p_num = page_data.get('page_number', 1)
+                p_file = os.path.join(output_dir, f"attach_preview_{p_num}.png")
+                pw, ph = render_text_preview_image(
+                    f"[SANITIZED] {page_data.get('title', f'Page {p_num}')}",
+                    page_data.get('preview_lines', []),
+                    p_file
+                )
+                with open(p_file, 'rb') as pf:
+                    p_b64 = f"data:image/png;base64,{base64.b64encode(pf.read()).decode('utf-8')}"
                 page_previews.append({
-                    'page_number': 1,
-                    'preview_data_url': b64
+                    'page_number': p_num,
+                    'width': pw,
+                    'height': ph,
+                    'preview_data_url': p_b64
                 })
+            if page_previews:
+                preview_data_url = page_previews[0]['preview_data_url']
+        else:
+            from PIL import Image
+            import io as _io
+            with Image.open(safe_output_path) as out_img:
+                if out_img.mode != 'RGB':
+                    out_img = out_img.convert('RGB')
+                buf = _io.BytesIO()
+                out_img.save(buf, format='PNG')
+                b64 = f"data:image/png;base64,{base64.b64encode(buf.getvalue()).decode('utf-8')}"
+            preview_data_url = b64
+            page_previews.append({
+                'page_number': 1,
+                'preview_data_url': b64
+            })
 
         # Read sanitized file bytes
         with open(safe_output_path, 'rb') as f:
@@ -1259,6 +1333,7 @@ def auto_redact_attachment():
             'session_id': session_id,
             'file_name': display_name,
             'is_pdf': is_pdf,
+            'format_category': format_category,
             'original_path': target_path,
             'output_dir': output_dir,
             'detections': detections,
@@ -1268,7 +1343,7 @@ def auto_redact_attachment():
         with open(os.path.join(upload_dir, 'session_info.json'), 'w', encoding='utf-8') as f:
             json.dump(session_info, f, indent=2)
 
-        mime_type = 'application/pdf' if is_pdf else f"image/{ext.replace('jpg', 'jpeg')}"
+        mime_type = get_mime_type(ext)
 
         return jsonify({
             'success': True,
@@ -1323,6 +1398,7 @@ def update_attachment_redactions(session_id):
 
         target_path = session_info['original_path']
         is_pdf = session_info['is_pdf']
+        format_category = session_info.get('format_category') or get_format_category(target_path)
         display_name = session_info['file_name']
         detections = session_info['detections']
         default_style = session_info.get('default_style', 'blackout')
@@ -1332,7 +1408,9 @@ def update_attachment_redactions(session_id):
         for d in detections:
             bbox = d.get('bbox')
             d_copy = dict(d)
-            if bbox and len(bbox) == 4 and d['id'] not in excluded_ids:
+            has_bbox = bool(bbox and len(bbox) == 4)
+            is_text_redactable = format_category in ('docx', 'pptx', 'xlsx', 'text', 'csv') and bool(d.get('value'))
+            if (has_bbox or is_text_redactable) and d['id'] not in excluded_ids:
                 style = custom_styles.get(d['id'], default_style)
                 d_copy['redacted'] = True
                 d_copy['style'] = style
@@ -1342,7 +1420,11 @@ def update_attachment_redactions(session_id):
                     'bbox': bbox,
                     'style': style,
                     'label': d.get('type', 'REDACTED'),
-                    'category': d.get('category', 'General PII')
+                    'category': d.get('category', 'General PII'),
+                    'value': d.get('value', ''),
+                    'masked': d.get('masked', ''),
+                    'location': d.get('location', ''),
+                    'source_type': d.get('source_type', '')
                 })
             else:
                 d_copy['redacted'] = False
@@ -1368,17 +1450,18 @@ def update_attachment_redactions(session_id):
             is_pdf=is_pdf,
             session_dir=output_dir,
             redactions=active_redactions,
-            output_filename=out_filename
+            output_filename=out_filename,
+            format_category=format_category
         )
 
         detected_vals = [d.get('value', '') for d in detections if d['id'] not in excluded_ids]
-        verification = validate_non_recoverability(safe_output_path, is_pdf, detected_vals)
+        verification = validate_non_recoverability(safe_output_path, is_pdf, detected_vals, format_category=format_category)
 
         # Render preview thumbnails matching 150 DPI
         page_previews = []
         preview_data_url = ""
         import base64
-        if is_pdf:
+        if format_category == 'pdf':
             import pymupdf
             out_doc = pymupdf.open(safe_output_path)
             zoom_mat = pymupdf.Matrix(150 / 72, 150 / 72)
@@ -1395,21 +1478,47 @@ def update_attachment_redactions(session_id):
             if len(page_previews) > 0:
                 preview_data_url = page_previews[0]['preview_data_url']
             out_doc.close()
-        else:
-            with open(safe_output_path, 'rb') as f:
-                b64 = f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
-                preview_data_url = b64
+        elif format_category in ('docx', 'pptx', 'xlsx', 'text', 'csv'):
+            extracted_out = extract_document(safe_output_path, format_category)
+            for page_data in extracted_out.get('pages', []):
+                p_num = page_data.get('page_number', 1)
+                p_file = os.path.join(output_dir, f"attach_preview_{p_num}.png")
+                pw, ph = render_text_preview_image(
+                    f"[SANITIZED] {page_data.get('title', f'Page {p_num}')}",
+                    page_data.get('preview_lines', []),
+                    p_file
+                )
+                with open(p_file, 'rb') as pf:
+                    p_b64 = f"data:image/png;base64,{base64.b64encode(pf.read()).decode('utf-8')}"
                 page_previews.append({
-                    'page_number': 1,
-                    'preview_data_url': b64
+                    'page_number': p_num,
+                    'width': pw,
+                    'height': ph,
+                    'preview_data_url': p_b64
                 })
+            if page_previews:
+                preview_data_url = page_previews[0]['preview_data_url']
+        else:
+            from PIL import Image
+            import io as _io
+            with Image.open(safe_output_path) as out_img:
+                if out_img.mode != 'RGB':
+                    out_img = out_img.convert('RGB')
+                buf = _io.BytesIO()
+                out_img.save(buf, format='PNG')
+                b64 = f"data:image/png;base64,{base64.b64encode(buf.getvalue()).decode('utf-8')}"
+            preview_data_url = b64
+            page_previews.append({
+                'page_number': 1,
+                'preview_data_url': b64
+            })
 
         with open(safe_output_path, 'rb') as f:
             sanitized_bytes = f.read()
             sanitized_b64 = base64.b64encode(sanitized_bytes).decode('utf-8')
 
         ext = os.path.splitext(target_path)[1].lower().replace('.', '')
-        mime_type = 'application/pdf' if is_pdf else f"image/{ext.replace('jpg', 'jpeg')}"
+        mime_type = get_mime_type(ext)
 
         return jsonify({
             'success': True,

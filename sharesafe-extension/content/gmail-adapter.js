@@ -93,41 +93,22 @@ class GmailAdapter {
    * Pre-send warning display attached to the compose box.
    */
   showPreSendWarning(findingsCount, riskLevel) {
-    const existing = document.getElementById("sharesafe-gmail-warning");
-    if (existing) existing.remove();
-
     const composeEl = this.getActiveComposeElement();
     if (!composeEl) return;
 
-    const banner = document.createElement("div");
-    banner.id = "sharesafe-gmail-warning";
-    banner.style.cssText = `
-      margin: 8px 16px;
-      padding: 8px 12px;
-      background: #FCE8E7;
-      border: 1px solid #E8B4B2;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 12px;
-      color: #A74440;
-      z-index: 9999;
-    `;
-
-    banner.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-weight: 700;">🛡️ ShareSafe Alert:</span>
-        <span>Detected ${findingsCount} sensitive item(s) (${riskLevel} risk). Review in extension popup before sending.</span>
-      </div>
-      <button style="background: none; border: none; font-size: 14px; color: #A74440; cursor: pointer; padding: 0 4px;" onclick="this.parentElement.remove()">✕</button>
-    `;
-
     const composeContainer = composeEl.closest('div[role="region"]') || composeEl.parentElement;
-    if (composeContainer && composeContainer.parentElement) {
-      composeContainer.parentElement.insertBefore(banner, composeContainer);
-    }
+    if (!composeContainer || !composeContainer.parentElement) return;
+
+    window.ShareSafeUI.showComposeThreatBanner({
+      id: "sharesafe-gmail-warning",
+      findingsCount,
+      riskLevel,
+      mountFn: (banner) => {
+        banner.style.margin = "10px 16px";
+        banner.style.zIndex = "9999";
+        composeContainer.parentElement.insertBefore(banner, composeContainer);
+      }
+    });
   }
 }
 

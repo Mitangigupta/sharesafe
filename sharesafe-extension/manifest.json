@@ -43,6 +43,7 @@
         "https://mail.google.com/*"
       ],
       "js": [
+        "content/sharesafe-ui.js",
         "content/file-shield.js",
         "content/gmail-adapter.js"
       ],
@@ -53,6 +54,7 @@
         "https://web.whatsapp.com/*"
       ],
       "js": [
+        "content/sharesafe-ui.js",
         "content/file-shield.js",
         "content/whatsapp-adapter.js"
       ],

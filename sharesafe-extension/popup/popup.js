@@ -611,7 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
       resultRiskBadge.textContent = `${riskLevel} RISK`;
       resultRiskBadge.style.background = "#C65A4A";
       resultRiskBadge.style.color = "#FFFFFF";
-      resultMeta.textContent = `${scan.total_findings} findings auto-redacted • ${scan.is_pdf ? "PDF" : "Image"}`;
+      resultMeta.textContent = `${scan.total_findings} findings auto-redacted • ${scan.format_category ? scan.format_category.toUpperCase() : (scan.is_pdf ? "PDF" : "Image")}`;
       btnDownloadPopupSanitized.style.display = "flex";
       renderPopupDetectionRows(scan.detections || []);
     }
@@ -726,7 +726,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="dropzone-title">Drop photo, image or PDF to redact</div>
         <button type="button" class="btn-choose-file-terracotta" id="btnPopupChooseFileAgain">Choose File to Audit</button>
-        <div class="dropzone-subtext">PDF, PNG, JPG, WEBP &bull; Zero Text Stream Leakage</div>
+        <div class="dropzone-subtext">PDF, DOCX, PPTX, XLSX, TXT, CSV, Images &bull; Zero Leak Sanitization</div>
       `;
       document.getElementById("btnPopupChooseFileAgain")?.addEventListener("click", () => {
         popupFileInput.click();

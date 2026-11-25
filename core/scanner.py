@@ -19,6 +19,8 @@ from core.qr_detector import QRDetector
 from core.ocr_engine import ocr_engine
 from core.risk_assessor import RiskAssessor
 from core.privacy_assistant import PrivacyAssistant
+from core.format_registry import get_format_category
+from core.extractors import extract_document, render_text_preview_image
 
 class DocumentScanner:
     """Multi-modal document scanner orchestrating PyMuPDF vector text extraction, Tesseract/WinRT OCR, and QR payload inspection."""
@@ -33,20 +35,28 @@ class DocumentScanner:
                   sharing_context: str = 'academic', 
                   original_filename: str = None,
                   sample_id: Optional[str] = None) -> Dict[str, Any]:
-        """Scans an uploaded PDF or image file and returns structured detections with page previews."""
+        """Scans an uploaded PDF, image, office document, or text/CSV file and returns structured detections with page previews."""
         ext = os.path.splitext(file_path)[1].lower().strip('.')
-        is_pdf = (ext == 'pdf')
+        format_category = get_format_category(ext)
+        is_pdf = (format_category == 'pdf')
 
         pages = []
         all_detections = []
         scan_warnings = []
 
-        if is_pdf:
+        if format_category == 'pdf':
             pages, all_detections, pdf_warnings = self._scan_pdf(file_path, session_dir)
             scan_warnings.extend(pdf_warnings)
-        else:
+        elif format_category == 'image':
             pages, all_detections, img_warnings = self._scan_image(file_path, session_dir, sample_id=sample_id)
             scan_warnings.extend(img_warnings)
+        elif format_category in ('docx', 'pptx', 'xlsx', 'text', 'csv'):
+            pages, all_detections, doc_warnings = self._scan_structured_document(
+                file_path, session_dir, format_category
+            )
+            scan_warnings.extend(doc_warnings)
+        else:
+            raise ValueError(f"Unsupported file format '.{ext}'.")
 
         # Global deduplication across all sources (OCR, vector text, QR)
         all_detections = self._deduplicate_detections(all_detections)
@@ -77,6 +87,7 @@ class DocumentScanner:
         return {
             'file_name': file_display_name,
             'is_pdf': is_pdf,
+            'format_category': format_category,
             'page_count': len(pages),
             'pages': pages,
             'detections': all_detections,
@@ -203,6 +214,8 @@ class DocumentScanner:
         try:
             # Open with PIL first to handle EXIF orientation transposition and format decoding
             with Image.open(img_path) as raw_img:
+                if getattr(raw_img, 'n_frames', 1) > 1:
+                    raw_img.seek(0)
                 # Transpose EXIF orientation so rotated camera photos from mobile devices are oriented correctly
                 pil_img = ImageOps.exif_transpose(raw_img)
                 if pil_img is None:
@@ -418,6 +431,113 @@ class DocumentScanner:
 
         return pages_info, detections, warnings
 
+    def _scan_structured_document(self, file_path: str, session_dir: str, format_category: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[str]]:
+        """Extracts Common Content Representation from DOCX/PPTX/XLSX/TXT/CSV and runs centralized threat detection."""
+        warnings: List[str] = []
+        try:
+            extracted = extract_document(file_path, format_category)
+        except Exception as e:
+            raise ValueError(f"Could not extract content from {format_category.upper()} file: {str(e)}")
+
+        pages_info: List[Dict[str, Any]] = []
+        all_detections: List[Dict[str, Any]] = []
+
+        for page_data in extracted.get('pages', []):
+            page_num = page_data.get('page_number', 1)
+            preview_filename = f"page_{page_num}.png"
+            preview_path = os.path.join(session_dir, preview_filename)
+
+            page_w, page_h = render_text_preview_image(
+                page_data.get('title', f"Page {page_num}"),
+                page_data.get('preview_lines', []),
+                preview_path
+            )
+            with open(preview_path, 'rb') as pf:
+                b64_preview = f"data:image/png;base64,{base64.b64encode(pf.read()).decode('ascii')}"
+
+            page_detections: List[Dict[str, Any]] = []
+
+            # 1. Scan all extracted text blocks via centralized SensitiveDetector
+            for block in page_data.get('blocks', []):
+                txt = block.get('text', '')
+                if not txt or not txt.strip():
+                    continue
+                matches = self.detector.scan_text(txt)
+                for m in matches:
+                    det = dict(m)
+                    det['id'] = f"det_{uuid.uuid4().hex[:8]}"
+                    det['page'] = page_num
+                    det['bbox'] = None
+                    det['location'] = block.get('location', f"Page {page_num}")
+                    det['source_type'] = block.get('source_type', 'text')
+                    page_detections.append(det)
+
+            # 2. Scan embedded images (e.g. DOCX/PPTX) for QR codes and OCR text
+            for img_item in page_data.get('images', []):
+                blob = img_item.get('bytes')
+                loc = img_item.get('location', 'Embedded Image')
+                if not blob:
+                    continue
+                try:
+                    import io
+                    with Image.open(io.BytesIO(blob)) as emb_img:
+                        if getattr(emb_img, 'n_frames', 1) > 1:
+                            emb_img.seek(0)
+                        if emb_img.mode != 'RGB':
+                            emb_img = emb_img.convert('RGB')
+
+                        if _CV2_AVAILABLE:
+                            img_np = cv2.cvtColor(np.array(emb_img), cv2.COLOR_RGB2BGR)
+                            qr_results = self.qr_detector.detect(img_np)
+                            for qr in qr_results:
+                                qr['id'] = f"det_{uuid.uuid4().hex[:8]}"
+                                qr['page'] = page_num
+                                qr['bbox'] = None
+                                qr['location'] = f"{loc} (QR)"
+                                qr['source_type'] = 'embedded_image_qr'
+                                page_detections.append(qr)
+
+                        if ocr_engine.is_available():
+                            ocr_words = ocr_engine.extract_words_and_boxes(emb_img)
+                            ocr_dets = self._extract_ocr_word_matches(ocr_words, page_num)
+                            for od in ocr_dets:
+                                od['bbox'] = None
+                                od['location'] = f"{loc} (OCR)"
+                                od['source_type'] = 'embedded_image_ocr'
+                                page_detections.append(od)
+                except Exception:
+                    pass
+
+            page_detections = self._deduplicate_detections(page_detections)
+            pages_info.append({
+                'page_number': page_num,
+                'width': page_w,
+                'height': page_h,
+                'preview_url': f"/preview/{os.path.basename(session_dir)}/{preview_filename}",
+                'preview_data_url': b64_preview,
+                'preview_file': preview_filename,
+                'detection_count': len(page_detections),
+            })
+            all_detections.extend(page_detections)
+
+        # 3. Scan extracted document metadata blocks (attach to page 1)
+        for mb in extracted.get('metadata_blocks', []):
+            txt = mb.get('text', '')
+            if not txt:
+                continue
+            matches = self.detector.scan_text(txt)
+            for m in matches:
+                det = dict(m)
+                det['id'] = f"det_{uuid.uuid4().hex[:8]}"
+                det['page'] = 1
+                det['bbox'] = None
+                det['location'] = mb.get('location', 'Metadata')
+                det['source_type'] = 'metadata'
+                all_detections.append(det)
+
+        all_detections = self._deduplicate_detections(all_detections)
+        return pages_info, all_detections, warnings
+
     def _extract_pdf_word_matches(self, words: List[Tuple], zoom: float, page_num: int) -> List[Dict[str, Any]]:
         """Matches sensitive regex patterns against reconstructed PDF word streams and maps coordinates."""
         if not words:
@@ -621,7 +741,9 @@ class DocumentScanner:
         for d in sorted_dets:
             b1 = d.get('bbox')
             p1 = d.get('page', 1)
-            norm1 = re.sub(r'\D', '', d.get('value', '')).lower() or d.get('value', '').lower()
+            val1 = str(d.get('value', '')).strip()
+            digits1 = re.sub(r'\D', '', val1)
+            norm1 = digits1 if len(digits1) >= 6 and len(digits1) >= len(val1) * 0.5 else val1.lower()
 
             is_dup = False
             for u in unique_dets:
@@ -631,10 +753,12 @@ class DocumentScanner:
                     continue
 
                 b2 = u.get('bbox')
-                norm2 = re.sub(r'\D', '', u.get('value', '')).lower() or u.get('value', '').lower()
+                val2 = str(u.get('value', '')).strip()
+                digits2 = re.sub(r'\D', '', val2)
+                norm2 = digits2 if len(digits2) >= 6 and len(digits2) >= len(val2) * 0.5 else val2.lower()
 
                 # Check normalized value match with spatial proximity or exact text match
-                if norm1 and norm2 and (norm1 == norm2 or (len(norm1) >= 8 and (norm1 in norm2 or norm2 in norm1))):
+                if norm1 and norm2 and (norm1 == norm2 or (len(norm1) >= 8 and len(norm2) >= 8 and (norm1 in norm2 or norm2 in norm1))):
                     if b1 and b2:
                         iou = self._compute_iou(b1, b2)
                         if iou > 0.15 or self._is_box_inside(b1, b2) or self._is_box_inside(b2, b1):

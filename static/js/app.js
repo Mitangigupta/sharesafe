@@ -4,7 +4,7 @@
  */
 
 const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30 MB
-const ALLOWED_EXTS = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp'];
+const ALLOWED_EXTS = ['pdf', 'docx', 'pptx', 'xlsx', 'txt', 'csv', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'tiff', 'tif', 'gif'];
 
 let currentStagedFile = null;
 let currentInspectingQrId = null;
@@ -69,7 +69,7 @@ function stageSelectedFile(file) {
     if (!ALLOWED_EXTS.includes(ext)) {
         showUploadError(
             'Unsupported File Format',
-            `File extension .${ext} is not supported. Please select a PDF, PNG, JPG, WEBP, or BMP document.`
+            `File extension .${ext} is not supported. Supported formats: PDF, DOCX, PPTX, XLSX, TXT, CSV, PNG, JPG, WEBP, BMP, TIFF, GIF.`
         );
         return;
     }

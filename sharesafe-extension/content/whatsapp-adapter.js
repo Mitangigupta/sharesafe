@@ -88,47 +88,27 @@ class WhatsAppWebAdapter {
    * Pre-send warning overlay (non-destructive visual indicator attached to compose bar).
    */
   showPreSendWarning(findingsCount, riskLevel) {
-    const existing = document.getElementById("sharesafe-whatsapp-warning");
-    if (existing) existing.remove();
-
     const composeEl = this.getActiveComposeElement();
     if (!composeEl) return;
 
     const footer = composeEl.closest("footer") || composeEl.parentElement;
     if (!footer) return;
 
-    const banner = document.createElement("div");
-    banner.id = "sharesafe-whatsapp-warning";
-    banner.style.cssText = `
-      position: absolute;
-      bottom: 100%;
-      left: 16px;
-      right: 16px;
-      margin-bottom: 8px;
-      padding: 8px 12px;
-      background: #FCE8E7;
-      border: 1px solid #E8B4B2;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 12px;
-      color: #A74440;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      z-index: 1000;
-    `;
-
-    banner.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-weight: 700;">🛡️ ShareSafe Privacy Guard:</span>
-        <span>${findingsCount} sensitive item(s) found (${riskLevel} risk). Review or sanitize before sending.</span>
-      </div>
-      <button style="background: none; border: none; font-size: 14px; color: #A74440; cursor: pointer; padding: 0 4px;" onclick="this.parentElement.remove()">✕</button>
-    `;
-
-    footer.style.position = "relative";
-    footer.appendChild(banner);
+    window.ShareSafeUI.showComposeThreatBanner({
+      id: "sharesafe-whatsapp-warning",
+      findingsCount,
+      riskLevel,
+      mountFn: (banner) => {
+        banner.style.position = "absolute";
+        banner.style.bottom = "100%";
+        banner.style.left = "16px";
+        banner.style.right = "16px";
+        banner.style.marginBottom = "10px";
+        banner.style.zIndex = "1000";
+        footer.style.position = "relative";
+        footer.appendChild(banner);
+      }
+    });
   }
 }
 
